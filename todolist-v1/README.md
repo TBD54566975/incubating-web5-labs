@@ -1,5 +1,8 @@
-- [Summary](#summary)
-- [Longer Summary](#longer-summary)
+# Todo List App <!-- omit from toc --> 
+
+A simple TODO List App that stores TODOs in a local DWN
+
+- [Description](#description)
 - [How to run](#how-to-run)
 - [Thoughts](#thoughts)
   - [The todos can't be accessed anywhere outside of the web app.](#the-todos-cant-be-accessed-anywhere-outside-of-the-web-app)
@@ -10,10 +13,7 @@
   - [(nit) no real benefit of `schema`.](#nit-no-real-benefit-of-schema)
 
 
-## Summary
-A simple TODO List App that stores TODOs in a local DWN
-
-## Longer Summary
+## Description
 Stores todos in a DWN that's "embedded" into the webapp. More technically speaking: stores DWeb Messages as IPLD DAG-CBOR blocks that reference IPLD DAG-PB blocks (`data` property is DAG-PB) in IndexedDB.
 
 ## How to run
@@ -27,9 +27,9 @@ Pop open a browser and head over to `https://localhost:5173`.
 
 ## Thoughts
 
-TL;DR - DWNs seem kinda pointless unless a single/logical DWN can be accessed by many applications (ideally across many environments)
+**TL;DR** - DWNs seem kinda pointless unless a single/logical DWN can be accessed by many applications (ideally across many environments)
 
-TL; -
+**TL;** -
 
 Candidly, the embedded DWN in webapp usage pattern of DWNs feels a bit pointless for the following reasons:
 
