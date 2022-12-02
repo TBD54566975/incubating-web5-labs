@@ -1,6 +1,6 @@
 # Todo List App <!-- omit from toc --> 
 
-A simple TODO List App that stores TODOs in a local DWN
+A simple TODO List App that stores TODOs in a local DWN. Uses Janky implementation of DID Key for DID. Most of the meat is [here](https://github.com/TBD54566975/web5-labs/blob/main/todolist-v1/src/App.vue)
 
 - [Description](#description)
 - [How to run](#how-to-run)
