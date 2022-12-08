@@ -99,10 +99,10 @@ async function toggleTodoComplete(todoId) {
   for (let todo of todos.value) {
     if (todo.id === todoId) {
       todo.completed = !todo.completed;
-    }
 
-    toggledTodo = todo;
-    break;
+      toggledTodo = todo;
+      break;
+    }
   }
 
   const todoStringified = JSON.stringify(toggledTodo);
