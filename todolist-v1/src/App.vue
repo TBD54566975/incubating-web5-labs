@@ -55,6 +55,8 @@ onMounted(async () => {
     const todoStringified = textDecoder.decode(todoBytes);
     const todo = JSON.parse(todoStringified);
 
+    // TODO data itself does not have `recordId`, we add it after deserialization
+    todo.id = entry.recordId;
     storedTodos.push(todo);
   }
 
@@ -63,12 +65,10 @@ onMounted(async () => {
 
 async function addTodo() {
   const todo = {
-    id          : uuidv4(),
     description : newTodoDescription.value,
     completed   : false
   };
   
-  todos.value.push(todo);
   newTodoDescription.value = '';
 
   const todoStringified = JSON.stringify(todo);
@@ -79,21 +79,28 @@ async function addTodo() {
     dataFormat     : 'application/json',
     nonce          : uuidv4(),
     recipient      : state.getDID(),
-    recordId       : todo.id,
     target         : state.getDID(),
     schema         : 'http://some-schema-registry.org/todo',
     signatureInput : state.getSignatureMaterial()
   });
 
   const result = await dwn.processMessage(dwnMessage.toJSON());
+  console.log(result);
 
   if (result.status.code !== 202) {
     toast.error('Failed to write todo to DWN. check console for error');
     console.error(result);
+
+    return;
   }
+
+  // TODO data itself does not have `recordId`, we add it for easy identification
+  todo.id = dwnMessage.message.recordId;
+  todos.value.push(todo);
 }
 
 async function toggleTodoComplete(todoId) {
+  console.log(todoId);
   let toggledTodo;
   
   for (let todo of todos.value) {
@@ -121,6 +128,7 @@ async function toggleTodoComplete(todoId) {
   });
 
   const result = await dwn.processMessage(dwnMessage.toJSON());
+  console.log(result);
 
   if (result.status.code !== 202) {
     toast.error('Failed to update todo in DWN. check console for error');
