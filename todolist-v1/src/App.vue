@@ -87,14 +87,16 @@ async function addTodo() {
   const result = await dwn.processMessage(dwnMessage.toJSON());
   console.log(result);
 
-  // TODO data itself does not have `recordId`, we add it for easy identification
-  todo.id = dwnMessage.message.recordId;
-  todos.value.push(todo);
-
   if (result.status.code !== 202) {
     toast.error('Failed to write todo to DWN. check console for error');
     console.error(result);
+
+    return;
   }
+
+  // TODO data itself does not have `recordId`, we add it for easy identification
+  todo.id = dwnMessage.message.recordId;
+  todos.value.push(todo);
 }
 
 async function toggleTodoComplete(todoId) {
