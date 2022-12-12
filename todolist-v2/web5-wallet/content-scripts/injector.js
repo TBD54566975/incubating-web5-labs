@@ -32,9 +32,10 @@ document.addEventListener('1660022065712_monkeys', async function (e) {
  * @see    {@link http://stackoverflow.com/questions/20499994/access-window-variable-from-content-script}
  * @see    {@link https://stackoverflow.com/questions/9602022/chrome-extension-retrieving-global-variable-from-webpage}
  */
-function injectScript(file_path, tag = 'body') {
-  var node = document.getElementsByTagName(tag)[0];
-  var script = document.createElement('script');
+function injectScript(file_path, tag = 'html') {
+  const node = document.querySelector('html');
+  const script = document.createElement('script');
+
   script.setAttribute('type', 'text/javascript');
   script.setAttribute('src', file_path);
   node.appendChild(script);
