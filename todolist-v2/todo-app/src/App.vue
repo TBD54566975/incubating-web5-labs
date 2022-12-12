@@ -8,6 +8,8 @@ const newTodoDescription = ref('');
 const todos = ref([]);
 
 onMounted(async () => {
+  const { isAllowed } = await window.web5.dwn.requestAccess();
+  console.log('allowed?', isAllowed);
 });
 
 async function addTodo() {
