@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 import * as db from './db';
 import { openUserConsentWindow } from './utils';
 
@@ -11,8 +10,6 @@ chrome.runtime.onInstalled.addListener(async ({ _reason, _version }) => {
     console.log('creating default DID');
     await Identity.create('default');
   }
-
-
 });
 
 // controls what happens when the extension's icon is clicked
