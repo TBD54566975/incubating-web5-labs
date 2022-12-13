@@ -9,6 +9,16 @@ import { Identity } from './identity';
 
 let collections;
 
+/**
+ * @typedef {Object} Collections
+ * @property {AccessControl} AccessControl
+ * @property {Identity} Identity
+ */
+
+/**
+ * 
+ * @returns {Collections}
+ */
 export async function open() {
   if (collections) {
     return collections;

@@ -1,15 +1,55 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
+import { base64url } from 'multiformats/bases/base64';
+import { useToast } from 'vue-toastification';
 import { PlusIcon as PlusIconMini } from '@heroicons/vue/solid';
 import { CheckCircleIcon } from '@heroicons/vue/outline';
 
 const newTodoDescription = ref('');
 const todos = ref([]);
 
+const toast = useToast();
+
 onMounted(async () => {
   const { isAllowed } = await window.web5.dwn.requestAccess();
-  console.log('allowed?', isAllowed);
+  
+  if (!isAllowed) {
+    toast.error('Access to DWN is forbidden. cannot write TODOs to DWN');
+    return;
+  }
+
+  const result = await window.web5.dwn.processMessage({
+    method  : 'CollectionsQuery',
+    message : {
+      filter: {
+        schema: 'http://some-schema-registry.org/todo'
+      }
+    }
+  });
+
+  if (result.status.code !== 200) {
+    toast.error('Failed to fetch todos from DWN. check console for error');
+    console.error(result);
+
+    return;
+  }
+
+  const textDecoder = new TextDecoder();
+  const storedTodos = [];
+
+  for (let entry of result.entries) {
+    const todoBytes = base64url.baseDecode(entry.encodedData);
+    const todoStringified = textDecoder.decode(todoBytes);
+    const todo = JSON.parse(todoStringified);
+
+    // TODO data itself does not have `recordId`, we add it after deserialization
+    todo.id = entry.recordId;
+    storedTodos.push(todo);
+  }
+
+  todos.value = storedTodos;
+
 });
 
 async function addTodo() {

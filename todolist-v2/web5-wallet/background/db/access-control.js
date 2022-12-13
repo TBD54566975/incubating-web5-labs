@@ -1,3 +1,11 @@
+/**
+ * @typedef {object} Permission
+ * @property {string} domain
+ * @property {string} did
+ * @property {boolean} isAllowed
+ */
+
+
 export class AccessControl {
   /**
    * @param {import('rxdb').RxCollection} client 
@@ -10,6 +18,11 @@ export class AccessControl {
     return this.client.insert({ domain, did, isAllowed });
   }
 
+  /**
+   * 
+   * @param {*} domain - the domain to return permissions for
+   * @returns {Permission | Undefined}
+   */
   async getDomainPermissions(domain) {
     const result = await this.client.findOne({
       selector: { domain }

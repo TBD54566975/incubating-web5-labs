@@ -16,7 +16,7 @@ document.addEventListener('1660022065712_monkeys', async function (e) {
   } else {
     response = {
       id: message.id,
-      errors: [{ error: 'OP_NOT_FOUND' }]
+      error: 'CMD_NOT_FOUND'
     }
   }
 

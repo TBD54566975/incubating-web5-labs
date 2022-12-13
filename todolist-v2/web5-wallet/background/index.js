@@ -1,4 +1,8 @@
+import { CollectionsQuery } from '@tbd54566975/dwn-sdk-js';
+
 import * as db from './db';
+import * as DWN from './dwn';
+
 import { openUserConsentWindow } from './utils';
 
 chrome.runtime.onInstalled.addListener(async ({ _reason, _version }) => {
@@ -10,6 +14,8 @@ chrome.runtime.onInstalled.addListener(async ({ _reason, _version }) => {
     console.log('creating default DID');
     await Identity.create('default');
   }
+
+  await DWN.open();
 });
 
 // controls what happens when the extension's icon is clicked
@@ -38,8 +44,56 @@ chrome.runtime.onMessage.addListener(async (message, sender) => {
 
       await AccessControl.createPermission(sender.origin, did, isAllowed);
 
-      await chrome.tabs.sendMessage(sender.tab.id, { id: message.id, data: { isAllowed } });
+      await chrome.tabs.sendMessage(sender.tab.id, {
+        id: message.id,
+        data: { isAllowed }
+      });
+    }
+  } else if (message.cmd === 'DWN_PROCESS_MESSAGE') {
+    const { AccessControl, Identity } = await db.open();
+
+    const permissions = await AccessControl.getDomainPermissions(sender.origin);
+
+    if (!permissions.isAllowed) {
+      await chrome.tabs.sendMessage(sender.tab.id, {
+        id: message.id,
+        error: 'ACCESS_FORBIDDEN'
+      })
+
+      return;
+    }
+
+    const dwn = await DWN.open();
+
+    const { data } = message;
+    const identity = await Identity.getByDID(permissions.did);
+    const signatureMaterial = Identity.getDWNSignatureMaterial(identity);
+
+    if (data.method === 'CollectionsQuery') {
+
+      const collectionsQuery = await CollectionsQuery.create({
+        ...data.message,
+        target: identity.did,
+        signatureInput: signatureMaterial
+      });
+
+      const result = await dwn.processMessage(collectionsQuery.toJSON());
+
+      await chrome.tabs.sendMessage(sender.tab.id, {
+        id: message.id,
+        data: result
+      });
     }
   }
 
 });
+
+
+// await window.web5.dwn.processMessage({
+//   method: 'CollectionsQuery',
+//   message: {
+//     filter: {
+//       schema: 'http://some-schema-registry.org/todo'
+//     }
+//   }
+// });
