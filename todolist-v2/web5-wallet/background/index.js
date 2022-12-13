@@ -1,4 +1,4 @@
-import { CollectionsQuery } from '@tbd54566975/dwn-sdk-js';
+import { CollectionsQuery, CollectionsWrite } from '@tbd54566975/dwn-sdk-js';
 
 import * as db from './db';
 import * as DWN from './dwn';
@@ -83,9 +83,39 @@ chrome.runtime.onMessage.addListener(async (message, sender) => {
         id: message.id,
         data: result
       });
+    } else if (data.method === 'CollectionsWrite') {
+      // TODO: ew. `data.data` need to think of less confusing property names
+      if (data.data) {
+        const { dataFormat } = data.message;
+
+        // handle data encoding
+        if (dataFormat) {
+          if (dataFormat === 'application/json') {
+            const jsonStringified = JSON.stringify(data.data);
+            const jsonBytes = new TextEncoder().encode(jsonStringified);
+
+            data.message.data = jsonBytes;
+          }
+        }
+      }
+
+      const collectionsWrite = await CollectionsWrite.create({
+        ...data.message,
+        target: identity.did,
+        signatureInput: signatureMaterial
+      })
+
+      const result = await dwn.processMessage(collectionsWrite.toJSON());
+
+      await chrome.tabs.sendMessage(sender.tab.id, {
+        id: message.id,
+        data: {
+          record: collectionsWrite.toJSON(),
+          result
+        }
+      });
     }
   }
-
 });
 
 
