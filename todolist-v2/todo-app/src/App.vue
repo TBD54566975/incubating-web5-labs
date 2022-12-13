@@ -61,16 +61,54 @@ async function addTodo() {
   
   newTodoDescription.value = '';
 
+  // record is the DWeb message written to the DWN
+  const { record, result } = await window.web5.dwn.processMessage({
+    method  : 'CollectionsWrite',
+    data    : todo,
+    message : {
+      schema     : 'http://some-schema-registry.org/todo',
+      dataFormat : 'application/json',
+    }
+  });
+
+  console.log(result);
+
+  // add DWeb message recordId as a way to reference the message for further operations
+  // e.g. updating it or overwriting it
+  todo.id = record.recordId;
   todos.value.push(todo);
 }
 
 async function toggleTodoComplete(todoId) {
+  let toggledTodo;
+
   for (let todo of todos.value) {
     if (todo.id === todoId) {
       todo.completed = !todo.completed;
 
+      toggledTodo = todo;
       break;
     }
+  }
+
+  // currently, we have to overwrite the entire DWeb Message to update the data stored within it
+  const dwnMessage = await CollectionsWrite.create({
+    data           : todoBytes,
+    dataFormat     : 'application/json',
+    nonce          : uuidv4(),
+    recipient      : state.getDID(),
+    recordId       : toggledTodo.id,
+    target         : state.getDID(),
+    schema         : 'http://some-schema-registry.org/todo',
+    signatureInput : state.getSignatureMaterial()
+  });
+
+  const result = await dwn.processMessage(dwnMessage.toJSON());
+  console.log(result);
+
+  if (result.status.code !== 202) {
+    toast.error('Failed to update todo in DWN. check console for error');
+    console.error(result);
   }
 }
 
