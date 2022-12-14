@@ -27,6 +27,8 @@ onMounted(async () => {
     }
   });
 
+  console.log(result);
+
   if (result.status.code !== 200) {
     toast.error('Failed to fetch todos from DWN. check console for error');
     console.error(result);
@@ -84,7 +86,7 @@ async function toggleTodoComplete(todoId) {
     if (todo.id === todoId) {
       todo.completed = !todo.completed;
 
-      toggledTodo = toRaw(todo);
+      toggledTodo = { ...toRaw(todo) };
       break;
     }
   }

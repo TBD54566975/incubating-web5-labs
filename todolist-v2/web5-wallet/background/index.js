@@ -105,6 +105,8 @@ chrome.runtime.onMessage.addListener(async (message, sender) => {
         signatureInput : signatureMaterial
       });
 
+      console.log(collectionsWrite.toJSON());
+
       const result = await dwn.processMessage(collectionsWrite.toJSON());
 
       await chrome.tabs.sendMessage(sender.tab.id, {

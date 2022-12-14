@@ -45,7 +45,7 @@ onMounted(async () => {
     }
 
     todos.value = storedTodos;
-  }, 5000, { immediateCallback: true });
+  }, 1500, { immediateCallback: true });
 
 });
 </script>
