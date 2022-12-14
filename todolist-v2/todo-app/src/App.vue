@@ -1,6 +1,5 @@
 <script setup>
 import { onMounted, ref, toRaw } from 'vue';
-import { v4 as uuidv4 } from 'uuid';
 import { base64url } from 'multiformats/bases/base64';
 import { useToast } from 'vue-toastification';
 import { PlusIcon as PlusIconMini } from '@heroicons/vue/solid';
