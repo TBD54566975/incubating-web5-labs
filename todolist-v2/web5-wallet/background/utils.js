@@ -1,5 +1,5 @@
-import { v4 as uuidv4 } from "uuid";
-import { storageWatcher } from "./lib/storage-watcher";
+import { v4 as uuidv4 } from 'uuid';
+import { storageWatcher } from './lib/storage-watcher';
 
 /**
  * 
@@ -13,12 +13,12 @@ export async function openUserConsentWindow(path, data) {
 
   const currentWindow = await chrome.windows.getLastFocused();
   await chrome.windows.create({
-    width: 459,
-    height: 692,
-    top: 100,
-    left: currentWindow.width - 500,
-    type: 'popup',
-    url: `/index.html#/${path}?task=${taskId}`
+    width  : 459,
+    height : 692,
+    top    : 100,
+    left   : currentWindow.width - 500,
+    type   : 'popup',
+    url    : `/index.html#/${path}?task=${taskId}`
   });
 
   return new Promise((resolve, reject) => {

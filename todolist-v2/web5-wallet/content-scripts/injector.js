@@ -7,6 +7,7 @@ const messenger = new Messenger();
 // weird event name is an attempt to ensure some sort of uniqueness
 document.addEventListener('1660022065712_monkeys', async function (e) {
   const { detail: message } = e;
+
   const { cmd } = message;
 
   let response;
@@ -15,9 +16,9 @@ document.addEventListener('1660022065712_monkeys', async function (e) {
     response = await messenger.sendMessage(message);
   } else {
     response = {
-      id: message.id,
-      error: 'CMD_NOT_FOUND'
-    }
+      id    : message.id,
+      error : 'CMD_NOT_FOUND'
+    };
   }
 
   const event = new CustomEvent(e.detail.id, { detail: response });

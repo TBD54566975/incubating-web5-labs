@@ -87,8 +87,8 @@ export class Identity {
     const [_, __, id] = did.split(':');
 
     return {
-      protectedHeader: { alg: privateJWK.alg, kid: `${did}#${id}` },
-      jwkPrivate: privateJWK
+      protectedHeader : { alg: privateJWK.alg, kid: `${did}#${id}` },
+      jwkPrivate      : privateJWK
     };
   }
 

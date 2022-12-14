@@ -9,6 +9,7 @@
     "build:bg": "node ./bundle-background.js",
     "build:cs": "node ./bundle-content-scripts.js",
     "build": "npm run build:ui && npm run build:bg && npm run build:cs && cp ./manifest.json dist/",
+    "lint": "eslint . --fix",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -30,6 +31,9 @@
     "@vitejs/plugin-vue": "^4.0.0",
     "autoprefixer": "^10.4.13",
     "esbuild": "0.16.4",
+    "eslint": "8.22.0",
+    "eslint-plugin-import": "2.26.0",
+    "eslint-plugin-vue": "9.4.0",
     "postcss": "^8.4.19",
     "tailwindcss": "^3.2.4",
     "vite": "^4.0.0"

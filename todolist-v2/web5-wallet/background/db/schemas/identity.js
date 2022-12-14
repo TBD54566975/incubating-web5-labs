@@ -1,20 +1,20 @@
 export const IdentitySchema = {
-  title: 'identity schema',
-  version: 0,
-  primaryKey: 'did',
-  type: 'object',
-  properties: {
+  title      : 'identity schema',
+  version    : 0,
+  primaryKey : 'did',
+  type       : 'object',
+  properties : {
     name: {
-      type: 'string',
-      maxLength: 50
+      type      : 'string',
+      maxLength : 50
     },
     did: {
-      type: 'string',
-      maxLength: 60
+      type      : 'string',
+      maxLength : 60
     },
     publicJWK: {
-      type: 'object',
-      properties: {
+      type       : 'object',
+      properties : {
         alg: {
           enum: ['EdDSA']
         },
@@ -28,15 +28,15 @@ export const IdentitySchema = {
           enum: ['sig']
         },
         x: {
-          type: 'string',
-          maxLength: 50
+          type      : 'string',
+          maxLength : 50
         }
       },
       required: ['alg', 'crv', 'kty', 'use', 'x']
     },
     privateJWK: {
-      type: 'object',
-      properties: {
+      type       : 'object',
+      properties : {
         alg: {
           enum: ['EdDSA']
         },
@@ -50,17 +50,17 @@ export const IdentitySchema = {
           enum: ['sig']
         },
         x: {
-          type: 'string',
-          maxLength: 50
+          type      : 'string',
+          maxLength : 50
         },
         d: {
-          type: 'string',
-          maxLength: 50
+          type      : 'string',
+          maxLength : 50
         }
       },
       required: ['alg', 'crv', 'kty', 'use', 'x', 'd']
     }
   },
-  required: ['name', 'did', 'publicJWK', 'privateJWK'],
-  indexes: ['name']
+  required : ['name', 'did', 'publicJWK', 'privateJWK'],
+  indexes  : ['name']
 };

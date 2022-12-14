@@ -25,18 +25,18 @@ export async function open() {
   }
 
   const db = await createRxDatabase({
-    name: 'walletdb',
-    storage: getRxStorageDexie()
+    name    : 'walletdb',
+    storage : getRxStorageDexie()
   });
 
   await db.addCollections({
-    accessControl: { schema: AccessControlSchema },
-    identities: { schema: IdentitySchema }
+    accessControl : { schema: AccessControlSchema },
+    identities    : { schema: IdentitySchema }
   });
 
   collections = {
-    AccessControl: new AccessControl(db.collections.accessControl),
-    Identity: new Identity(db.collections.identities),
+    AccessControl : new AccessControl(db.collections.accessControl),
+    Identity      : new Identity(db.collections.identities),
   };
 
   return collections;

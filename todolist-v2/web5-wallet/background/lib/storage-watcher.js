@@ -1,10 +1,10 @@
 class StorageWatcher {
   constructor() {
     this.listeners = {
-      local: {},
-      session: {},
-      sync: {}
-    }
+      local   : {},
+      session : {},
+      sync    : {}
+    };
 
     chrome.storage.onChanged.addListener(async (changes, namespace) => {
       const namespaceListeners = this.listeners[namespace];

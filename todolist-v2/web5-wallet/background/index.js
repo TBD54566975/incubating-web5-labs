@@ -7,7 +7,7 @@ import { openUserConsentWindow } from './utils';
 
 chrome.runtime.onInstalled.addListener(async ({ _reason, _version }) => {
   console.log('extension installed');
-  const { Identity } = await db.open()
+  const { Identity } = await db.open();
   const [defaultIdentity] = await Identity.query({ name: 'default' }, { limit: 1 });
 
   if (!defaultIdentity) {
@@ -32,8 +32,8 @@ chrome.runtime.onMessage.addListener(async (message, sender) => {
 
     if (permissions) {
       await chrome.tabs.sendMessage(sender.tab.id, {
-        id: message.id,
-        data: {
+        id   : message.id,
+        data : {
           isAllowed: permissions.isAllowed
         }
       });
@@ -45,8 +45,8 @@ chrome.runtime.onMessage.addListener(async (message, sender) => {
       await AccessControl.createPermission(sender.origin, did, isAllowed);
 
       await chrome.tabs.sendMessage(sender.tab.id, {
-        id: message.id,
-        data: { isAllowed }
+        id   : message.id,
+        data : { isAllowed }
       });
     }
   } else if (message.cmd === 'DWN_PROCESS_MESSAGE') {
@@ -56,9 +56,9 @@ chrome.runtime.onMessage.addListener(async (message, sender) => {
 
     if (!permissions.isAllowed) {
       await chrome.tabs.sendMessage(sender.tab.id, {
-        id: message.id,
-        error: 'ACCESS_FORBIDDEN'
-      })
+        id    : message.id,
+        error : 'ACCESS_FORBIDDEN'
+      });
 
       return;
     }
@@ -73,15 +73,15 @@ chrome.runtime.onMessage.addListener(async (message, sender) => {
 
       const collectionsQuery = await CollectionsQuery.create({
         ...data.message,
-        target: identity.did,
-        signatureInput: signatureMaterial
+        target         : identity.did,
+        signatureInput : signatureMaterial
       });
 
       const result = await dwn.processMessage(collectionsQuery.toJSON());
 
       await chrome.tabs.sendMessage(sender.tab.id, {
-        id: message.id,
-        data: result
+        id   : message.id,
+        data : result
       });
     } else if (data.method === 'CollectionsWrite') {
       // TODO: ew. `data.data` need to think of less confusing property names
@@ -101,15 +101,15 @@ chrome.runtime.onMessage.addListener(async (message, sender) => {
 
       const collectionsWrite = await CollectionsWrite.create({
         ...data.message,
-        target: identity.did,
-        signatureInput: signatureMaterial
-      })
+        target         : identity.did,
+        signatureInput : signatureMaterial
+      });
 
       const result = await dwn.processMessage(collectionsWrite.toJSON());
 
       await chrome.tabs.sendMessage(sender.tab.id, {
-        id: message.id,
-        data: {
+        id   : message.id,
+        data : {
           record: collectionsWrite.toJSON(),
           result
         }
