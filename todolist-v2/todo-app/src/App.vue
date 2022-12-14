@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, toRaw } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import { base64url } from 'multiformats/bases/base64';
 import { useToast } from 'vue-toastification';
@@ -55,8 +55,7 @@ onMounted(async () => {
 async function addTodo() {
   const todo = {
     completed   : false,
-    description : newTodoDescription.value,
-    id          : uuidv4()
+    description : newTodoDescription.value
   };
   
   newTodoDescription.value = '';
@@ -64,7 +63,7 @@ async function addTodo() {
   // record is the DWeb message written to the DWN
   const { record, result } = await window.web5.dwn.processMessage({
     method  : 'CollectionsWrite',
-    data    : todo,
+    data    : toRaw(todo),
     message : {
       schema     : 'http://some-schema-registry.org/todo',
       dataFormat : 'application/json',
@@ -86,30 +85,23 @@ async function toggleTodoComplete(todoId) {
     if (todo.id === todoId) {
       todo.completed = !todo.completed;
 
-      toggledTodo = todo;
+      toggledTodo = toRaw(todo);
       break;
     }
   }
 
-  // currently, we have to overwrite the entire DWeb Message to update the data stored within it
-  const dwnMessage = await CollectionsWrite.create({
-    data           : todoBytes,
-    dataFormat     : 'application/json',
-    nonce          : uuidv4(),
-    recipient      : state.getDID(),
-    recordId       : toggledTodo.id,
-    target         : state.getDID(),
-    schema         : 'http://some-schema-registry.org/todo',
-    signatureInput : state.getSignatureMaterial()
+  delete toggledTodo.id;
+  const result = await window.web5.dwn.processMessage({
+    method  : 'CollectionsWrite',
+    data    : toggledTodo,
+    message : {
+      schema     : 'http://some-schema-registry.org/todo',
+      dataFormat : 'application/json',
+      recordId   : todoId,
+    }
   });
 
-  const result = await dwn.processMessage(dwnMessage.toJSON());
   console.log(result);
-
-  if (result.status.code !== 202) {
-    toast.error('Failed to update todo in DWN. check console for error');
-    console.error(result);
-  }
 }
 
 </script>
