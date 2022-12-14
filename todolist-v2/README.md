@@ -3,7 +3,11 @@ Stores TODOs in a DWN embedded in a chrome extension (aka web5 wallet) using the
 
 There's another webapp included here that fetches (using the `web5` API) and renders the same TODOs added through the todo app to showcase the ability to access personal data across multiple unrelated webapps.
 
-**TODO**: Include Video of project running here
+
+
+https://user-images.githubusercontent.com/4887440/207717131-3e7aa7de-d0e3-46db-b99c-3a84e5946bcd.mov
+
+
 
 # How to run
 
@@ -35,7 +39,11 @@ npm run build
 * click the puzzle icon to the right of the omnibar
 * click the pushpin icon next to Web5 Wallet
 
-**TODO**: Include walkthrough video of ^ here
+
+
+https://user-images.githubusercontent.com/4887440/207717202-5e223dee-8c06-4b77-8403-30c37e6cd500.mov
+
+
 
 ## Todo List App
 _assuming you have a terminal open and `cd`'d into `web5-labs/todolist-v2`_
