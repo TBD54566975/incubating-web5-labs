@@ -96,7 +96,8 @@ This is because the wallet is taking care of signing and serializing as a way to
 ### Access Control for data stored within DWN is far too relaxed
 In this demo, read/write access to all data is a binary yes/no. "Want to read/write TODOs to my DWN? here's full blown access to read/write **everything**". We need more fine-grained access control. DWNs have [permissions](https://identity.foundation/decentralized-web-node/spec/#permissions) but we don't have them fully implemented in the SDK.
 
-**TODO**: add image of access control popup
+<img width="414" alt="wallet-dwn-access-control" src="https://user-images.githubusercontent.com/4887440/207928278-86a0ff54-4f7a-4976-a849-9dfe86f3967a.png">
+
 
 ### Data is more usable but not really 
 It's nice that data stored within a DWN can be accessed by more than one webapp but this is still limited to a single browser installation on one specific desktop computer. Can't access this data on different devices or even different browsers on the same computer. 
