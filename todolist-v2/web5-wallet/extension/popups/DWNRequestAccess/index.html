@@ -1,0 +1,19 @@
+<html>
+<head>
+	<title data-localize="textContent">DWNRequestAccess_window_title</title>
+	<script type="module" src="/popups/DWNRequestAccess/index.mjs" defer></script>
+	<link rel="stylesheet" href="/external/tailwind.css">
+</head>
+<body class="font-tbd">
+	<header class="align-middle bg-tbd-yellow border-b border-gray-200 flex h-20 justify-center">
+		<h1 class="max-h-fit my-5 text-2xl" data-localize="textContent=extension_name">&nbsp;</h1>
+	</header>
+	<main class="mt-8 flex flex-col">
+		<p id="description" class="mx-auto">&nbsp;</p>
+		<div class="flex space-x-4 mx-4 mt-16">
+			<button id="allow" class="bg-green-600 border-transparent flex focus:outline-none focus:ring-2 focus:ring-offset-2 hover:bg-tbd-yellower justify-center px-4 py-4 rounded-md shadow-sm text-black text-md w-full" data-localize="textContent=DWNRequestAccess_allow">&nbsp;</button>
+			<button id="deny" class="bg-red-600 border-transparent flex focus:outline-none focus:ring-2 focus:ring-offset-2 hover:bg-tbd-yellower justify-center px-4 py-4 rounded-md shadow-sm text-black text-md w-full" data-localize="textContent=DWNRequestAccess_deny">&nbsp;</button>
+		</div>
+	</main>
+</body>
+</html>

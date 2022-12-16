@@ -17,7 +17,7 @@ onMounted(async () => {
   const { pause, resume, isActive } = useIntervalFn(async () => {
     const result = await window.web5.dwn.processMessage({
       method: 'CollectionsQuery',
-      message: {
+      options: {
         filter: {
           schema: 'http://some-schema-registry.org/todo'
         }
