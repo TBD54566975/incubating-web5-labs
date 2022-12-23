@@ -37,7 +37,7 @@ cd web5-labs/todolist-v2
 _assuming you have a terminal open and `cd`'d into `web5-labs/todolist-v2`_
 
 ```bash
-cd web5-wallet
+cd web5-wallet/external
 npm install
 npm run build
 ```
@@ -47,9 +47,7 @@ npm run build
 * toggle Developer Mode on (toggle should be on top right)
 * click on Load Unpacked
 * navigate to `web5-labs/todolist-v2/web5-wallet`
-* select the `dist` directory. The extension should now appear in the tiled list of installed extensions
-* click the puzzle icon to the right of the omnibar
-* click the pushpin icon next to Web5 Wallet
+* select the `extension` directory. The extension should now appear in the tiled list of installed extensions
 
 
 
