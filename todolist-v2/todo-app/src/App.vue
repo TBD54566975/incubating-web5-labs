@@ -20,7 +20,7 @@ onMounted(async () => {
 
   const result = await window.web5.dwn.processMessage({
     method  : 'CollectionsQuery',
-    message : {
+    options : {
       filter: {
         schema: 'http://some-schema-registry.org/todo'
       }
@@ -65,7 +65,7 @@ async function addTodo() {
   const { record, result } = await window.web5.dwn.processMessage({
     method  : 'CollectionsWrite',
     data    : toRaw(todo),
-    message : {
+    options : {
       schema     : 'http://some-schema-registry.org/todo',
       dataFormat : 'application/json',
     }
@@ -95,7 +95,7 @@ async function toggleTodoComplete(todoId) {
   const result = await window.web5.dwn.processMessage({
     method  : 'CollectionsWrite',
     data    : toggledTodo,
-    message : {
+    options : {
       schema     : 'http://some-schema-registry.org/todo',
       dataFormat : 'application/json',
       recordId   : todoId,

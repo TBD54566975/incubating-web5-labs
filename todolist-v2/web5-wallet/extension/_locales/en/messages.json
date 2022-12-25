@@ -1,0 +1,9 @@
+{
+	"extension_name": { "message": "Web5 Wallet" },
+	"extension_description": { "message": "injects features supporting a Web5 Wallet" },
+
+	"DWNRequestAccess_window_title": { "message": "Web5 Wallet - Access Request" },
+	"DWNRequestAccess_description": { "message": "%host% is requesting access to your DWN" },
+	"DWNRequestAccess_Allow": { "message": "Allow" },
+	"DWNRequestAccess_Deny": { "message": "Deny" }
+}
