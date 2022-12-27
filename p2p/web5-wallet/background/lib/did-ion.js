@@ -47,9 +47,11 @@ export class DIDIon {
     if (options.serviceEndpoint) {
       createOptions.services = [
         {
-          id              : 'dwn-1',
-          type            : 'DWN',
-          serviceEndpoint : options.serviceEndpoint
+          'id'              : 'dwn',
+          'type'            : 'DecentralizedWebNode',
+          'serviceEndpoint' : {
+            'nodes': [ options.serviceEndpoint ]
+          }
         }
       ];
     }
@@ -74,8 +76,6 @@ export class DIDIon {
   }
 
   static async resolve(did) {
-    const { didDocument } = await _resolve(did);
-
-    return didDocument;
+    return _resolve(did);
   }
 }

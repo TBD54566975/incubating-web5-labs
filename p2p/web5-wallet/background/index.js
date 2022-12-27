@@ -1,4 +1,7 @@
 import { CollectionsQuery, CollectionsWrite } from '@tbd54566975/dwn-sdk-js';
+import { DIDResolver } from './lib/did-resolver';
+
+const WebSocket = globalThis.WebSocket;
 
 import { AccessControlStore, IdentityStore } from './db';
 import * as DWN from './dwn';
@@ -11,10 +14,28 @@ chrome.runtime.onInstalled.addListener(async ({ _reason, _version }) => {
 
   if (!defaultIdentity) {
     console.log('creating default DID');
-    await IdentityStore.create('default', 'ion', { serviceEndpoint: 'SOME_NGROK_URL' });
+    await IdentityStore.create('default', 'ion', { serviceEndpoint: 'http://localhost:3000/dwn' });
   }
 
   await DWN.open();
+
+  // const connection = new WebSocket('ws://localhost:3000/sync');
+
+  // connection.onopen = function() {
+  //   console.log('connection opened');
+  // };
+
+  // connection.onerror = function(error) {
+  //   console.log('connection errored', error);
+  // };
+
+  // connection.onmessage = function(e) {
+  //   console.log('message recvd', e);
+  // };
+
+  // connection.onclose = function(event) {
+  //   console.log('connection closed', event);
+  // };
 });
 
 // controls what happens when the extension's icon is clicked
@@ -64,8 +85,6 @@ chrome.runtime.onMessage.addListener(async (message, sender) => {
     const identity = await IdentityStore.getByDID(permissions.did);
     const signatureMaterial = await IdentityStore.getDWNSignatureMaterial(identity);
 
-    console.log(signatureMaterial);
-
     if (data.method === 'CollectionsQuery') {
       const collectionsQuery = await CollectionsQuery.create({
         ...data.message,
@@ -103,9 +122,8 @@ chrome.runtime.onMessage.addListener(async (message, sender) => {
         signatureInput : signatureMaterial
       });
 
-      console.log(collectionsWrite.toJSON());
-
-      const result = await dwn.processMessage(collectionsWrite.toJSON());
+      const collectionsWriteJSON = collectionsWrite.toJSON();
+      const result = await dwn.processMessage(collectionsWriteJSON);
 
       await chrome.tabs.sendMessage(sender.tab.id, {
         id   : message.id,
@@ -114,6 +132,33 @@ chrome.runtime.onMessage.addListener(async (message, sender) => {
           result
         }
       });
+
+      // replicate message to Addressable DWN
+      const dwnHosts = await DIDResolver.getDWNHosts(identity.did);
+      
+      // TODO: handle multiple dwn hosts. send to all? send to at least 1 successfully?
+      const [ dwnHost ] = dwnHosts;
+
+      if (dwnHost) {
+        // TODO: handle unsuccessful responses. retry? cadence?
+        const sendResult = await DWN.send(dwnHost, collectionsWriteJSON);
+        console.log('replicate message:', sendResult);
+      }
+
+      // send message to recipient 
+      const { recipient } = collectionsWrite.message.descriptor;
+      if (recipient && recipient !== identity.did) {
+        const dwnHosts = await DIDResolver.getDWNHosts(recipient);
+
+        // TODO: handle multiple dwn hosts. send to all? send to at least 1 successfully?
+        const [ dwnHost ] = dwnHosts;
+
+        if (dwnHost) {
+          // TODO: handle unsuccessful responses. retry? cadence?
+          const sendResult = await DWN.send(dwnHost, collectionsWriteJSON);
+          console.log('send message to recipient result:', sendResult);
+        }
+      }
     }
   } else if (message.cmd === 'CREATE_ION_DID') {
     console.log(message);

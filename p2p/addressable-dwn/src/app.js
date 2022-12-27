@@ -2,7 +2,7 @@ import cors from 'cors';
 import express from 'express';
 import * as Challenge from './store/challenge.js';
 
-import { dwn } from './dwn';
+import { dwn } from './dwn.js';
 
 const app = express();
 
@@ -25,7 +25,7 @@ app.post('/tenants', express.json(), async (req, res) => {
 app.post('/dwn', express.json({ type: '*/*' }), async (req, res) => {
   const result = await dwn.processMessage(req.body);
 
-  return res.status(result.status).json(result);
+  return res.status(result.status.code).json(result);
 });
 
 
