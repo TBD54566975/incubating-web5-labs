@@ -70,7 +70,6 @@ export class MessageStore {
   }
 
   async put(messageJson, indexes) {
-    console.log('HELLO?');
     // delete `encodedData` if it exists so `messageJson` is stored without it, `encodedData` will be decoded, chunked and stored separately below
     let encodedData = undefined;
     if (messageJson['encodedData'] !== undefined) {
@@ -102,8 +101,6 @@ export class MessageStore {
       messageCid: encodedBlock.cid.toString(),
       ...indexes,
     });
-
-    console.log(evResult);
   }
 
   async query(includeCriteria, excludeCriteria) {
