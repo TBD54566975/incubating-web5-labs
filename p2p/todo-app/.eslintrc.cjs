@@ -3,12 +3,7 @@ module.exports = {
     ecmaVersion: 2022
   },
   env: {
-    node    : true,
-    browser : true
-  },
-  globals: {
-    chrome     : true,
-    globalThis : false // means it's not writable
+    node: true,
   },
   extends: [
     'eslint:recommended',
@@ -44,16 +39,6 @@ module.exports = {
       },
     }],
     'vue/static-class-names-order' : 'error',
-    'indent'                       : ['error', 2],
-    'no-unused-vars'               : [
-      'error',
-      {
-        'vars'               : 'all',
-        'args'               : 'after-used',
-        'ignoreRestSiblings' : true,
-        'argsIgnorePattern'  : '^_',
-        'varsIgnorePattern'  : '^_'
-      }
-    ]
+    'indent'                       : ['error', 2]
   }
 };

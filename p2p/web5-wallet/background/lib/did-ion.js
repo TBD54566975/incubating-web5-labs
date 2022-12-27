@@ -1,113 +1,81 @@
-import { IonDid } from '@decentralized-identity/ion-sdk';
-import * as ed25519 from '@noble/ed25519';
-import * as secp256k1 from '@noble/secp256k1';
-import { base64url } from 'multiformats/bases/base64';
+import { DID, generateKeyPair, resolve as _resolve } from '@decentralized-identity/ion-tools';
 
 /**
  * @typedef {object} GenerateOptions
  * @property {string} [serviceEndpoint] - optional serviceEndpoint to include in DID Doc
  */
 
+/**
+ * @typedef {object} KeyPair
+ * @property {import('../db/key-store').PrivateJWK} privateJwk
+ * @property {import('../db/key-store').PrivateJWK} publicJwk
+ */
 
-export class DIDION {
+/**
+ * @typedef {object} DIDIonGenerateResult
+ * @property {KeyPair} authnKeyPair
+ * @property {string} longFormDID
+ * @property {Array<object>} ops
+ * @property {KeyPair} recoveryKeyPair
+ * @property {KeyPair} updateKeyPair
+ */
+export class DIDIon {
   /**
    * 
    * @param {object} options
-   * @property {string} [serviceEndpoint] - optional serviceEndpoint to include in DID Doc
+   * @property {string} [options.serviceEndpoint] - optional serviceEndpoint to include in DID Doc
+   * @returns {DIDIonGenerateResult}
    */
   static async generate(options = {}) {
-    const recoveryKeyPair = DIDION.#generateSECP256K1KeyPair();
-    const updateKeyPair = DIDION.#generateSECP256K1KeyPair();
-    const authKeyPair = await DIDION.#generateED25519KeyPair(); 
+    const updateKeyPair = await generateKeyPair('secp256k1');
+    const recoveryKeyPair = await generateKeyPair('secp256k1');
+    
+    const authnKeyPair = await generateKeyPair('Ed25519');
+    const authnKeyId = 'key-1';
 
-    const didDocument = {
-      publicKeys: [{
-        'id'           : 'publicKeyModelEd25519',
-        'type'         : 'JsonWebKey2020',
-        'publicKeyJwk' : authKeyPair.publicJWK,
-        'purposes'     : ['authentication', 'keyAgreement']
-      }]
+    const createOptions = {
+      publicKeys: [
+        {
+          id           : authnKeyId,
+          type         : 'JsonWebKey2020',
+          publicKeyJwk : authnKeyPair.publicJwk,
+          purposes     : ['authentication']
+        }
+      ],
     };
-
 
     if (options.serviceEndpoint) {
-      didDocument.services = [{
-        id              : 'dwn',
-        type            : 'DecentralizedWebNode',
-        serviceEndpoint : {
-          nodes: [options.serviceEndpoint]
+      createOptions.services = [
+        {
+          id              : 'dwn-1',
+          type            : 'DWN',
+          serviceEndpoint : options.serviceEndpoint
         }
-      }];
+      ];
     }
 
-    const longFormDID = await IonDid.createLongFormDid({ 
-      recoveryKey : recoveryKeyPair.publicJWK, 
-      updateKey   : updateKeyPair.publicJWK, 
-      didDocument 
-    });
+    const did = new DID({ content: createOptions });
+    const longFormDID = await did.getURI('long');
+    const ops = await did.getAllOperations();
+
+    authnKeyPair.privateJwk.alg = 'EdDSA';
+    authnKeyPair.privateJwk.kid = authnKeyId;
+    
+    authnKeyPair.publicJwk.alg = 'EdDSA';
+    authnKeyPair.publicJwk.kid = authnKeyId;
 
     return {
+      authnKeyPair,
       longFormDID,
+      ops,
       recoveryKeyPair,
       updateKeyPair,
-      authKeyPair
     };
   }
 
-  static #generateSECP256K1KeyPair() {
-    const privateKeyBytes = secp256k1.utils.randomPrivateKey();
-    const publicKeyBytes =  secp256k1.getPublicKey(privateKeyBytes);
+  static async resolve(did) {
+    const { didDocument } = await _resolve(did);
 
-    // ensure public key is in uncompressed format so we can convert it into both x and y value
-    let uncompressedPublicKeyBytes;
-    if (publicKeyBytes.byteLength === 33) {
-      // this means given key is compressed
-      const publicKeyHex = secp256k1.utils.bytesToHex(publicKeyBytes);
-      const curvePoints = secp256k1.Point.fromHex(publicKeyHex);
-      uncompressedPublicKeyBytes = curvePoints.toRawBytes(false); // isCompressed = false
-    } else {
-      uncompressedPublicKeyBytes = publicKeyBytes;
-    }
-    
-    // the first byte is a header that indicates whether the key is uncompressed (0x04 if uncompressed), we can safely ignore
-    // bytes 1 - 32 represent X
-    // bytes 33 - 64 represent Y
-    
-    // skip the first byte because it's used as a header to indicate whether the key is uncompressed
-    const x = base64url.baseEncode(uncompressedPublicKeyBytes.subarray(1, 33));
-    const y = base64url.baseEncode(uncompressedPublicKeyBytes.subarray(33, 65));
-    
-    const publicJWK = {
-      kty : 'EC',
-      crv : 'secp256k1',
-      x,
-      y
-    };
-
-    const privateJWK = { 
-      ...publicJWK, 
-      d: base64url.baseEncode(privateKeyBytes)
-    };
-
-    return { publicJWK, privateJWK };
-  }
-
-  static async #generateED25519KeyPair() {
-    const privateKeyBytes = ed25519.utils.randomPrivateKey();
-    const publicKeyBytes = await ed25519.getPublicKey(privateKeyBytes);
-
-    const publicJWK = {
-      alg : 'EdDSA',
-      kty : 'OKP',
-      crv : 'Ed25519',
-      x   : base64url.baseEncode(publicKeyBytes)
-    };
-    
-    const privateJWK = { 
-      ...publicJWK, 
-      d: base64url.baseEncode(privateKeyBytes)
-    };
-
-    return { publicJWK, privateJWK };
+    return didDocument;
   }
 }

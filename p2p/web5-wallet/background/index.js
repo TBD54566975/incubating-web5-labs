@@ -1,18 +1,17 @@
 import { CollectionsQuery, CollectionsWrite } from '@tbd54566975/dwn-sdk-js';
 
-import * as db from './db';
+import { AccessControlStore, IdentityStore } from './db';
 import * as DWN from './dwn';
 
 import { openUserConsentWindow } from './utils';
 
 chrome.runtime.onInstalled.addListener(async ({ _reason, _version }) => {
   console.log('extension installed');
-  const { Identity } = await db.open();
-  const [defaultIdentity] = await Identity.query({ name: 'default' }, { limit: 1 });
+  const defaultIdentity = await IdentityStore.getByName('default');
 
   if (!defaultIdentity) {
     console.log('creating default DID');
-    await Identity.create('default');
+    await IdentityStore.create('default', 'ion', { serviceEndpoint: 'SOME_NGROK_URL' });
   }
 
   await DWN.open();
@@ -26,9 +25,7 @@ chrome.action.onClicked.addListener(async _ => {
 
 chrome.runtime.onMessage.addListener(async (message, sender) => {
   if (message.cmd === 'DWN_REQUEST_ACCESS') {
-    const { AccessControl, Identity } = await db.open();
-
-    const permissions = await AccessControl.getDomainPermissions(sender.origin);
+    const permissions = await AccessControlStore.getDomainPermissions(sender.origin);
 
     if (permissions) {
       await chrome.tabs.sendMessage(sender.tab.id, {
@@ -40,9 +37,9 @@ chrome.runtime.onMessage.addListener(async (message, sender) => {
     } else {
       // show user consent prompt if no permissions exist for domain yet
       const isAllowed = await openUserConsentWindow('user-consent/dwn-access', { requestingDomain: sender.origin });
-      const { did } = await Identity.getByName('default');
+      const { did } = await IdentityStore.getByName('default');
 
-      await AccessControl.createPermission(sender.origin, did, isAllowed);
+      await AccessControlStore.createPermission(sender.origin, did, isAllowed);
 
       await chrome.tabs.sendMessage(sender.tab.id, {
         id   : message.id,
@@ -50,9 +47,7 @@ chrome.runtime.onMessage.addListener(async (message, sender) => {
       });
     }
   } else if (message.cmd === 'DWN_PROCESS_MESSAGE') {
-    const { AccessControl, Identity } = await db.open();
-
-    const permissions = await AccessControl.getDomainPermissions(sender.origin);
+    const permissions = await AccessControlStore.getDomainPermissions(sender.origin);
 
     if (!permissions.isAllowed) {
       await chrome.tabs.sendMessage(sender.tab.id, {
@@ -66,8 +61,10 @@ chrome.runtime.onMessage.addListener(async (message, sender) => {
     const dwn = await DWN.open();
 
     const { data } = message;
-    const identity = await Identity.getByDID(permissions.did);
-    const signatureMaterial = Identity.getDWNSignatureMaterial(identity);
+    const identity = await IdentityStore.getByDID(permissions.did);
+    const signatureMaterial = await IdentityStore.getDWNSignatureMaterial(identity);
+
+    console.log(signatureMaterial);
 
     if (data.method === 'CollectionsQuery') {
       const collectionsQuery = await CollectionsQuery.create({
@@ -75,6 +72,8 @@ chrome.runtime.onMessage.addListener(async (message, sender) => {
         target         : identity.did,
         signatureInput : signatureMaterial
       });
+
+      console.log(collectionsQuery.toJSON());
 
       const result = await dwn.processMessage(collectionsQuery.toJSON());
 

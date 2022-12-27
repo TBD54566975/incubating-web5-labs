@@ -1,0 +1,34 @@
+{
+  "name": "todolist-v1",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@headlessui/vue": "1.7.4",
+    "@heroicons/vue": "1.0.6",
+    "@noble/ed25519": "1.7.1",
+    "@tbd54566975/dwn-sdk-js": "0.0.13-unstable-20221208-1",
+    "@vueuse/core": "9.6.0",
+    "multiformats": "10.0.2",
+    "uuid": "9.0.0",
+    "varint": "6.0.0",
+    "vue": "^3.2.41",
+    "vue-toastification": "^2.0.0-rc.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "0.5.3",
+    "@vitejs/plugin-vue": "^3.2.0",
+    "autoprefixer": "^10.4.13",
+    "eslint": "8.22.0",
+    "eslint-plugin-import": "2.26.0",
+    "eslint-plugin-vue": "9.4.0",
+    "postcss": "^8.4.19",
+    "tailwindcss": "3.2.4",
+    "vite": "^3.2.3"
+  }
+}
