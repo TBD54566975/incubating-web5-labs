@@ -44,7 +44,6 @@ export class MessageStore {
     }
 
     const decodedBlock = await Block.decode({ bytes, codec: CBOR, hasher: sha256 });
-
     const messageJson = decodedBlock.value;
 
     if (!messageJson.descriptor['dataCid']) {
@@ -96,7 +95,7 @@ export class MessageStore {
       for await (const _ of chunk) { ; }
     }
 
-    const evResult = await this.#eventLog.put({
+    await this.#eventLog.put({
       _id: MessageStore.#generateID(),
       messageCid: encodedBlock.cid.toString(),
       ...indexes,
