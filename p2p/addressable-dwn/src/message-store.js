@@ -10,6 +10,7 @@ import { Encoder } from './encoder.js';
 import { exporter } from 'ipfs-unixfs-exporter';
 import { importer } from 'ipfs-unixfs-importer';
 import { sha256 } from 'multiformats/hashes/sha2';
+import { base58btc } from 'multiformats/bases/base58';
 import { Blockstore } from './block-store.js';
 
 PouchDB.plugin(pouchFind);
@@ -95,9 +96,13 @@ export class MessageStore {
       for await (const _ of chunk) { ; }
     }
 
+    const { target } = indexes;
+    const targetHashed = await MessageStore.#hash(target);
+
     await this.#eventLog.put({
-      _id: MessageStore.#generateID(),
+      _id: MessageStore.generateID(targetHashed),
       messageCid: encodedBlock.cid.toString(),
+      targetHashed,
       ...indexes,
     });
   }
@@ -131,7 +136,17 @@ export class MessageStore {
    * returns system time as a plain ISO date string with microsecond precision
    * using @js-temporal/polyfill
    */
-  static #generateID() {
-    return Temporal.Now.instant().epochNanoseconds.toString();
+  static generateID(prefix) {
+    const now = Temporal.Now.instant().epochNanoseconds.toString();
+
+    return `${prefix}:${now}`;
+  }
+
+  static async #hash(prefix) {
+    const bytes = Encoder.stringToBytes(prefix);
+    const bytesHashed = await sha256.encode(bytes);
+    const hashBase58BtcEncoded = base58btc.baseEncode(bytesHashed);
+
+    return hashBase58BtcEncoded;
   }
 }
