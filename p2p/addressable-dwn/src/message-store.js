@@ -13,15 +13,20 @@ import { sha256 } from 'multiformats/hashes/sha2';
 import { base58btc } from 'multiformats/bases/base58';
 import { Blockstore } from './block-store.js';
 
+// TODO: create typedef for `Event`
+// TODO: separate event-log from index because we'll want to delete stuff from the index but never from the event log
+
 PouchDB.plugin(pouchFind);
 
 export class MessageStore {
   #eventLog;
   #messageStore;
+  #eventListeners;
 
   constructor() {
     this.#eventLog = new PouchDB('message-event-log');
     this.#messageStore = new Blockstore('messages');
+    this.#eventListeners = { put: [] };
   }
 
   async open() {
@@ -99,12 +104,21 @@ export class MessageStore {
     const { target } = indexes;
     const targetHashed = await MessageStore.#hash(target);
 
-    await this.#eventLog.put({
+    const event = {
       _id: MessageStore.generateID(targetHashed),
       messageCid: encodedBlock.cid.toString(),
       targetHashed,
       ...indexes,
-    });
+    };
+
+    await this.#eventLog.put(event);
+
+    const eventListeners = this.#eventListeners['put'];
+
+    // TODO: potentially parallelize 
+    for (let listener of eventListeners) {
+      await listener(event);
+    }
   }
 
   async query(includeCriteria, excludeCriteria) {
@@ -130,6 +144,55 @@ export class MessageStore {
     // TODO: Implement data deletion in Collections - https://github.com/TBD54566975/dwn-sdk-js/issues/84
     await this.#messageStore.delete(cid);
     return;
+  }
+
+  /**
+   * TODO: decide whether the first arg should be a generalized query or explictly `target`
+   * @param {string} target - the target to get event log for
+   * @param {string} [watermark]  - where to start
+   * @returns 
+   */
+  async getEventLog(target, watermark) {
+    const targetHashed = await MessageStore.#hash(target);
+    let startKey;
+
+    if (watermark) {
+      startKey = `${targetHashed}:${watermark}`;
+    } else {
+      // if `watermark` isn't provideed, find it by getting the first event for target
+      const { docs } = await eventLog.find({
+        selector: { targetHashed },
+        limit: 1
+      });
+
+      const [doc] = docs;
+
+      if (!doc) {
+        return [];
+      }
+
+      startKey = doc._id;
+    }
+
+    // generate the latest possible key for the target. this limits the events returned to only the target's
+    const endKey = MessageStore.generateID(targetHashed);
+
+    const { rows: targetEvents } = await eventLog.allDocs({
+      include_docs: true,
+      startkey: startKey,
+      endkey: endKey
+    });
+
+    return targetEvents;
+  }
+
+  /**
+   * registers a callback to be triggered whenever the event provided occurs
+   * @param {'put'} event 
+   * @param {Function} callback 
+   */
+  on(event, callback) {
+    this.#eventListeners[event] = callback;
   }
 
   /**
