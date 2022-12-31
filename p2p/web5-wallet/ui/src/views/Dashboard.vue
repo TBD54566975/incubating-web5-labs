@@ -1,20 +1,25 @@
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
+// import { Background } from '../background-request';
+
 
 const identityName = ref('');
 const dwnProviderHostname = ref('');
 
 async function weehee() {
   console.log('hello?');
-  await chrome.runtime.sendMessage({
-    id   : Date.now(),
-    cmd  : 'CREATE_ION_DID',
-    data : {
-      dwnProviderHostname,
-      identityName,
-    },
-  });
+  // await chrome.runtime.sendMessage({
+  //   id   : Date.now(),
+  //   cmd  : 'CREATE_ION_DID',
+  //   data : {
+  //     dwnProviderHostname,
+  //     identityName,
+  //   },
+  // });
 }
+
+onMounted(async () => {
+});
 </script>
 
 <template>

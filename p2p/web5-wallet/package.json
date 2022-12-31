@@ -19,6 +19,7 @@
     "@tbd54566975/dwn-sdk-js": "0.0.16",
     "eventemitter3": "4.0.7",
     "multiformats": "9.6.4",
+    "path-to-regexp": "6.2.1",
     "pouchdb": "8.0.0",
     "pouchdb-find": "8.0.0",
     "rxdb": "^12.7.16",

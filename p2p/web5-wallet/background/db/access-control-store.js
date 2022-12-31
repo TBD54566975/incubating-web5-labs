@@ -9,6 +9,7 @@ import { db } from './client';
  */
 
 
+// TODO: rename to PermissionStore
 export class AccessControlStore {
   static createPermission(domain, did, isAllowed) {
     return db.put({

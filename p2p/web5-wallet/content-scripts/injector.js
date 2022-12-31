@@ -1,6 +1,6 @@
 import { Messenger } from './lib/messenger';
 
-const COMMANDS = new Set(['DWN_REQUEST_ACCESS', 'DWN_PROCESS_MESSAGE']);
+const COMMANDS = new Set(['web5.dwn.requestAccess', 'web5.dwn.processMessage']);
 const messenger = new Messenger();
 
 
@@ -33,7 +33,7 @@ document.addEventListener('1660022065712_monkeys', async function (e) {
  * @see    {@link http://stackoverflow.com/questions/20499994/access-window-variable-from-content-script}
  * @see    {@link https://stackoverflow.com/questions/9602022/chrome-extension-retrieving-global-variable-from-webpage}
  */
-function injectScript(file_path, tag = 'html') {
+function injectScript(file_path) {
   const node = document.querySelector('html');
   const script = document.createElement('script');
 

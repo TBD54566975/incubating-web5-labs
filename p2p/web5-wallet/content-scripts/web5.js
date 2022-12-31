@@ -3,7 +3,7 @@ console.log('injected web5 onto window!');
 window.web5 = {
   dwn: {
     requestAccess: async function () {
-      const { data, error } = await window.web5.send('DWN_REQUEST_ACCESS');
+      const { data, error } = await window.web5.send('web5.dwn.requestAccess');
 
       // TODO: better error handling.
       if (error) {
@@ -15,7 +15,7 @@ window.web5 = {
     },
 
     processMessage: async function (message) {
-      const { data, error } = await window.web5.send('DWN_PROCESS_MESSAGE', message);
+      const { data, error } = await window.web5.send('web5.dwn.processMessage', message);
 
       if (error) {
         throw new Error(error);

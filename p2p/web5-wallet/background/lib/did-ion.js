@@ -7,8 +7,8 @@ import { DID, generateKeyPair, resolve as _resolve } from '@decentralized-identi
 
 /**
  * @typedef {object} KeyPair
- * @property {import('../db/key-store').PrivateJWK} privateJwk
- * @property {import('../db/key-store').PrivateJWK} publicJwk
+ * @property {import('../../shared/db/key-store').PrivateJWK} privateJwk
+ * @property {import('../../shared/db/key-store').PrivateJWK} publicJwk
  */
 
 /**

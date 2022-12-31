@@ -92,6 +92,16 @@ export class IdentityStore {
     return docs[0];
   }
 
+  static async getAllIdentities() {
+    const { docs } = await db.find({
+      selector: { 
+        type: '__identity__'
+      },
+    });
+
+    return docs;
+  }
+
   /**
    * **note**: works for did:key only right now!
    * @param {Identity} identity 
