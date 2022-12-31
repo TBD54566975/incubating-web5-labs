@@ -7,6 +7,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+did-state.json
 messages
 message-event-log
 BLOCKSTORE
