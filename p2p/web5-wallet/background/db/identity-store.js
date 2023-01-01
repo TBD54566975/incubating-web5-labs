@@ -3,6 +3,7 @@ import { db } from './client';
 import { DIDKey } from '../lib/did-key';
 import { DIDIon } from '../lib/did-ion';
 import { KeyStore } from './key-store';
+import dayjs from 'dayjs';
 
 /**
  * @typedef {object} Identity
@@ -34,7 +35,7 @@ export class IdentityStore {
       const didDoc = DIDKey.resolve(did);
 
       await KeyStore.save(did, privateJWK, didDoc.authentication[0], 'private');
-      await db.put({ _id: uuidv4(), type: '__identity__', did, didMethod, name });
+      await db.put({ _id: uuidv4(), type: '__identity__', did, didMethod, name, dateCreated: dayjs().toISOString() });
     } else if (didMethod === 'ion') {
       const { 
         authnKeyPair, 
