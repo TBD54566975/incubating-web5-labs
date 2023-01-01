@@ -1,5 +1,24 @@
 import { match } from 'path-to-regexp';
 
+/**
+ * @typedef {object} Request
+ * @property {string} endpoint
+ * @property {object} [params] - query params
+ * @property {object} [data] - request body
+ */
+
+/**
+ * @typedef {object} Response
+ * @property {number} [status=200] - response status
+ * @property {any} [data] - response data returned to the requester
+ */
+
+/**
+ * @callback Handler
+ * @param {Request} request
+ * @returns {Promise<Response>}
+ */
+
 export class RequestRouter {
   #routes;
 
@@ -57,18 +76,38 @@ export class RequestRouter {
     });
   }
 
+  /**
+   * registers a handler at the route provided
+   * @param {string} route 
+   * @param {Handler} handler 
+   */
   delete(route, handler) {
     this.#addRoute('delete', route, handler);
   }
 
+  /**
+   * registers a handler at the route provided
+   * @param {string} route 
+   * @param {Handler} handler 
+   */
   get(route, handler) {
     this.#addRoute('get', route, handler);
   }
 
+  /**
+   * registers a handler at the route provided
+   * @param {string} route 
+   * @param {Handler} handler 
+   */
   post(route, handler) {
     this.#addRoute('post', route, handler);
   }
 
+  /**
+   * registers a handler at the route provided
+   * @param {string} route 
+   * @param {Handler} handler 
+   */
   put(route, handler) {
     this.#addRoute('put', route, handler);
   }
