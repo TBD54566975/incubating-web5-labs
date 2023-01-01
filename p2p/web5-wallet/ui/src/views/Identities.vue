@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
+import { ClipboardDocumentIcon } from '@heroicons/vue/24/outline';
 import { BackgroundRequest } from '../background-request';
 import Modal from '../components/Modal.vue';
 import CreateIonDidForm from '../components/CreateIonDidForm.vue';
@@ -11,6 +12,10 @@ onMounted(async () => {
   const { data } = await BackgroundRequest.get('/identities');
   identities.value = data;
 });
+
+async function copyDidToClipboard(identity) {
+  await navigator.clipboard.writeText(identity.did);
+}
 
 </script>
 
@@ -63,8 +68,9 @@ onMounted(async () => {
                 <td class="font-medium md:pl-0 pl-4 pr-3 py-4 sm:pl-6 text-gray-900 text-sm whitespace-nowrap">
                   {{ identity.name }}
                 </td>
-                <td class="px-3 py-4 text-gray-500 text-sm whitespace-nowrap">
-                  {{ identity.did }}
+                <td class="flex px-3 py-4 space-x-2 text-gray-500 text-sm whitespace-nowrap">
+                  {{ identity.didMethod }}
+                  <ClipboardDocumentIcon class="cursor-pointer h-6 text-black w-6" @click="copyDidToClipboard(identity)" />
                 </td>
                 <td class="px-3 py-4 text-gray-500 text-sm whitespace-nowrap">
                   <a href="#" class="hover:text-indigo-900 text-indigo-600">Resolve</a>

@@ -1,13 +1,38 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, defineEmits } from 'vue';
+import { BackgroundRequest } from '../background-request';
+
+const emit = defineEmits(['submitted']);
 
 const identityName = ref('');
 const dwnProviderHostname = ref('');
+
+async function createIdentity() {
+  const payload = {
+    didMethod : 'ion',
+    name      : identityName.value
+  };
+
+  if (dwnProviderHostname.value) {
+    payload.options = {
+      serviceEndpoint: dwnProviderHostname.value
+    };
+  }
+
+  console.log(payload);
+
+  const resp = await BackgroundRequest.post('/identities', payload);
+
+  // TODO: handle non-201 status codes
+  if (resp.status === 201) {
+    emit('submitted');
+  }
+}
 </script>
 
 <template>
   <div class="font-tbd">
-    <form @submit.prevent="weehee">
+    <form @submit.prevent="createIdentity">
       <!-- Title -->
       <div class="text-lg">
         Create ION DID

@@ -1,5 +1,7 @@
 import { IdentityStore } from '../db';
 
 export async function getIdentities(_request) {
-  return await IdentityStore.getAllIdentities();
+  const identities = await IdentityStore.getAllIdentities();
+
+  return { data: identities };
 }

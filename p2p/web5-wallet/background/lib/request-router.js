@@ -18,7 +18,7 @@ export class RequestRouter {
         return;
       }
 
-      const routes = this.#routes[message.method];
+      const routes = this.#routes[method];
       let matchedRoute;
 
       for (let route of routes) {
@@ -43,8 +43,9 @@ export class RequestRouter {
         });
 
         return chrome.tabs.sendMessage(sender.tab.id, {
-          id   : message.id,
-          data : result
+          id     : message.id,
+          status : result.status || 200,
+          data   : result.data
         });
       } catch(e) {
         console.error(e);

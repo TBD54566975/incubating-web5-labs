@@ -71,8 +71,6 @@ export class KeyStore {
       limit: 1
     });
 
-    console.log(docs);
-
     return docs[0];
   }
 }

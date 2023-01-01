@@ -22,14 +22,13 @@ import dayjs from 'dayjs';
 
 export class IdentityStore {
   /**
-   * TODO: decouple did-generation logic
    * @param {string} name - human-friendly name
    * @param {'key' | 'ion'} didMethod
    * @param {object} options
    * @returns {Promise<void>}
    */
   static async create(name, didMethod, options = {}) {
-
+    // TODO: decouple did-generation logic
     if (didMethod === 'key') {
       const { did, privateJWK } = await DIDKey.generate();
       const didDoc = DIDKey.resolve(did);
@@ -37,25 +36,15 @@ export class IdentityStore {
       await KeyStore.save(did, privateJWK, didDoc.authentication[0], 'private');
       await db.put({ _id: uuidv4(), type: '__identity__', did, didMethod, name, dateCreated: dayjs().toISOString() });
     } else if (didMethod === 'ion') {
-      const { 
-        authnKeyPair, 
-        longFormDID, 
-        _ops,
-        _recoveryKeyPair, 
-        _updateKeyPair 
-      } = await DIDIon.generate(options);
+      
+      // TODO: save recovery and update keys
+      // TODO: save ops at some point maybe
+      // TODO: save authn public key?
+      const { authnKeyPair, longFormDID } = await DIDIon.generate(options);
 
       await KeyStore.save(longFormDID, authnKeyPair.privateJwk, authnKeyPair.privateJwk.kid, 'private');
 
-      // TODO: save recovery and update keys
-      // await KeyStore.save(longFormDID, recoveryKeyPair.privateJwk, 'recovery', 'private');
-      // await KeyStore.save(longFormDID, recoveryKeyPair.publicJwk, 'recovery', 'public');
-      
-      // await KeyStore.save(longFormDID, updateKeyPair.privateJwk, 'update', 'private');
-      // await KeyStore.save(longFormDID, updateKeyPair.publicJwk, 'update', 'public');
-
-      // TODO: save ops at some point maybe
-      await db.put({ _id: uuidv4(), type: '__identity__', did: longFormDID, didMethod, name });
+      await db.put({ _id: uuidv4(), type: '__identity__', did: longFormDID, didMethod, name, dateCreated: dayjs().toISOString() });
     } else {
       throw new Error(`did method ${didMethod} not supported`);
     }

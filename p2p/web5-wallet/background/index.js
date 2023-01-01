@@ -8,6 +8,7 @@ import { requestAccess } from './message-handlers/dwn/request-access';
 import { processMessage } from './message-handlers/dwn/process-message';
 
 import { getIdentities } from './request-handlers/get-identities';
+import { createIdentity } from './request-handlers/create-identity';
 
 
 // const WebSocket = globalThis.WebSocket;
@@ -50,8 +51,7 @@ chrome.action.onClicked.addListener(async _ => {
 
 const requestRouter = new RequestRouter();
 requestRouter.get('/identities', getIdentities);
-// TODO: implement
-// requestRouter.post('/identities', createIdentity);
+requestRouter.post('/identities', createIdentity);
 
 const messageRouter = new MessageRouter();
 messageRouter.on('web5.dwn.requestAccess', requestAccess);
