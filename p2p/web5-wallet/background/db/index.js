@@ -1,3 +1,3 @@
-export { AccessControlStore } from './access-control-store';
+export { PermissionStore } from './permission-store';
 export { IdentityStore } from './identity-store';
 export { KeyStore } from './key-store';

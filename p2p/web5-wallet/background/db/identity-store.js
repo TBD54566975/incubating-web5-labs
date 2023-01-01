@@ -21,7 +21,7 @@ import { KeyStore } from './key-store';
 
 export class IdentityStore {
   /**
-   * 
+   * TODO: decouple did-generation logic
    * @param {string} name - human-friendly name
    * @param {'key' | 'ion'} didMethod
    * @param {object} options
@@ -103,7 +103,7 @@ export class IdentityStore {
   }
 
   /**
-   * **note**: works for did:key only right now!
+   * TODO: move to another place
    * @param {Identity} identity 
    * @returns {SignatureMaterial}
    */

@@ -1,4 +1,4 @@
-import { AccessControlStore, IdentityStore } from '../../../db';
+import { PermissionStore, IdentityStore } from '../../../db';
 import { handleCollectionsQuery } from './collections-query';
 import { handleCollectionsWrite } from './collections-write';
 
@@ -20,7 +20,7 @@ export async function processMessage(ctx, data) {
     throw new Error(`${data.method} not supported.`);
   }
   
-  const permissions = await AccessControlStore.getDomainPermissions(ctx.sender.origin);
+  const permissions = await PermissionStore.getDomainPermissions(ctx.sender.origin);
 
   if (!permissions.isAllowed) {
     return { error: 'Access Forbidden' };
