@@ -68,9 +68,9 @@ async function copyDidToClipboard(identity) {
                 <td class="font-medium md:pl-0 pl-4 pr-3 py-4 sm:pl-6 text-gray-900 text-sm whitespace-nowrap">
                   {{ identity.name }}
                 </td>
-                <td class="flex px-3 py-4 space-x-2 text-gray-500 text-sm whitespace-nowrap">
-                  {{ identity.didMethod }}
-                  <ClipboardDocumentIcon class="cursor-pointer h-6 text-black w-6" @click="copyDidToClipboard(identity)" />
+                <td class="align-middle flex px-3 py-4 space-x-2 text-gray-500 text-sm whitespace-nowrap">
+                  <span>{{ identity.didMethod }}</span>
+                  <ClipboardDocumentIcon class="cursor-pointer h-5 text-black w-5" @click="copyDidToClipboard(identity)" />
                 </td>
                 <td class="px-3 py-4 text-gray-500 text-sm whitespace-nowrap">
                   <a href="#" class="hover:text-indigo-900 text-indigo-600">Resolve</a>
