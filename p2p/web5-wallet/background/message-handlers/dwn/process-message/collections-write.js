@@ -1,5 +1,7 @@
-import { CollectionsWrite } from '@tbd54566975/dwn-sdk-js';
 import * as DWN from '../../../dwn';
+
+import { CollectionsWrite } from '@tbd54566975/dwn-sdk-js';
+import { DIDResolver } from '../../../lib/did-resolver';
 
 /**
  * TODO: fill out
@@ -35,19 +37,7 @@ export async function handleCollectionsWrite(ctx, data) {
   const dwn = await DWN.open();
   const result = await dwn.processMessage(collectionsWriteJSON);
 
-  // TODO: replicate message to Addressable DWN
-  // const dwnHosts = await DIDResolver.getDWNHosts(identity.did);
-      
-  // TODO: handle multiple dwn hosts. send to all? send to at least 1 successfully?
-  // const [ dwnHost ] = dwnHosts;
-  
-  // if (dwnHost) {
-  //   TODO: handle unsuccessful responses. retry? cadence?
-  //   const sendResult = await DWN.send(dwnHost, collectionsWriteJSON);
-  //   console.log('replicate message:', sendResult);
-  // }
-
-  // TODO: send message to recipient 
+  //! send message to recipient 
   // const { recipient } = collectionsWrite.message.descriptor;
   // if (recipient && recipient !== identity.did) {
   //   const dwnHosts = await DIDResolver.getDWNHosts(recipient);

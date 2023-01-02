@@ -1,10 +1,12 @@
 import { PermissionStore, IdentityStore } from '../../../db';
 import { handleCollectionsQuery } from './collections-query';
 import { handleCollectionsWrite } from './collections-write';
+import { handleProtocolsConfigure } from './protocols-configure';
 
 const dwnMethodHandlers = {
-  'CollectionsQuery' : handleCollectionsQuery,
-  'CollectionsWrite' : handleCollectionsWrite
+  'CollectionsQuery'   : handleCollectionsQuery,
+  'CollectionsWrite'   : handleCollectionsWrite,
+  'ProtocolsConfigure' : handleProtocolsConfigure
 };
 
 /**

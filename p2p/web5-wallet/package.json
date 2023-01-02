@@ -13,6 +13,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "message-store-level-v2": "file:../message-store-level-v2",
     "@heroicons/vue": "2.0.13",
     "@headlessui/vue": "1.7.7",
     "@decentralized-identity/ion-tools": "1.0.3",

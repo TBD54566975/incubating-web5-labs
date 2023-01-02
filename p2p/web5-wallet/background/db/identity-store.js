@@ -7,9 +7,11 @@ import dayjs from 'dayjs';
 
 /**
  * @typedef {object} Identity
+ * @property {string} _id
  * @property {string} name
  * @property {string} did
  * @property {'key' | 'ion'} didMethod
+ * @property {'string'} dateCreated
  */
 
 /**
@@ -82,6 +84,10 @@ export class IdentityStore {
     return docs[0];
   }
 
+  /**
+   * 
+   * @returns {Promise<Identity[]>}
+   */
   static async getAllIdentities() {
     const { docs } = await db.find({
       selector: { 

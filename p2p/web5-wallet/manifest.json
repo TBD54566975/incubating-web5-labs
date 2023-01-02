@@ -18,6 +18,7 @@
     "<all_urls>"
   ],
   "permissions": [
+    "alarms",
     "notifications",
     "storage",
     "scripting",

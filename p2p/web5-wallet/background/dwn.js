@@ -1,10 +1,12 @@
 import { Dwn } from '@tbd54566975/dwn-sdk-js';
+import { MessageStore } from 'message-store-level-v2';
 
 let dwn;
+export const messageStore = new MessageStore();
 
 export async function open() {
   if (!dwn) {
-    dwn = await Dwn.create({});
+    dwn = await Dwn.create({ messageStore });
   }
 
   return dwn;
@@ -19,7 +21,8 @@ export async function send(host, message) {
   // TODO: handle request failure
   console.log('sending to', host);
   try {
-    const response = await fetch(host, {
+    // TODO: remove /dwn
+    const response = await fetch(`${host}/dwn`, {
       method : 'POST',
       body   : JSON.stringify(message)
     });
@@ -29,6 +32,4 @@ export async function send(host, message) {
   } catch (error) {
     console.log(error);
   }
-
-
 }
