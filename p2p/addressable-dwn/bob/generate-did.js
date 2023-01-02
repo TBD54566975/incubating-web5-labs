@@ -32,7 +32,7 @@ const did = new DID({ content: createOptions });
 const longFormDID = await did.getURI('long');
 const ops = await did.getAllOperations();
 
-const kid = `${longFormDID}:${authnKeyId}`
+const kid = `${longFormDID}#${authnKeyId}`
 const alg = 'EdDSA';
 
 authnKeyPair.privateJwk.alg = alg;

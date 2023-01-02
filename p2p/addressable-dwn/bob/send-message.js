@@ -16,7 +16,7 @@ const bob = JSON.parse(didState);
 const questions = [{
   type: 'text',
   name: 'recipient',
-  message: 'who do you want to message (must be an ION DID)?'
+  message: 'who do you want to message?'
 }, {
   type: 'text',
   name: 'messageText',
@@ -63,20 +63,28 @@ const message = await CollectionsWrite.create({
   data: directMessageBytes,
   dataFormat: 'application/json',
   recipient,
-  schema: 'http://localhost:3000/schemas/direct-message.json',
+  target: recipient,
+  protocol: 'chat',
+  schema: 'chat/thread',
   signatureInput: bob.signatureMaterial,
 });
+
+console.log(message.toJSON());
 
 try {
   // TODO: handle multiple dwn hosts. send to all? send to at least 1 successfully?
   const [dwnHost] = dwnHosts;
 
-  const sendResult = await fetch(dwnHost, {
+  console.log(`${dwnHost}/dwn`);
+
+  const response = await fetch(`${dwnHost}/dwn`, {
     method: 'POST',
-    body: JSON.stringify(message)
+    body: JSON.stringify(message.toJSON())
   });
 
-  console.log(`message sent! result: ${JSON.stringify(sendResult, null, 4)}`);
+  const responseBody = await response.json();
+
+  console.log(`message sent! result: ${JSON.stringify(responseBody, null, 4)}`);
 } catch (error) {
   console.error(`Failed to send message to recipient. Error: ${error.message}`);
   process.exit(1);

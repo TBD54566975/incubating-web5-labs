@@ -11,6 +11,7 @@ did-state.json
 messages
 message-event-log
 BLOCKSTORE
+EVENTLOG
 INDEX
 tmp
 node_modules

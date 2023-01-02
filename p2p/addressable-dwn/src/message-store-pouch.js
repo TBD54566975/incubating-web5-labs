@@ -18,7 +18,7 @@ import { Blockstore } from './block-store.js';
 
 PouchDB.plugin(pouchFind);
 
-export class MessageStore {
+export class MessageStorePouch {
   #eventLog;
   #messageStore;
   #eventListeners;
@@ -102,10 +102,10 @@ export class MessageStore {
     }
 
     const { target } = indexes;
-    const targetHashed = await MessageStore.#hash(target);
+    const targetHashed = await MessageStorePouch.#hash(target);
 
     const event = {
-      _id: MessageStore.generateID(targetHashed),
+      _id: MessageStorePouch.generateID(targetHashed),
       messageCid: encodedBlock.cid.toString(),
       targetHashed,
       ...indexes,
@@ -175,7 +175,7 @@ export class MessageStore {
     }
 
     // generate the latest possible key for the target. this limits the events returned to only the target's
-    const endKey = MessageStore.generateID(targetHashed);
+    const endKey = MessageStorePouch.generateID(targetHashed);
 
     const { rows: targetEvents } = await eventLog.allDocs({
       include_docs: true,

@@ -1,5 +1,5 @@
 import { Dwn, CollectionsWrite } from '@tbd54566975/dwn-sdk-js';
-import { MessageStore } from '../src/message-store.js';
+import { MessageStoreLevelv2 } from '../src/message-store-level-v2.js';
 import { DIDKey } from '../src/lib/did-key.js';
 
 async function createIdentity() {
@@ -55,7 +55,7 @@ const bob = await createIdentity();
 
 const identities = [alice, bob];
 
-const messageStore = new MessageStore();
+const messageStore = new MessageStoreLevelv2();
 const dwn = await Dwn.create({ messageStore });
 
 for (let i = 0; i < 30; i += 1) {
@@ -74,3 +74,27 @@ for (let i = 0; i < 30; i += 1) {
   const result = await dwn.processMessage(message.toJSON());
   console.log(JSON.stringify(result, null, 2));
 }
+
+const aliceEventLog = await messageStore.getEventLog(alice.did);
+console.log('--------------- ALICE EVENT LOG ---------------');
+console.log(aliceEventLog);
+
+for (let i = 1; i < aliceEventLog.length; i += 1) {
+  const watermark = BigInt(aliceEventLog[i].watermark);
+  const prevWatermark = BigInt(aliceEventLog[i - 1].watermark);
+
+  console.log(watermark > prevWatermark);
+}
+
+const bobEventLog = await messageStore.getEventLog(bob.did);
+console.log('--------------- BOB EVENT LOG ---------------');
+console.log(bobEventLog);
+
+for (let i = 1; i < bobEventLog.length; i += 1) {
+  const watermark = BigInt(bobEventLog[i].watermark);
+  const prevWatermark = BigInt(bobEventLog[i - 1].watermark);
+
+  console.log(watermark > prevWatermark);
+}
+
+

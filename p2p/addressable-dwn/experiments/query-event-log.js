@@ -1,7 +1,7 @@
 import PouchDB from 'pouchdb';
 import pouchFind from 'pouchdb-find';
 
-import { MessageStore } from '../src/message-store.js';
+import { MessageStorePouch } from '../src/message-store.js';
 
 PouchDB.plugin(pouchFind);
 
@@ -14,6 +14,7 @@ const result = await eventLog.allDocs({
 const targetHashes = new Set([]);
 
 for (let row of result.rows) {
+  console.log(row);
   console.log(row.id, row.doc.dateCreated);
   targetHashes.add(row.doc.targetHashed);
 }
@@ -29,7 +30,7 @@ for (let targetHashed of targetHashes) {
   const { rows: targetEvents } = await eventLog.allDocs({
     include_docs: true,
     startkey: startKey,
-    endkey: MessageStore.generateID(targetHashed)
+    endkey: MessageStorePouch.generateID(targetHashed)
   });
 
   console.log(`--------------- TARGET EVENTS FOR ${targetHashed} ---------------`);

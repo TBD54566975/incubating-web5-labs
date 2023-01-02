@@ -16,10 +16,11 @@
     "sqlite3": "5.1.2",
     "uuid": "8.3.2",
     "ws": "8.11.0",
-    "@tbd54566975/dwn-sdk-js": "0.0.14",
+    "@tbd54566975/dwn-sdk-js": "0.0.16",
     "@js-temporal/polyfill": "0.4.3",
     "pouchdb": "8.0.0",
     "pouchdb-find": "8.0.0",
+    "search-index": "3.3.0",
     "prompts": "2.4.2",
     "level": "8.0.0",
     "multiformats": "10.0.3"

@@ -53,19 +53,19 @@ wsServer.on('connection', function connection(socket, request, client) {
   });
 });
 
-messageStore.on('put', async event => {
-  /** @type {WebSocket} */
-  const socket = WebSocketManager.getWebSocket(event.target);
+// messageStore.on('put', async event => {
+//   /** @type {WebSocket} */
+//   const socket = WebSocketManager.getWebSocket(event.target);
 
-  if (!socket) {
-    return;
-  }
+//   if (!socket) {
+//     return;
+//   }
 
-  const eventString = JSON.stringify(event);
-  const eventBytes = new TextEncoder.encode(eventString);
+//   const eventString = JSON.stringify(event);
+//   const eventBytes = new TextEncoder.encode(eventString);
 
-  return socket.send(eventBytes);
-});
+//   return socket.send(eventBytes);
+// });
 
 const heartbeatInterval = setInterval(function ping() {
   wsServer.clients.forEach(function pingSocket(socket) {
