@@ -1,0 +1,49 @@
+{
+  "manifest_version": 3,
+  "name": "Web5 Wallet",
+  "description": "Web5 Web Extension Wallet",
+  "version": "1.0",
+  "action": {
+    "default_icon": {
+      "16": "tbd-fav-icon-main.png",
+      "24": "tbd-fav-icon-main.png",
+      "32": "tbd-fav-icon-main.png"
+    }
+  },
+  "background": {
+    "service_worker": "background/index.js",
+    "type": "module"
+  },
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "permissions": [
+    "alarms",
+    "notifications",
+    "storage",
+    "scripting",
+    "tabs"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content-scripts/injector.js"
+      ],
+      "all_frames": true,
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "content-scripts/web5.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+    "name": "message-store-level-v2",
+    "version": "0.1.1",
+    "type": "module",
+    "devDependencies": {
+        "esbuild": "0.16.7",
+        "@esbuild-plugins/node-globals-polyfill": "0.1.1",
+        "@esbuild-plugins/node-modules-polyfill": "0.1.4"
+    },
+    "dependencies": {
+        "lodash": "4.17.21",
+        "ipfs-unixfs-exporter": "7.0.11",
+        "ipfs-unixfs-importer": "9.0.10",
+        "@ipld/dag-cbor": "8.0.0",
+        "@js-temporal/polyfill": "0.4.3",
+        "search-index": "3.3.0",
+        "level": "8.0.0",
+        "multiformats": "10.0.3"
+    },
+    "exports": "./src/index.js",
+    "main": "./src/index.js",
+    "browser": {
+        "./src/index.js": "./dist/browser.js"
+    },
+    "files": [
+        "src",
+        "dist"
+    ]
+}
