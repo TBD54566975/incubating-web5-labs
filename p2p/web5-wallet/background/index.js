@@ -7,6 +7,7 @@ import { MessageRouter } from './lib/message-router';
 import { RequestRouter } from './lib/request-router';
 
 import { pushDwnMessages } from './alarm-handlers/push-dwn-messages';
+import { pullDwnMessages } from './alarm-handlers/pull-dwn-messages';
 
 import { requestAccess } from './message-handlers/dwn/request-access';
 import { processMessage } from './message-handlers/dwn/process-message';
@@ -26,6 +27,7 @@ chrome.runtime.onInstalled.addListener(async ({ _reason, _version }) => {
   await DWN.open();
 
   chrome.alarms.create('dwn.push', { delayInMinutes: 1 });
+  chrome.alarms.create('dwn.pull', { delayInMinutes: 1 });
 });
 
 // controls what happens when the extension's icon is clicked
@@ -36,6 +38,7 @@ chrome.action.onClicked.addListener(async _ => {
 
 const alarmRouter = new AlarmRouter();
 alarmRouter.on('dwn.push', pushDwnMessages);
+alarmRouter.on('dwn.pull', pullDwnMessages);
 
 const requestRouter = new RequestRouter();
 requestRouter.get('/identities', getIdentities);

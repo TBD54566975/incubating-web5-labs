@@ -18,23 +18,27 @@ export class WatermarkStore {
    * @param {string} key 
    * @returns {Promise<void>}
    */
-  static async upsert(kind, identityId, key) {
-    const watermark = await WatermarkStore.getWatermark(kind, identityId);
+  static async upsert(identityId, kind, key) {
+    const watermark = await WatermarkStore.getWatermark(identityId, kind);
 
     if (watermark) {
-      return db.put({
+      await db.put({
         _id  : watermark._id,
         _rev : watermark._rev, 
+        identityId,
         key,
       });
+
+      console.log('[watermark-store.put]');
     } else {
-      return db.put({
-        _id  : uuidv4(),
-        type : '__watermark__',
+      await db.put({
+        _id: this.#generateId(identityId, kind),
         identityId,
         kind,
         key
       });
+
+      console.log('[watermark-store.create]');
     }
   }
 
@@ -44,16 +48,21 @@ export class WatermarkStore {
    * @param {string} identityId
    * @returns {Promise<Watermark>}
    */
-  static async getWatermark(kind, identityId) {
-    const { docs } = await db.find({
-      selector: {
-        type: '__watermark__',
-        kind,
-        identityId
-      },
-      limit: 1
-    });
+  static async getWatermark(identityId, kind) {
+    const watermarkId = WatermarkStore.#generateId(identityId, kind);
 
-    return docs[0];
+    try {
+      return await db.get(watermarkId);
+    } catch(e) {
+      if (e.status === 404) {
+        return undefined;
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  static #generateId(identityId, kind) {
+    return `watermark:${identityId}:${kind}`;
   }
 }

@@ -11,7 +11,9 @@
   "dependencies": {
     "vue": "^3.2.45",
     "@headlessui/vue": "1.7.7",
-    "@heroicons/vue": "2.0.13"
+    "@heroicons/vue": "2.0.13",
+    "multiformats": "11.0.0",
+    "@vueuse/core": "9.6.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.0.0",

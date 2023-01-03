@@ -49,43 +49,98 @@ try {
   process.exit(1);
 }
 
+// TODO: handle multiple dwn hosts. send to all? send to at least 1 successfully?
+const [dwnHost] = dwnHosts;
+console.log(`${dwnHost}/dwn`);
 
-const directMessage = {
-  text: messageText
-};
+const thread = await createThread('Randy');
+await createChatMessage(recipient, thread, messageText);
 
-const encoder = new TextEncoder();
+async function createThread(subject) {
+  const savedThreadPath = `${__dirname}/thread.json`;
 
-const directMessageStringified = JSON.stringify(directMessage);
-const directMessageBytes = encoder.encode(directMessageStringified);
+  if (fs.existsSync(savedThreadPath)) {
+    const savedThreadStringified = fs.readFileSync(savedThreadPath, { encoding: 'utf-8' });
+    return JSON.parse(savedThreadStringified);
+  }
 
-const message = await CollectionsWrite.create({
-  data: directMessageBytes,
-  dataFormat: 'application/json',
-  recipient,
-  target: recipient,
-  protocol: 'chat',
-  schema: 'chat/thread',
-  signatureInput: bob.signatureMaterial,
-});
+  const encoder = new TextEncoder();
+  const thread = {
+    subject: subject
+  };
 
-console.log(message.toJSON());
+  const threadStringified = JSON.stringify(thread);
+  const threadBytes = encoder.encode(threadStringified);
 
-try {
-  // TODO: handle multiple dwn hosts. send to all? send to at least 1 successfully?
-  const [dwnHost] = dwnHosts;
-
-  console.log(`${dwnHost}/dwn`);
-
-  const response = await fetch(`${dwnHost}/dwn`, {
-    method: 'POST',
-    body: JSON.stringify(message.toJSON())
+  const threadMessage = await CollectionsWrite.create({
+    data: threadBytes,
+    dataFormat: 'application/json',
+    recipient,
+    target: recipient,
+    protocol: 'chat',
+    schema: 'chat/thread',
+    signatureInput: bob.signatureMaterial,
   });
 
-  const responseBody = await response.json();
+  const threadMessageJson = threadMessage.toJSON();
+  console.log(JSON.stringify(threadMessageJson, null, 2));
 
-  console.log(`message sent! result: ${JSON.stringify(responseBody, null, 4)}`);
-} catch (error) {
-  console.error(`Failed to send message to recipient. Error: ${error.message}`);
-  process.exit(1);
+  fs.writeFileSync(savedThreadPath, JSON.stringify(threadMessageJson), { encoding: 'utf-8' });
+
+  try {
+    const response = await fetch(`${dwnHost}/dwn`, {
+      method: 'POST',
+      body: JSON.stringify(threadMessageJson)
+    });
+
+    const responseBody = await response.json();
+
+    console.log(`send thread message result: ${JSON.stringify(responseBody, null, 4)}`);
+
+    return threadMessageJson;
+  } catch (error) {
+    console.error(`Failed to send message to recipient. Error: ${error.message}`);
+    process.exit(1);
+  }
+}
+
+async function createChatMessage(recipient, thread, messageText) {
+  const encoder = new TextEncoder();
+
+  const directMessage = {
+    text: messageText
+  };
+
+  const directMessageStringified = JSON.stringify(directMessage);
+  const directMessageBytes = encoder.encode(directMessageStringified);
+
+  // oof. yikes variable name.
+  const directMessageMessage = await CollectionsWrite.create({
+    data: directMessageBytes,
+    dataFormat: 'application/json',
+    recipient,
+    target: recipient,
+    protocol: 'chat',
+    contextId: thread.contextId,
+    parentId: thread.recordId,
+    schema: 'chat/message',
+    signatureInput: bob.signatureMaterial,
+  });
+
+  console.log(directMessageMessage.toJSON());
+
+
+  try {
+    const response = await fetch(`${dwnHost}/dwn`, {
+      method: 'POST',
+      body: JSON.stringify(directMessageMessage.toJSON())
+    });
+
+    const responseBody = await response.json();
+
+    console.log(`send message result: ${JSON.stringify(responseBody, null, 4)}`);
+  } catch (error) {
+    console.error(`Failed to send message to recipient. Error: ${error.message}`);
+    process.exit(1);
+  }
 }

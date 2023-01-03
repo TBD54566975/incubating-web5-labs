@@ -1,7 +1,6 @@
 <script setup>
 import { FingerPrintIcon, UserCircleIcon } from '@heroicons/vue/24/outline';
-import { onMounted, ref } from 'vue';
-// import { Background } from '../background-request';
+import { onMounted } from 'vue';
 
 const navigation = [
   { name: 'Identities', href: '/dashboard', icon: FingerPrintIcon , current: true },

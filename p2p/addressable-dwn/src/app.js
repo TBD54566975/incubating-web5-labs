@@ -23,6 +23,7 @@ app.post('/dwn/event-log', express.json({ type: '*/*' }), async (req, res) => {
 
   try {
     const eventLog = await messageStore.getEventLog(tenant, watermark);
+    console.log(eventLog);
     return res.status(200).json({ data: eventLog });
   } catch (e) {
     console.error(`[/dwn/event-log] error: ${e}`);

@@ -61,6 +61,12 @@ export class MessageStoreLevelv2 {
     await this.#eventLog.close();
   }
 
+  async has(cid) {
+    const bytes = await this.#db.get(cid);
+
+    return !!bytes;
+  }
+
   async get(cid) {
     const bytes = await this.#db.get(cid);
 
@@ -112,7 +118,7 @@ export class MessageStoreLevelv2 {
     let opts = {};
 
     if (watermark) {
-      opts.gte = watermark;
+      opts.gt = watermark;
     }
 
     const events = [];

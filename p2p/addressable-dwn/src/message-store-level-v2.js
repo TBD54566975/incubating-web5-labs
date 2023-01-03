@@ -34,11 +34,12 @@ export class MessageStoreLevelv2 {
     this.#config = {
       blockstoreLocation: 'BLOCKSTORE',
       indexLocation: 'INDEX',
+      eventLogLocation: 'EVENTLOG',
       ...config
     };
 
     this.#db = new Blockstore(this.#config.blockstoreLocation);
-    this.#eventLog = new Level('EVENTLOG');
+    this.#eventLog = new Level(this.#config.eventLogLocation);
   }
 
   async open() {
@@ -112,7 +113,7 @@ export class MessageStoreLevelv2 {
     let opts = {};
 
     if (watermark) {
-      opts.gte = watermark;
+      opts.gt = watermark;
     }
 
     const events = [];

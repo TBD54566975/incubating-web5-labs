@@ -24,35 +24,46 @@ export async function pushDwnMessages() {
       continue;
     }
 
-    console.log('dwn host', dwnHost);
-
-    console.log(`pushing dwn messages for ${identity.did}`);
-
     let watermarkKey; 
-    const watermark = await WatermarkStore.getWatermark('push', identity._id);
+    const watermark = await WatermarkStore.getWatermark(identity._id, 'push');
     
     if (watermark) {
       watermarkKey = watermark.key;
+      console.log('[push] watermark found', watermarkKey);
     }
 
-    console.log('watermark', watermark);
 
     const tenantEvents = await DWN.messageStore.getEventLog(identity.did, watermarkKey);
-    console.log('tenantEvents', tenantEvents);
+    console.log(`[push] pushing dwn messages to ${dwnHost} for ${identity.name}. ${tenantEvents.length} messages to push`, tenantEvents);
+    let numAccepts = 0;
+    let numConflicts = 0;
     
     for (let event of tenantEvents) {
       const messageCid = CID.parse(event.messageCid);
       const message = await DWN.messageStore.get(messageCid);
+      
+      try {
+        const sendResult = await DWN.send(dwnHost, message);
+        console.log('[push] push result', sendResult);
 
-      const sendResult = await DWN.send(dwnHost, message);
-      console.log('push result', sendResult);
-
-      // TODO: on success update watermark
-      await WatermarkStore.upsert('push', identity._id, event.watermark);
+        if (sendResult.status.code === 202 || sendResult.status.code === 409) {
+          if (sendResult.status.code === 202) {
+            numAccepts += 1;
+          } else if (sendResult.status.code === 409) {
+            numConflicts += 1;
+          }
+          
+          await WatermarkStore.upsert(identity._id, 'push', event.watermark);
+        }
+      } catch(e) {
+        console.error(`[push] [DWN.send] error: ${e}`);
+      }
 
       // TODO: send message to recipient
     }
 
-    chrome.alarms.create('dwn.push', { delayInMinutes: 1 });
+    console.log(`[push] # accepts: ${numAccepts}. # dupes: ${numConflicts}`);
   }
+
+  chrome.alarms.create('dwn.push', { delayInMinutes: 1 });
 }
