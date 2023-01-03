@@ -5,7 +5,11 @@ module.exports = {
     "./src/**/*.{vue,js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        tbd: ['IBM Plex Mono', 'monospace']
+      }
+    },
   },
   plugins: [
     require('@tailwindcss/forms')
