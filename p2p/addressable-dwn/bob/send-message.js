@@ -19,12 +19,16 @@ const questions = [{
   message: 'who do you want to message?'
 }, {
   type: 'text',
+  name: 'threadSubject',
+  message: 'Thread subject?'
+}, {
+  type: 'text',
   name: 'messageText',
   message: 'What do you want to say?'
 }];
 
 
-const { recipient, messageText } = await prompts(questions, { onCancel: () => process.exit(0) });
+const { recipient, messageText, threadSubject } = await prompts(questions, { onCancel: () => process.exit(0) });
 let dwnHosts = [];
 
 try {
@@ -53,7 +57,7 @@ try {
 const [dwnHost] = dwnHosts;
 console.log(`${dwnHost}/dwn`);
 
-const thread = await createThread('Randy');
+const thread = await createThread(threadSubject);
 await createChatMessage(recipient, thread, messageText);
 
 async function createThread(subject) {
@@ -66,7 +70,9 @@ async function createThread(subject) {
 
   const encoder = new TextEncoder();
   const thread = {
-    subject: subject
+    subject: subject,
+    authorName: 'Aggro Internet Troll (FULLCAPS LYFER)',
+    authorDid: bob.longFormDID
   };
 
   const threadStringified = JSON.stringify(thread);

@@ -9,18 +9,20 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.2.45",
     "@headlessui/vue": "1.7.7",
     "@heroicons/vue": "2.0.13",
+    "@vueuse/core": "9.6.0",
     "multiformats": "11.0.0",
-    "@vueuse/core": "9.6.0"
+    "vue": "^3.2.45",
+    "dayjs": "1.11.7",
+    "vue3-markdown-it": "^1.0.10"
   },
   "devDependencies": {
+    "@tailwindcss/forms": "0.5.3",
     "@vitejs/plugin-vue": "^4.0.0",
     "autoprefixer": "^10.4.13",
     "postcss": "^8.4.20",
     "tailwindcss": "^3.2.4",
-    "vite": "^4.0.0",
-    "@tailwindcss/forms": "0.5.3"
+    "vite": "^4.0.0"
   }
 }

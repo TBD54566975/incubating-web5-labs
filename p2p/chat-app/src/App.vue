@@ -4,11 +4,13 @@ import { onMounted, ref, toRaw } from 'vue';
 import { useIntervalFn } from '@vueuse/core';
 import Threads from './components/Threads.vue';
 import Chat from './components/Chat.vue';
+import SendMessageForm from './components/SendMessageForm.vue';
 
 const { web5 } = globalThis;
 
 const protocolInstalled = ref(false);
 const threads = ref([]);
+const activeThread = ref(undefined)
 const chat = ref([]);
 
 let chatRefreshFn;
@@ -119,6 +121,26 @@ onMounted(async () => {
   // await web5.dwn.subscribe(filter);
 });
 
+async function sendMessage(messageText) {
+  const lastMessage = chat.value[chat.value.length - 1];
+  console.log(lastMessage.dWebMessage.contextId);
+
+  const result = await web5.dwn.processMessage({
+    method: 'CollectionsWrite',
+    data: { messageText },
+    message: {
+      protocol: 'chat',
+      schema: 'chat/message',
+      dataFormat: 'application/json',
+      recipient: activeThread.value.data.authorDid,
+      parentId: lastMessage.dWebMessage.recordId,
+      contextId: lastMessage.dWebMessage.contextId,
+    }
+  });
+
+  console.log(result);
+}
+
 function selectThread(threadId) {
   if (chatRefreshFn) {
     chatRefreshFn.pause();
@@ -129,6 +151,7 @@ function selectThread(threadId) {
   });
 
   selectedThread = toRaw(selectedThread);
+  activeThread.value = selectedThread;
 
   chatRefreshFn = useIntervalFn(async () => {
     const { status, entries } = await web5.dwn.processMessage({
@@ -169,9 +192,12 @@ function selectThread(threadId) {
 </script>
 
 <template>
-  <div class="flex" v-if="protocolInstalled">
-    <Threads @select-thread="selectThread" :threads="threads" />
-    <Chat :messages="chat" />
+  <div class="flex-col h-screen" v-if="protocolInstalled">
+    <div class="flex">
+      <Threads @select-thread="selectThread" :threads="threads" />
+      <Chat :messages="chat" :active-thread="activeThread" />
+    </div>
+    <SendMessageForm @send-message="sendMessage" />
   </div>
   <div v-else>
   </div>

@@ -1,7 +1,5 @@
 import * as DWN from '../../../dwn';
-
 import { CollectionsWrite } from '@tbd54566975/dwn-sdk-js';
-import { DIDResolver } from '../../../lib/did-resolver';
 
 /**
  * TODO: fill out
@@ -52,7 +50,7 @@ export async function handleCollectionsWrite(ctx, data) {
   // }
 
   return {
-    record: collectionsWrite.toJSON(),
+    record: collectionsWriteJSON,
     result
   };
 }
