@@ -34,12 +34,12 @@ document.addEventListener('1660022065712_monkeys', async function (e) {
  * @see    {@link https://stackoverflow.com/questions/9602022/chrome-extension-retrieving-global-variable-from-webpage}
  */
 function injectScript(file_path) {
-  const node = document.querySelector('html');
-  const script = document.createElement('script');
-
-  script.setAttribute('type', 'text/javascript');
+  let script = document.createElement('script');
   script.setAttribute('src', file_path);
-  node.appendChild(script);
+  script.setAttribute('type', 'module');
+  document.documentElement.appendChild(script);
+
+  script.remove(); 
 }
 
 injectScript(chrome.runtime.getURL('content-scripts/web5.js'));
