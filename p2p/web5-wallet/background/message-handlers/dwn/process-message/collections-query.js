@@ -15,8 +15,6 @@ export async function handleCollectionsQuery(ctx, data) {
     signatureInput : signatureMaterial
   });
 
-  console.log(collectionsQuery.toJSON());
-
   const dwn = await DWN.open();
   const result =  await dwn.processMessage(collectionsQuery.toJSON());
 

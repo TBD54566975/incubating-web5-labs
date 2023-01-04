@@ -10,6 +10,7 @@ const app = express();
 app.use(cors());
 
 app.post('/dwn', express.json({ type: '*/*' }), async (req, res) => {
+  console.log(new Date(), '/dwn', JSON.stringify(req.body, null, 4));
   const result = await dwn.processMessage(req.body);
 
   return res.status(result.status.code).json(result);
@@ -23,7 +24,7 @@ app.post('/dwn/event-log', express.json({ type: '*/*' }), async (req, res) => {
 
   try {
     const eventLog = await messageStore.getEventLog(tenant, watermark);
-    console.log(eventLog);
+    console.log(new Date(), '[/dwn/event-log]', eventLog);
     return res.status(200).json({ data: eventLog });
   } catch (e) {
     console.error(`[/dwn/event-log] error: ${e}`);
@@ -45,6 +46,7 @@ app.get('/dwn/messages/:cid', express.json({ type: '*/*' }), async (req, res) =>
 
     // TODO: ensure CID belongs to tenant
     const message = await messageStore.get(cid);
+    console.log(new Date(), '[/dwn/messages/cid]', JSON.stringify(message, null, 4));
 
     if (message) {
       return res.status(200).json({ data: message });

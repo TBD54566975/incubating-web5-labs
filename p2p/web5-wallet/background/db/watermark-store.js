@@ -1,5 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
-import { db } from './client';
+import { client } from './client';
 
 /**
  * @typedef {object} Watermark
@@ -8,6 +7,8 @@ import { db } from './client';
  * @property {'push' | 'pull'} kind
  * @property {string} key
  */
+
+const db = new client('watermark-store');
 
 export class WatermarkStore {
 
@@ -65,4 +66,6 @@ export class WatermarkStore {
   static #generateId(identityId, kind) {
     return `watermark:${identityId}:${kind}`;
   }
+
+  static async createIndexes() {}
 }

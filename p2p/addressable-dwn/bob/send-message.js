@@ -15,12 +15,17 @@ const bob = JSON.parse(didState);
 
 const questions = [{
   type: 'text',
-  name: 'recipient',
-  message: 'who do you want to message?'
+  name: 'recipientDid',
+  message: 'who do you want to message?',
+
 }, {
   type: 'text',
-  name: 'threadSubject',
-  message: 'Thread subject?'
+  name: 'recipientName',
+  message: 'what\'s their name?'
+}, {
+  type: 'text',
+  name: 'senderName',
+  message: 'what\'s your name?'
 }, {
   type: 'text',
   name: 'messageText',
@@ -28,11 +33,16 @@ const questions = [{
 }];
 
 
-const { recipient, messageText, threadSubject } = await prompts(questions, { onCancel: () => process.exit(0) });
+const {
+  recipientDid,
+  recipientName,
+  senderName,
+  messageText
+} = await prompts(questions, { onCancel: () => process.exit(0) });
 let dwnHosts = [];
 
 try {
-  const { didDocument } = await resolve(recipient);
+  const { didDocument } = await resolve(recipientDid);
 
   const { service = [] } = didDocument;
 
@@ -49,7 +59,7 @@ try {
     process.exit(1);
   }
 } catch (error) {
-  console.error(`Failed to resolve recipient DID: ${recipient}. Error: ${error.message}`);
+  console.error(`Failed to resolve recipient DID: ${recipientDid}. Error: ${error.message}`);
   process.exit(1);
 }
 
@@ -57,10 +67,10 @@ try {
 const [dwnHost] = dwnHosts;
 console.log(`${dwnHost}/dwn`);
 
-const thread = await createThread(threadSubject);
-await createChatMessage(recipient, thread, messageText);
+const thread = await createThread(recipientDid, recipientName, bob.longFormDID, senderName);
+await createChatMessage(recipientDid, recipientName, bob.longFormDID, senderName, thread, messageText);
 
-async function createThread(subject) {
+async function createThread(recipientDid, recipientName, senderDid, senderName) {
   const savedThreadPath = `${__dirname}/thread.json`;
 
   if (fs.existsSync(savedThreadPath)) {
@@ -70,9 +80,15 @@ async function createThread(subject) {
 
   const encoder = new TextEncoder();
   const thread = {
-    subject: subject,
-    authorName: 'Aggro Internet Troll (FULLCAPS LYFER)',
-    authorDid: bob.longFormDID
+    to: {
+      did: recipientDid,
+      name: recipientName
+    },
+    from: {
+      did: senderDid,
+      name: senderName
+    },
+    subject: senderName
   };
 
   const threadStringified = JSON.stringify(thread);
@@ -81,8 +97,8 @@ async function createThread(subject) {
   const threadMessage = await CollectionsWrite.create({
     data: threadBytes,
     dataFormat: 'application/json',
-    recipient,
-    target: recipient,
+    recipient: recipientDid,
+    target: recipientDid,
     protocol: 'chat',
     schema: 'chat/thread',
     signatureInput: bob.signatureMaterial,
@@ -110,10 +126,18 @@ async function createThread(subject) {
   }
 }
 
-async function createChatMessage(recipient, thread, messageText) {
+async function createChatMessage(recipientDid, recipientName, senderDid, senderName, thread, messageText) {
   const encoder = new TextEncoder();
 
   const directMessage = {
+    to: {
+      did: recipientDid,
+      name: recipientName
+    },
+    from: {
+      did: senderDid,
+      name: senderName
+    },
     text: messageText
   };
 
@@ -124,8 +148,8 @@ async function createChatMessage(recipient, thread, messageText) {
   const directMessageMessage = await CollectionsWrite.create({
     data: directMessageBytes,
     dataFormat: 'application/json',
-    recipient,
-    target: recipient,
+    recipient: recipientDid,
+    target: recipientDid,
     protocol: 'chat',
     contextId: thread.contextId,
     parentId: thread.recordId,
@@ -134,7 +158,6 @@ async function createChatMessage(recipient, thread, messageText) {
   });
 
   console.log(directMessageMessage.toJSON());
-
 
   try {
     const response = await fetch(`${dwnHost}/dwn`, {

@@ -20,6 +20,7 @@ onMounted(async () => {
   identities.value = data;
 });
 
+
 async function grantAccess(isAllowed) {
   await chrome.storage.session.set({ [task]: { isAllowed, did: selectedIdentity.value.did } });
   window.close();
@@ -47,7 +48,7 @@ async function grantAccess(isAllowed) {
           <option disabled value="">
             Select an identity
           </option>
-          <option v-for="identity in identities" :key="identity._id">
+          <option v-for="identity in identities" :key="identity._id" :value="identity">
             {{ identity.name }}
           </option>
         </select>

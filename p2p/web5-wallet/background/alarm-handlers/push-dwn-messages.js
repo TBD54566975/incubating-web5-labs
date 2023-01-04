@@ -1,4 +1,5 @@
 import * as DWN from '../dwn';
+import { CollectionsWrite } from '@tbd54566975/dwn-sdk-js';
 import { IdentityStore, WatermarkStore } from '../db';
 import { DIDResolver } from '../lib/did-resolver';
 import { CID } from 'multiformats/cid';
@@ -58,8 +59,6 @@ export async function pushDwnMessages() {
       } catch(e) {
         console.error(`[push] [DWN.send] error: ${e}`);
       }
-
-      // TODO: send message to recipient
     }
 
     console.log(`[push] # accepts: ${numAccepts}. # dupes: ${numConflicts}`);

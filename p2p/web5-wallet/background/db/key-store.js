@@ -1,5 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
-import { db } from './client';
+import { client } from './client';
 
 /**
  * @typedef {object} PrivateJWK
@@ -30,6 +29,8 @@ import { db } from './client';
  * @property {'private' | 'public'} kind
  */
 
+const db = new client('key-store');
+
 export class KeyStore {
   /**
    * 
@@ -40,7 +41,7 @@ export class KeyStore {
    * @returns {Promise<void>}
    */
   static async save(did, jwk, kid, kind) {
-    return db.put({ _id: uuidv4(), type: '__key__', did, jwk, kid, kind });
+    return db.post({ did, jwk, kid, kind });
   }
 
   /**
@@ -65,12 +66,21 @@ export class KeyStore {
   static async getByDID(did) {
     const { docs } = await db.find({
       selector: { 
-        type: '__key__',
         did 
       },
       limit: 1
     });
 
     return docs[0];
+  }
+
+  static async createIndexes() {
+    await db.createIndex({ 
+      index: { fields: ['did'] }
+    });
+
+    await db.createIndex({ 
+      index: { fields: ['kid'] }
+    });
   }
 }

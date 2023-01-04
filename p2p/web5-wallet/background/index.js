@@ -1,6 +1,6 @@
 import * as DWN from './dwn';
 
-import { IdentityStore } from './db';
+import { createIndexes, IdentityStore } from './db';
 
 import { AlarmRouter } from './lib/alarm-router';
 import { MessageRouter } from './lib/message-router';
@@ -17,6 +17,8 @@ import { createIdentity } from './request-handlers/create-identity';
 
 chrome.runtime.onInstalled.addListener(async ({ _reason, _version }) => {
   console.log('extension installed');
+  await createIndexes(); 
+
   const defaultIdentity = await IdentityStore.getByName('default');
 
   if (!defaultIdentity) {

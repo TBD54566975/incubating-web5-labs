@@ -1,5 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
-import { db } from './client';
+import { client } from './client';
 import { DIDKey } from '../lib/did-key';
 import { DIDIon } from '../lib/did-ion';
 import { KeyStore } from './key-store';
@@ -22,6 +21,7 @@ import dayjs from 'dayjs';
  * @property {import('./key-store').PrivateJWK} privateJwk
  */
 
+const db = new client('identity-store');
 export class IdentityStore {
   /**
    * @param {string} name - human-friendly name
@@ -36,7 +36,7 @@ export class IdentityStore {
       const didDoc = DIDKey.resolve(did);
 
       await KeyStore.save(did, privateJWK, didDoc.authentication[0], 'private');
-      await db.put({ _id: uuidv4(), type: '__identity__', did, didMethod, name, dateCreated: dayjs().toISOString() });
+      await db.post({ did, didMethod, name, dateCreated: dayjs().toISOString() });
     } else if (didMethod === 'ion') {
       
       // TODO: save recovery and update keys
@@ -46,7 +46,7 @@ export class IdentityStore {
 
       await KeyStore.save(longFormDID, authnKeyPair.privateJwk, authnKeyPair.privateJwk.kid, 'private');
 
-      await db.put({ _id: uuidv4(), type: '__identity__', did: longFormDID, didMethod, name, dateCreated: dayjs().toISOString() });
+      await db.post({ did: longFormDID, didMethod, name, dateCreated: dayjs().toISOString() });
     } else {
       throw new Error(`did method ${didMethod} not supported`);
     }
@@ -59,7 +59,6 @@ export class IdentityStore {
   static async getByName(name) {
     const { docs } = await db.find({
       selector: { 
-        type: '__identity__',
         name 
       },
       limit: 1
@@ -75,7 +74,6 @@ export class IdentityStore {
   static async getByDID(did) {
     const { docs } = await db.find({
       selector: { 
-        type: '__identity__',
         did 
       },
       limit: 1
@@ -89,11 +87,16 @@ export class IdentityStore {
    * @returns {Promise<Identity[]>}
    */
   static async getAllIdentities() {
-    const { docs } = await db.find({
-      selector: { 
-        type: '__identity__'
-      },
-    });
+    const { rows } = await db.allDocs({ include_docs: true });
+    const docs = [];
+
+    for (let row of rows) {
+      if (row.id[0] === '_') {
+        continue;
+      }
+      
+      docs.push(row.doc);
+    }
 
     return docs;
   }
@@ -118,5 +121,15 @@ export class IdentityStore {
       protectedHeader : { alg, kid },
       privateJwk      : jwk
     };
+  }
+
+  static async createIndexes() {
+    await db.createIndex({ 
+      index: { fields: ['name'] }
+    });
+
+    await db.createIndex({ 
+      index: { fields: ['did'] }
+    });
   }
 }

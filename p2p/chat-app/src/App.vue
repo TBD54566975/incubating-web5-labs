@@ -2,26 +2,32 @@
 import { base64url } from 'multiformats/bases/base64';
 import { onMounted, ref, toRaw } from 'vue';
 import { useIntervalFn } from '@vueuse/core';
+
 import Threads from './components/Threads.vue';
 import Chat from './components/Chat.vue';
 import SendMessageForm from './components/SendMessageForm.vue';
 
 const { web5 } = globalThis;
 
-const protocolInstalled = ref(false);
+const protocolInstalled = ref(true);
 const threads = ref([]);
 const activeThread = ref(undefined)
 const chat = ref([]);
+const userDid = ref('');
+const username = ref('');
 
 let chatRefreshFn;
 
 onMounted(async () => {
-  const { isAllowed } = await web5.dwn.requestAccess();
+  const { isAllowed, did, name } = await web5.dwn.requestAccess();
 
   if (!isAllowed) {
     toast.error('Access to DWN is forbidden. cannot write TODOs to DWN');
     return;
   }
+
+  userDid.value = did;
+  username.value = name
 
   // create protocol
   // TODO: query for protocol before trying to create
@@ -121,21 +127,78 @@ onMounted(async () => {
   // await web5.dwn.subscribe(filter);
 });
 
-async function sendMessage(messageText) {
-  const lastMessage = chat.value[chat.value.length - 1];
-  console.log(lastMessage.dWebMessage.contextId);
+async function createThread(newThreadInfo) {
+  const { name, did, text } = newThreadInfo;
 
+  const { record: thread, result: createThreadResult } = await web5.dwn.processMessage({
+    method: 'CollectionsWrite',
+    message: {
+      protocol: 'chat',
+      schema: 'chat/thread',
+      dataFormat: 'application/json',
+      recipient: did,
+    },
+    data: {
+      from: { did: userDid.value, name: username.value },
+      to: { did, name },
+      subject: name
+    }
+  });
+
+  if (createThreadResult.status.code !== 202) {
+    console.error('failed to create thread', result, record);
+    return;
+  }
+
+  console.log('create chat/thread result:', { record: thread, result: createThreadResult });
+
+  // TODO: create message
   const result = await web5.dwn.processMessage({
     method: 'CollectionsWrite',
-    data: { messageText },
     message: {
       protocol: 'chat',
       schema: 'chat/message',
       dataFormat: 'application/json',
-      recipient: activeThread.value.data.authorDid,
-      parentId: lastMessage.dWebMessage.recordId,
-      contextId: lastMessage.dWebMessage.contextId,
-    }
+      recipient: did,
+      parentId: thread.recordId,
+      contextId: thread.contextId,
+    },
+    data: {
+      from: { did: userDid.value, name: username.value },
+      to: { did, name },
+      text,
+    },
+  });
+
+  console.log('create chat/message result:', result);
+}
+
+async function sendMessage(messageText) {
+  const firstMessage = chat.value[0];
+  // probably slow bc did is so long. use a set instead
+  const recipient = firstMessage.to.did === userDid.value ? firstMessage.data.from : firstMessage.data.to;
+
+  const result = await web5.dwn.processMessage({
+    method: 'CollectionsWrite',
+    message: {
+      protocol: 'chat',
+      schema: 'chat/message',
+      dataFormat: 'application/json',
+      recipient: recipient.did,
+      parentId: activeThread.value.dWebMessage.recordId,
+      contextId: activeThread.value.dWebMessage.contextId,
+    },
+    data: {
+      to: {
+        did: recipient.did,
+        name: recipient.name
+      },
+      from: {
+        did: userDid.value,
+        name: username.value,
+      },
+      text: messageText
+    },
   });
 
   console.log(result);
@@ -193,9 +256,9 @@ function selectThread(threadId) {
 
 <template>
   <div class="flex-col h-screen" v-if="protocolInstalled">
-    <div class="flex">
-      <Threads @select-thread="selectThread" :threads="threads" />
-      <Chat :messages="chat" :active-thread="activeThread" />
+    <div class="flex h-0">
+      <Threads @select-thread="selectThread" @create-thread="createThread" :threads="threads" />
+      <Chat :messages="chat" :userDid="userDid" />
     </div>
     <SendMessageForm @send-message="sendMessage" />
   </div>

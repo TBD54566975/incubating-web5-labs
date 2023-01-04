@@ -22,7 +22,7 @@ const createOptions = {
       'id': 'dwn',
       'type': 'DecentralizedWebNode',
       'serviceEndpoint': {
-        'nodes': ['http://localhost:3000/dwn']
+        'nodes': ['http://localhost:3000']
       }
     }
   ]

@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { db } from './client';
+import { client } from './client';
 
 /**
  * @typedef {object} Permission
@@ -8,12 +8,10 @@ import { db } from './client';
  * @property {boolean} isAllowed
  */
 
-
+const db = new client('permission-store');
 export class PermissionStore {
   static createPermission(domain, did, isAllowed) {
-    return db.put({
-      _id  : uuidv4(),
-      type : '__access_control__',
+    return db.post({
       domain, 
       did, 
       isAllowed 
@@ -28,12 +26,17 @@ export class PermissionStore {
   static async getDomainPermissions(domain) {
     const { docs } = await db.find({
       selector: { 
-        type: '__access_control__',
         domain 
       },
       limit: 1
     });
 
     return docs[0];
+  }
+
+  static async createIndexes() {
+    await db.createIndex({ 
+      index: { fields: ['domain'] }
+    });
   }
 }

@@ -1,4 +1,5 @@
 import * as DWN from '../../../dwn';
+import { DIDResolver } from '../../../lib/did-resolver';
 import { CollectionsWrite } from '@tbd54566975/dwn-sdk-js';
 
 /**
@@ -35,19 +36,38 @@ export async function handleCollectionsWrite(ctx, data) {
   const dwn = await DWN.open();
   const result = await dwn.processMessage(collectionsWriteJSON);
 
-  //! send message to recipient 
-  // const { recipient } = collectionsWrite.message.descriptor;
-  // if (recipient && recipient !== identity.did) {
-  //   const dwnHosts = await DIDResolver.getDWNHosts(recipient);
+  //! send message to recipient
+  // TODO: consider doing this elsewhere. definitely need to abstract out into a reusable method
+  // once we introduce other message types that can have `recipient`.
 
-  // TODO: handle multiple dwn hosts. send to all? send to at least 1 successfully?
-  // const [ dwnHost ] = dwnHosts;
+  //! **WARNING**: having this here can cause a weird race condition. Imagine Alice is sending
+  //! a message to bob. bob's remote dwn recieves the message which is synced to his device.
+  //! He then sends a reply message to alice _before_ the _original_ message synced to alice's DWN. 
+  //! if that message is referenced as `parentId` in bob's message to alice
+  //! then alice's remote dwn will reject the message 
+  const { recipient } = collectionsWrite.message.descriptor;
+  if (recipient && recipient !== identity.did) {
+    const dwnHosts = await DIDResolver.getDWNHosts(recipient);
 
-  // if (dwnHost) {
-  //   TODO: handle unsuccessful responses. retry? cadence?
-  //   const sendResult = await DWN.send(dwnHost, collectionsWriteJSON);
-  //   console.log('send message to recipient result:', sendResult);
-  // }
+    // TODO: handle multiple dwn hosts. send to all? send to at least 1 successfully?
+    const [ dwnHost ] = dwnHosts;
+
+    if (dwnHost) {
+      const recipientCollectionsWrite = await CollectionsWrite.create({
+        ...data.message,
+        target         : recipient,
+        signatureInput : signatureMaterial
+      });
+
+      try {
+        // TODO: handle unsuccessful responses. retry? cadence?
+        const sendResult = await DWN.send(dwnHost, recipientCollectionsWrite.toJSON());
+        console.log('send message to recipient result:', sendResult);
+      } catch(e) {
+        console.error('failed to send message to recipient. error:', e, 'message:', recipientCollectionsWrite.toJSON());
+      }
+    }
+  }
 
   return {
     record: collectionsWriteJSON,

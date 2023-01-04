@@ -3,7 +3,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import { ProtocolsConfigure } from '@tbd54566975/dwn-sdk-js';
-import { dwn } from '../src/dwn.js';
 
 // __filename and __dirname are not defined in ES module scope
 const __filename = fileURLToPath(import.meta.url);
@@ -19,10 +18,10 @@ const message = await ProtocolsConfigure.create({
   definition: {
     "labels": {
       "thread": {
-        "schema": "https://identity.foundation/protocols/chat/thread"
+        "schema": "chat/thread"
       },
       "message": {
-        "schema": "https://identity.foundation/protocols/chat/message"
+        "schema": "chat/message"
       }
     },
     "records": {
@@ -35,7 +34,8 @@ const message = await ProtocolsConfigure.create({
         "records": {
           "message": {
             "allow": {
-              "recipient": {
+              "anyone": {
+                "of": "thread",
                 "to": ["write"]
               }
             }
@@ -46,7 +46,16 @@ const message = await ProtocolsConfigure.create({
   }
 });
 
-console.log(JSON.stringify(message.toJSON(), null, 2));
+try {
+  const response = await fetch('http://localhost:3000/dwn', {
+    method: 'POST',
+    body: JSON.stringify(message.toJSON())
+  });
 
-const result = await dwn.processMessage(message.toJSON());
-console.log(result);
+  const responseBody = await response.json();
+
+  console.log(`send message result: ${JSON.stringify(responseBody, null, 4)}`);
+} catch (error) {
+  console.error(`Failed to send message to recipient. Error: ${error.message}`);
+  process.exit(1);
+}
