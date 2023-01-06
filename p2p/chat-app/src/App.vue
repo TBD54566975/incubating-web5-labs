@@ -174,9 +174,10 @@ async function createThread(newThreadInfo) {
 }
 
 async function sendMessage(messageText) {
-  const firstMessage = chat.value[0];
+  const firstMessage = toRaw(chat.value[0]);
+  console.log(firstMessage);
   // probably slow bc did is so long. use a set instead
-  const recipient = firstMessage.to.did === userDid.value ? firstMessage.data.from : firstMessage.data.to;
+  const recipient = firstMessage.data.to.did === userDid.value ? firstMessage.data.from : firstMessage.data.to;
 
   const result = await web5.dwn.processMessage({
     method: 'CollectionsWrite',
