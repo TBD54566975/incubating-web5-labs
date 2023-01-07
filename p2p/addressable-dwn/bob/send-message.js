@@ -173,3 +173,7 @@ async function createChatMessage(recipientDid, recipientName, senderDid, senderN
     process.exit(1);
   }
 }
+
+async function getThreads(didState) {
+
+}
