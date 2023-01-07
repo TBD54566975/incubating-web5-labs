@@ -36,6 +36,13 @@ export async function handleCollectionsWrite(ctx, data) {
   const dwn = await DWN.open();
   const result = await dwn.processMessage(collectionsWriteJSON);
 
+  if (result.status.code !== 202) {
+    return {
+      record: collectionsWriteJSON,
+      result
+    };
+  }
+
   //! send message to recipient
   // TODO: consider doing this elsewhere. definitely need to abstract out into a reusable method
   // once we introduce other message types that can have `recipient`.
@@ -64,6 +71,7 @@ export async function handleCollectionsWrite(ctx, data) {
         const sendResult = await DWN.send(dwnHost, recipientCollectionsWrite.toJSON());
         console.log('send message to recipient result:', sendResult);
       } catch(e) {
+        // TODO: figure out where to retry these sends
         console.error('failed to send message to recipient. error:', e, 'message:', recipientCollectionsWrite.toJSON());
       }
     }
