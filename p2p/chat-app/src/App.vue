@@ -27,40 +27,52 @@ onMounted(async () => {
   }
 
   userDid.value = did;
-  username.value = name
+  username.value = name;
 
-  // create protocol
-  // TODO: query for protocol before trying to create
-  const result = await web5.dwn.processMessage({
-    method: 'ProtocolsConfigure',
+  const { status, entries } = await web5.dwn.processMessage({
+    method: 'ProtocolsQuery',
     message: {
-      protocol: 'chat',
-      definition: {
-        'labels': {
-          'thread': {
-            'schema': 'chat/thread'
-          },
-          'message': {
-            'schema': 'chat/message'
-          }
-        },
-        'records': {
-          'thread': {
-            'allow': {
-              'anyone': {
-                'to': [
-                  'write'
-                ]
-              }
+      filter: { protocol: 'chat' }
+    }
+  });
+
+  if (status.code !== 200) {
+    console.error('failed to query protocols', status);
+    return;
+  }
+
+  if (entries.length === 0) {
+    const result = await web5.dwn.processMessage({
+      method: 'ProtocolsConfigure',
+      message: {
+        protocol: 'chat',
+        definition: {
+          'labels': {
+            'thread': {
+              'schema': 'chat/thread'
             },
-            'records': {
-              'message': {
-                'allow': {
-                  'anyone': {
-                    'of': 'thread',
-                    'to': [
-                      'write'
-                    ]
+            'message': {
+              'schema': 'chat/message'
+            }
+          },
+          'records': {
+            'thread': {
+              'allow': {
+                'anyone': {
+                  'to': [
+                    'write'
+                  ]
+                }
+              },
+              'records': {
+                'message': {
+                  'allow': {
+                    'anyone': {
+                      'of': 'thread',
+                      'to': [
+                        'write'
+                      ]
+                    }
                   }
                 }
               }
@@ -68,19 +80,16 @@ onMounted(async () => {
           }
         }
       }
+    });
+
+    if (result.status.code !== 202) {
+      if (result.status.code === 409) {
+        // protocol has already been written. ignore
+      } else {
+        console.error('failed to create protocol. result:', result);
+        return;
+      }
     }
-  });
-
-  console.log(result);
-
-  if (result.status.code !== 202) {
-    if (result.status.code === 409) {
-      // protocol has already been written. ignore
-    } else {
-      console.error(result);
-      return;
-    }
-
   }
 
   protocolInstalled.value = true;
