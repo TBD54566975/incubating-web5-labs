@@ -10,8 +10,8 @@ const app = express();
 app.use(cors());
 
 app.post('/dwn', express.json({ type: '*/*' }), async (req, res) => {
-  console.log(new Date(), '/dwn', JSON.stringify(req.body, null, 4));
   const result = await dwn.processMessage(req.body);
+  console.log(new Date(), '/dwn', JSON.stringify(result));
 
   return res.status(result.status.code).json(result);
 });
