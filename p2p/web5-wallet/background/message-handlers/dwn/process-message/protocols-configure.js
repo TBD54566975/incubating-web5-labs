@@ -8,10 +8,10 @@ import { ProtocolsConfigure } from '@tbd54566975/dwn-sdk-js';
  * @param {*} data 
  */
 export async function handleProtocolsConfigure(ctx, data) {
-  const { identity, signatureMaterial } = ctx;
+  const { profile, signatureMaterial } = ctx;
 
   const protocolsConfigure = await ProtocolsConfigure.create({
-    target         : identity.did,
+    target         : profile.did,
     signatureInput : signatureMaterial,
     ...data.message
   });

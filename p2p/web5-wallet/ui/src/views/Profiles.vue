@@ -5,16 +5,16 @@ import { BackgroundRequest } from '../background-request';
 import Modal from '../components/Modal.vue';
 import CreateIonDidForm from '../components/CreateIonDidForm.vue';
 
-const showCreateIdentityModal = ref(false);
-const identities = ref([]);
+const showCreateProfileModal = ref(false);
+const profiles = ref([]);
 
 onMounted(async () => {
-  const { data } = await BackgroundRequest.get('/identities');
-  identities.value = data;
+  const { data } = await BackgroundRequest.get('/profiles');
+  profiles.value = data;
 });
 
-async function copyDidToClipboard(identity) {
-  await navigator.clipboard.writeText(identity.did);
+async function copyDidToClipboard(profile) {
+  await navigator.clipboard.writeText(profile.did);
 }
 
 </script>
@@ -25,17 +25,17 @@ async function copyDidToClipboard(identity) {
     <div class="sm:flex sm:items-center">
       <div class="sm:flex-auto">
         <h1 class="font-semibold text-gray-900 text-xl">
-          Identities
+          Profiles
         </h1>
         <p class="mt-2 text-gray-700 text-sm">
-          A list of all your identities including their name, did, and creation date.
+          A list of all your profiles including their name, did, and creation date.
         </p>
       </div>
       <div class="mt-4 sm:flex-none sm:ml-16 sm:mt-0">
         <button
-          type="button" @click="showCreateIdentityModal = true"
+          type="button" @click="showCreateProfileModal = true"
           class="bg-indigo-600 border border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 font-medium hover:bg-indigo-700 inline-flex items-center justify-center px-4 py-2 rounded-md shadow-sm sm:w-auto text-sm text-white">
-          Create Identity
+          Create Profile
         </button>
       </div>
     </div>
@@ -64,19 +64,19 @@ async function copyDidToClipboard(identity) {
             </thead>
             <!-- Table Body -->
             <tbody class="divide-gray-200 divide-y">
-              <tr v-for="identity in identities" :key="identity._id">
+              <tr v-for="profile in profiles" :key="profile._id">
                 <td class="font-medium md:pl-0 pl-4 pr-3 py-4 sm:pl-6 text-gray-900 text-sm whitespace-nowrap">
-                  {{ identity.name }}
+                  {{ profile.name }}
                 </td>
                 <td class="align-middle flex px-3 py-4 space-x-2 text-gray-500 text-sm whitespace-nowrap">
-                  <span>{{ identity.didMethod }}</span>
-                  <ClipboardDocumentIcon class="cursor-pointer h-5 text-black w-5" @click="copyDidToClipboard(identity)" />
+                  <span>{{ profile.didMethod }}</span>
+                  <ClipboardDocumentIcon class="cursor-pointer h-5 text-black w-5" @click="copyDidToClipboard(profile)" />
                 </td>
                 <td class="px-3 py-4 text-gray-500 text-sm whitespace-nowrap">
                   <a href="#" class="hover:text-indigo-900 text-indigo-600">Resolve</a>
                 </td>
                 <td class="px-3 py-4 text-gray-500 text-sm whitespace-nowrap">
-                  {{ identity.dateCreated }}
+                  {{ profile.dateCreated }}
                 </td>
               </tr>
             </tbody>
@@ -86,9 +86,9 @@ async function copyDidToClipboard(identity) {
     </div>
   </div>
 
-  <Modal :open="showCreateIdentityModal" @close="showCreateIdentityModal = false">
+  <Modal :open="showCreateProfileModal" @close="showCreateProfileModal = false">
     <template #default>
-      <CreateIonDidForm @submitted="showCreateIdentityModal = false" />
+      <CreateIonDidForm @submitted="showCreateProfileModal = false" />
     </template>
   </Modal>
 </template>

@@ -8,7 +8,7 @@ import { CollectionsWrite } from '@tbd54566975/dwn-sdk-js';
  * @param {*} data 
  */
 export async function handleCollectionsWrite(ctx, data) {
-  const { identity, signatureMaterial } = ctx;
+  const { profile, signatureMaterial } = ctx;
   
   // TODO: ew. `data.data` need to think of less confusing property names
   if (data.data) {
@@ -27,7 +27,7 @@ export async function handleCollectionsWrite(ctx, data) {
 
   const collectionsWrite = await CollectionsWrite.create({
     ...data.message,
-    target         : identity.did,
+    target         : profile.did,
     signatureInput : signatureMaterial
   });
 
@@ -53,7 +53,7 @@ export async function handleCollectionsWrite(ctx, data) {
   //! if that message is referenced as `parentId` in bob's message to alice
   //! then alice's remote dwn will reject the message 
   const { recipient } = collectionsWrite.message.descriptor;
-  if (recipient && recipient !== identity.did) {
+  if (recipient && recipient !== profile.did) {
     const dwnHosts = await DIDResolver.getDWNHosts(recipient);
 
     // TODO: handle multiple dwn hosts. send to all? send to at least 1 successfully?

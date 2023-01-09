@@ -5,7 +5,7 @@ import { KeyStore } from './key-store';
 import dayjs from 'dayjs';
 
 /**
- * @typedef {object} Identity
+ * @typedef {object} Profile
  * @property {string} _id
  * @property {string} name
  * @property {string} did
@@ -21,8 +21,8 @@ import dayjs from 'dayjs';
  * @property {import('./key-store').PrivateJWK} privateJwk
  */
 
-const db = new client('identity-store');
-export class IdentityStore {
+const db = new client('profile-store');
+export class ProfileStore {
   /**
    * @param {string} name - human-friendly name
    * @param {'key' | 'ion'} didMethod
@@ -54,7 +54,7 @@ export class IdentityStore {
 
   /**
    * @param {string} name
-   * @returns {Promise<Identity>}
+   * @returns {Promise<Profile>}
    */
   static async getByName(name) {
     const { docs } = await db.find({
@@ -69,7 +69,7 @@ export class IdentityStore {
 
   /**
    * @param {string} did 
-   * @returns {Identity}
+   * @returns {Profile}
    */
   static async getByDID(did) {
     const { docs } = await db.find({
@@ -84,9 +84,9 @@ export class IdentityStore {
 
   /**
    * 
-   * @returns {Promise<Identity[]>}
+   * @returns {Promise<Profile[]>}
    */
-  static async getAllIdentities() {
+  static async getAllProfiles() {
     const { rows } = await db.allDocs({ include_docs: true });
     const docs = [];
 
@@ -103,11 +103,11 @@ export class IdentityStore {
 
   /**
    * TODO: move to another place
-   * @param {Identity} identity 
+   * @param {Profile} Profile 
    * @returns {SignatureMaterial}
    */
-  static async getDWNSignatureMaterial(identity) {
-    const { did } = identity;
+  static async getDWNSignatureMaterial(Profile) {
+    const { did } = Profile;
     const { jwk } = await KeyStore.getByDID(did);
 
     let { alg, kid } = jwk;

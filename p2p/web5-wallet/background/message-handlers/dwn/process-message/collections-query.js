@@ -7,11 +7,11 @@ import * as DWN from '../../../dwn';
  * @param {any} [data] 
  */
 export async function handleCollectionsQuery(ctx, data) {
-  const { identity, signatureMaterial } = ctx;
+  const { profile, signatureMaterial } = ctx;
   
   const collectionsQuery = await CollectionsQuery.create({
     ...data.message,
-    target         : identity.did,
+    target         : profile.did,
     signatureInput : signatureMaterial
   });
 

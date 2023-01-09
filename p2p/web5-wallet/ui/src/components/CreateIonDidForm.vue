@@ -4,13 +4,13 @@ import { BackgroundRequest } from '../background-request';
 
 const emit = defineEmits(['submitted']);
 
-const identityName = ref('');
+const profileName = ref('');
 const dwnProviderHostname = ref('');
 
-async function createIdentity() {
+async function createProfile() {
   const payload = {
     didMethod : 'ion',
-    name      : identityName.value
+    name      : profileName.value
   };
 
   if (dwnProviderHostname.value) {
@@ -21,7 +21,7 @@ async function createIdentity() {
 
   console.log(payload);
 
-  const resp = await BackgroundRequest.post('/identities', payload);
+  const resp = await BackgroundRequest.post('/profiles', payload);
 
   // TODO: handle non-201 status codes
   if (resp.status === 201) {
@@ -32,7 +32,7 @@ async function createIdentity() {
 
 <template>
   <div class="font-tbd">
-    <form @submit.prevent="createIdentity">
+    <form @submit.prevent="createProfile">
       <!-- Title -->
       <div class="text-lg">
         Create ION DID
@@ -46,7 +46,7 @@ async function createIdentity() {
         <div class="mt-1">
           <input
             type="text" name="name" id="name"
-            v-model="identityName"
+            v-model="profileName"
             class="block border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm sm:text-sm w-full"
             placeholder="Social">
         </div>

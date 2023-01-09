@@ -1,5 +1,5 @@
 import * as DWN from '../dwn';
-import { IdentityStore, WatermarkStore } from '../db';
+import { ProfileStore, WatermarkStore } from '../db';
 import { DIDResolver } from '../lib/did-resolver';
 import { CID } from 'multiformats/cid';
 
@@ -8,15 +8,15 @@ import { CID } from 'multiformats/cid';
 const compatibleDidMethods = new Set(['ion']);
 
 export async function pullDwnMessages() {
-  const identities = await IdentityStore.getAllIdentities();
+  const profiles = await ProfileStore.getAllProfiles();
   const dwn = await DWN.open();
 
-  for (let identity of identities) {
-    if (!compatibleDidMethods.has(identity.didMethod)) {
+  for (let profile of profiles) {
+    if (!compatibleDidMethods.has(profile.didMethod)) {
       continue;
     }
 
-    const dwnHosts = await DIDResolver.getDWNHosts(identity.did);
+    const dwnHosts = await DIDResolver.getDWNHosts(profile.did);
 
     // TODO: handle multiple dwn hosts. send to all? send to at least 1 successfully?
     const [ dwnHost ] = dwnHosts;
@@ -26,7 +26,7 @@ export async function pullDwnMessages() {
     }
 
     let watermarkKey; 
-    const watermark = await WatermarkStore.getWatermark(identity._id, 'pull');
+    const watermark = await WatermarkStore.getWatermark(profile._id, 'pull');
     
     if (watermark) {
       watermarkKey = watermark.key;
@@ -34,8 +34,8 @@ export async function pullDwnMessages() {
     }
 
 
-    const eventLog = await DWN.getEventLog(dwnHost, identity.did, watermarkKey);
-    console.log(`[pull] pulling dwn messages from ${dwnHost} for ${identity.name}. ${eventLog.length} messages to pull`, eventLog);
+    const eventLog = await DWN.getEventLog(dwnHost, profile.did, watermarkKey);
+    console.log(`[pull] pulling dwn messages from ${dwnHost} for ${profile.name}. ${eventLog.length} messages to pull`, eventLog);
     let numAccepts = 0;
     let numDupes = 0;
 
@@ -46,14 +46,14 @@ export async function pullDwnMessages() {
       if (messageExists) {
         numDupes += 1;
       } else {
-        const message = await DWN.getMessage(dwnHost, identity.did, event.messageCid);
+        const message = await DWN.getMessage(dwnHost, profile.did, event.messageCid);
         const result = await dwn.processMessage(message);
         numAccepts += 1;
         console.log(`[pull] synced message ${event.messageCid}. result`, result);
       }
       
       console.log(`[pull] # accepts: ${numAccepts}. # dupes: ${numDupes}`);
-      await WatermarkStore.upsert(identity._id, 'pull', event.watermark);
+      await WatermarkStore.upsert(profile._id, 'pull', event.watermark);
     }
 
 

@@ -1,4 +1,4 @@
-import { PermissionStore, IdentityStore } from '../../../db';
+import { PermissionStore, ProfileStore } from '../../../db';
 import { handleCollectionsQuery } from './collections-query';
 import { handleCollectionsWrite } from './collections-write';
 import { handleProtocolsConfigure } from './protocols-configure';
@@ -30,8 +30,8 @@ export async function processMessage(ctx, data) {
     return { error: 'Access Forbidden' };
   }
 
-  ctx.identity = await IdentityStore.getByDID(permissions.did);
-  ctx.signatureMaterial = await IdentityStore.getDWNSignatureMaterial(ctx.identity);
+  ctx.profile = await ProfileStore.getByDID(permissions.did);
+  ctx.signatureMaterial = await ProfileStore.getDWNSignatureMaterial(ctx.profile);
 
   return dwnMethodHandler(ctx, data);
 }

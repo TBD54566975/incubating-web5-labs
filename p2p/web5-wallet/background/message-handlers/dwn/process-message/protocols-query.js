@@ -8,10 +8,10 @@ import { ProtocolsQuery } from '@tbd54566975/dwn-sdk-js';
  * @param {*} data 
  */
 export async function handleProtocolsQuery(ctx, data) {
-  const { identity, signatureMaterial } = ctx;
+  const { profile, signatureMaterial } = ctx;
 
   const protocolsQuery = await ProtocolsQuery.create({
-    target         : identity.did,
+    target         : profile.did,
     signatureInput : signatureMaterial,
     ...data.message
   });

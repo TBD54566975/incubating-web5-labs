@@ -15,26 +15,26 @@ export class WatermarkStore {
   /**
    * 
    * @param {string} kind 
-   * @param {string} identityId 
+   * @param {string} profileId 
    * @param {string} key 
    * @returns {Promise<void>}
    */
-  static async upsert(identityId, kind, key) {
-    const watermark = await WatermarkStore.getWatermark(identityId, kind);
+  static async upsert(profileId, kind, key) {
+    const watermark = await WatermarkStore.getWatermark(profileId, kind);
 
     if (watermark) {
       await db.put({
         _id  : watermark._id,
         _rev : watermark._rev, 
-        identityId,
+        profileId,
         key,
       });
 
       console.log('[watermark-store.put]');
     } else {
       await db.put({
-        _id: this.#generateId(identityId, kind),
-        identityId,
+        _id: this.#generateId(profileId, kind),
+        profileId,
         kind,
         key
       });
@@ -46,11 +46,11 @@ export class WatermarkStore {
   /**
    * 
    * @param {string} kind 
-   * @param {string} identityId
+   * @param {string} profileId
    * @returns {Promise<Watermark>}
    */
-  static async getWatermark(identityId, kind) {
-    const watermarkId = WatermarkStore.#generateId(identityId, kind);
+  static async getWatermark(profileId, kind) {
+    const watermarkId = WatermarkStore.#generateId(profileId, kind);
 
     try {
       return await db.get(watermarkId);
@@ -63,8 +63,8 @@ export class WatermarkStore {
     }
   }
 
-  static #generateId(identityId, kind) {
-    return `watermark:${identityId}:${kind}`;
+  static #generateId(profileId, kind) {
+    return `watermark:${profileId}:${kind}`;
   }
 
   static async createIndexes() {}

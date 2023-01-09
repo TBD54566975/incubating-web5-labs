@@ -3,7 +3,7 @@ import { FingerPrintIcon, UserCircleIcon } from '@heroicons/vue/24/outline';
 import { onMounted } from 'vue';
 
 const navigation = [
-  { name: 'Identities', href: '/dashboard', icon: FingerPrintIcon , current: true },
+  { name: 'Profiles', href: '/dashboard', icon: FingerPrintIcon , current: true },
   { name: 'Contacts', href: '/dashboard/personas', icon: UserCircleIcon, current: false },
 ];
 

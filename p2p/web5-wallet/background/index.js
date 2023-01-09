@@ -1,6 +1,6 @@
 import * as DWN from './dwn';
 
-import { createIndexes, IdentityStore } from './db';
+import { createIndexes, ProfileStore } from './db';
 
 import { AlarmRouter } from './lib/alarm-router';
 import { MessageRouter } from './lib/message-router';
@@ -12,18 +12,18 @@ import { pullDwnMessages } from './alarm-handlers/pull-dwn-messages';
 import { requestAccess } from './message-handlers/dwn/request-access';
 import { processMessage } from './message-handlers/dwn/process-message';
 
-import { getIdentities } from './request-handlers/get-identities';
-import { createIdentity } from './request-handlers/create-identity';
+import { getProfiles } from './request-handlers/get-profiles';
+import { createProfile } from './request-handlers/create-profile';
 
 chrome.runtime.onInstalled.addListener(async ({ _reason, _version }) => {
   console.log('extension installed');
   await createIndexes(); 
 
-  const defaultIdentity = await IdentityStore.getByName('default');
+  const defaultProfile = await ProfileStore.getByName('default');
 
-  if (!defaultIdentity) {
+  if (!defaultProfile) {
     console.log('creating default DID');
-    await IdentityStore.create('default', 'key');
+    await ProfileStore.create('default', 'key');
   }
 
   await DWN.open();
@@ -43,8 +43,8 @@ alarmRouter.on('dwn.push', pushDwnMessages);
 alarmRouter.on('dwn.pull', pullDwnMessages);
 
 const requestRouter = new RequestRouter();
-requestRouter.get('/identities', getIdentities);
-requestRouter.post('/identities', createIdentity);
+requestRouter.get('/profiles', getProfiles);
+requestRouter.post('/profiles', createProfile);
 
 const messageRouter = new MessageRouter();
 messageRouter.on('web5.dwn.requestAccess', requestAccess);

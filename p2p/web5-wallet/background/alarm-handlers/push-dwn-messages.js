@@ -1,6 +1,5 @@
 import * as DWN from '../dwn';
-import { CollectionsWrite } from '@tbd54566975/dwn-sdk-js';
-import { IdentityStore, WatermarkStore } from '../db';
+import { ProfileStore, WatermarkStore } from '../db';
 import { DIDResolver } from '../lib/did-resolver';
 import { CID } from 'multiformats/cid';
 
@@ -9,14 +8,14 @@ import { CID } from 'multiformats/cid';
 const compatibleDidMethods = new Set(['ion']);
 
 export async function pushDwnMessages() {
-  const identities = await IdentityStore.getAllIdentities();
+  const profiles = await ProfileStore.getAllProfiles();
 
-  for (let identity of identities) {
-    if (!compatibleDidMethods.has(identity.didMethod)) {
+  for (let profile of profiles) {
+    if (!compatibleDidMethods.has(profile.didMethod)) {
       continue;
     }
 
-    const dwnHosts = await DIDResolver.getDWNHosts(identity.did);
+    const dwnHosts = await DIDResolver.getDWNHosts(profile.did);
 
     // TODO: handle multiple dwn hosts. send to all? send to at least 1 successfully?
     const [ dwnHost ] = dwnHosts;
@@ -26,7 +25,7 @@ export async function pushDwnMessages() {
     }
 
     let watermarkKey; 
-    const watermark = await WatermarkStore.getWatermark(identity._id, 'push');
+    const watermark = await WatermarkStore.getWatermark(profile._id, 'push');
     
     if (watermark) {
       watermarkKey = watermark.key;
@@ -34,8 +33,8 @@ export async function pushDwnMessages() {
     }
 
 
-    const tenantEvents = await DWN.messageStore.getEventLog(identity.did, watermarkKey);
-    console.log(`[push] pushing dwn messages to ${dwnHost} for ${identity.name}. ${tenantEvents.length} messages to push`, tenantEvents);
+    const tenantEvents = await DWN.messageStore.getEventLog(profile.did, watermarkKey);
+    console.log(`[push] pushing dwn messages to ${dwnHost} for ${profile.name}. ${tenantEvents.length} messages to push`, tenantEvents);
     let numAccepts = 0;
     let numConflicts = 0;
     
@@ -54,7 +53,7 @@ export async function pushDwnMessages() {
             numConflicts += 1;
           }
           
-          await WatermarkStore.upsert(identity._id, 'push', event.watermark);
+          await WatermarkStore.upsert(profile._id, 'push', event.watermark);
         }
       } catch(e) {
         console.error(`[push] [DWN.send] error: ${e}`);

@@ -4,8 +4,8 @@ import { useRoute } from 'vue-router';
 import { BackgroundRequest } from '../background-request';
 
 const requestingDomain = ref('soso');
-const identities = ref([]);
-const selectedIdentity = ref(undefined);
+const profiles = ref([]);
+const selectedProfile = ref(undefined);
 
 const route = useRoute();
 const { task } = route.query;
@@ -16,13 +16,13 @@ onMounted(async () => {
 
   requestingDomain.value = result.requestingDomain;
 
-  const { data } =  await BackgroundRequest.get('/identities');
-  identities.value = data;
+  const { data } =  await BackgroundRequest.get('/profiles');
+  profiles.value = data;
 });
 
 
 async function grantAccess(isAllowed) {
-  await chrome.storage.session.set({ [task]: { isAllowed, did: selectedIdentity.value.did } });
+  await chrome.storage.session.set({ [task]: { isAllowed, did: selectedProfile.value.did } });
   window.close();
 }
 
@@ -41,15 +41,15 @@ async function grantAccess(isAllowed) {
         is requesting access to your DWN
       </p>
       <div class="mt-4 mx-4">
-        <label for="identity" class="block font-medium text-gray-700 text-sm">Identity</label>
+        <label for="profile" class="block font-medium text-gray-700 text-sm">Profile</label>
         <select
-          id="identity" name="identity" v-model="selectedIdentity"
+          id="profile" name="profile" v-model="selectedProfile"
           class="block border-gray-300 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 mt-1 pl-3 pr-10 py-2 rounded-md sm:text-sm text-base w-full">
           <option disabled value="">
-            Select an identity
+            Select an profile
           </option>
-          <option v-for="identity in identities" :key="identity._id" :value="identity">
-            {{ identity.name }}
+          <option v-for="profile in profiles" :key="profile._id" :value="profile">
+            {{ profile.name }}
           </option>
         </select>
       </div>

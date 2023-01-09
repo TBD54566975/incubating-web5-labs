@@ -1,4 +1,4 @@
-import { PermissionStore, IdentityStore } from '../../db';
+import { PermissionStore, ProfileStore } from '../../db';
 import { openUserConsentWindow } from '../../utils';
 
 export async function requestAccess(ctx) {
@@ -9,9 +9,9 @@ export async function requestAccess(ctx) {
     const { isAllowed } = permissions;
 
     if (isAllowed) {
-      // TODO: store identity instead of did in PermissionStore
-      const identity = await IdentityStore.getByDID(permissions.did);
-      return { did: permissions.did, isAllowed, name: identity.name };
+      // TODO: store profile instead of did in PermissionStore
+      const profile = await ProfileStore.getByDID(permissions.did);
+      return { did: permissions.did, isAllowed, name: profile.name };
     } else {
       return { isAllowed };
     }
@@ -22,11 +22,11 @@ export async function requestAccess(ctx) {
   
   await PermissionStore.createPermission(sender.origin, did, isAllowed);
 
-  // TODO: store identity instead of did in PermissionStore
-  const identity = await IdentityStore.getByDID(did);
+  // TODO: store profile instead of did in PermissionStore
+  const profile = await ProfileStore.getByDID(did);
 
   if (isAllowed) {
-    return { did, isAllowed, name: identity.name };
+    return { did, isAllowed, name: profile.name };
   } else {
     return { isAllowed };
   }
