@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue';
 import { ClipboardDocumentIcon } from '@heroicons/vue/24/outline';
 import { BackgroundRequest } from '../background-request';
 import Modal from '../components/Modal.vue';
-import CreateIonDidForm from '../components/CreateIonDidForm.vue';
+import CreateProfileForm from '../components/CreateProfileForm.vue';
 
 const showCreateProfileModal = ref(false);
 const profiles = ref([]);
@@ -88,7 +88,7 @@ async function copyDidToClipboard(profile) {
 
   <Modal :open="showCreateProfileModal" @close="showCreateProfileModal = false">
     <template #default>
-      <CreateIonDidForm @submitted="showCreateProfileModal = false" />
+      <CreateProfileForm @submitted="showCreateProfileModal = false" />
     </template>
   </Modal>
 </template>

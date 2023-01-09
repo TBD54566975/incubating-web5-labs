@@ -1,4 +1,6 @@
 <script setup>
+// TODO: include ability to select did type: key, ion, etc.
+
 import { ref, defineEmits } from 'vue';
 import { BackgroundRequest } from '../background-request';
 
@@ -35,7 +37,7 @@ async function createProfile() {
     <form @submit.prevent="createProfile">
       <!-- Title -->
       <div class="text-lg">
-        Create ION DID
+        Create Profile
       </div>
         
       <!-- Name Input -->
