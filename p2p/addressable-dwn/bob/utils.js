@@ -184,7 +184,7 @@ export async function collectionsWrite(didState, data, options) {
   return await sendDWNMessage(dwnHost, message);
 }
 
-export async function createIdentity() {
+export async function createProfile() {
   const { did, publicJWK, privateJWK } = await DIDKey.generate();
   const { alg, kid } = publicJWK;
 

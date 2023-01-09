@@ -61,9 +61,12 @@ export async function handleCollectionsWrite(ctx, data) {
 
     if (dwnHost) {
       const recipientCollectionsWrite = await CollectionsWrite.create({
-        ...data.message,
+        // copying over dateCreated is required because it is included in the deterministic
+        // generation of recordId and contextId
+        dateCreated    : collectionsWrite.message.descriptor.dateCreated,
         target         : recipient,
-        signatureInput : signatureMaterial
+        signatureInput : signatureMaterial,
+        ...data.message,
       });
 
       try {
