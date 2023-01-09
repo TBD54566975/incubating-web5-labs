@@ -1,9 +1,11 @@
 import fs from 'fs';
+
 import path from 'path';
 
 import { fileURLToPath } from 'url';
 import { ProtocolsQuery, CollectionsQuery, CollectionsWrite, ProtocolsConfigure } from "@tbd54566975/dwn-sdk-js";
 import { generateKeyPair, DID, resolve } from '@decentralized-identity/ion-tools';
+import { DIDKey } from '../src/lib/did-key.js';
 
 // __filename and __dirname are not defined in ES module scope
 const __filename = fileURLToPath(import.meta.url);
@@ -180,4 +182,52 @@ export async function collectionsWrite(didState, data, options) {
   });
 
   return await sendDWNMessage(dwnHost, message);
+}
+
+export async function createIdentity() {
+  const { did, publicJWK, privateJWK } = await DIDKey.generate();
+  const { alg, kid } = publicJWK;
+
+  const signatureMaterial = {
+    protectedHeader: { alg, kid },
+    privateJwk: privateJWK
+  };
+
+  return { did, publicJWK, privateJWK, signatureMaterial }
+}
+
+/**
+ * Generates a random alpha-numeric string.
+ */
+export function randomString(length) {
+  const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+  // pick characters randomly
+  let randomString = '';
+  for (let i = 0; i < length; i++) {
+    randomString += charset.charAt(Math.floor(Math.random() * charset.length));
+  }
+
+  return randomString;
+};
+
+/**
+ * Generates a random byte array of given length.
+ */
+export function randomBytes(length) {
+  const random = randomString(length);
+  return new TextEncoder().encode(random);
+};
+
+/**
+ * The maximum is exclusive and the minimum is inclusive
+ * @param {number} min 
+ * @param {number} max 
+ * @returns {number}
+ */
+export function randomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+
+  return Math.floor(Math.random() * (max - min) + min);
 }
