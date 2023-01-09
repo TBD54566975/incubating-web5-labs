@@ -9,11 +9,11 @@ import { RequestRouter } from './lib/request-router';
 import { pushDwnMessages } from './alarm-handlers/push-dwn-messages';
 import { pullDwnMessages } from './alarm-handlers/pull-dwn-messages';
 
-import { requestAccess } from './message-handlers/dwn/request-access';
-import { processMessage } from './message-handlers/dwn/process-message';
+import { requestAccess } from './web5-message-handlers/dwn/request-access';
+import { processMessage } from './web5-message-handlers/dwn/process-message';
 
-import { getProfiles } from './request-handlers/get-profiles';
-import { createProfile } from './request-handlers/create-profile';
+import { getProfiles } from './ui-request-handlers/get-profiles';
+import { createProfile } from './ui-request-handlers/create-profile';
 
 chrome.runtime.onInstalled.addListener(async ({ _reason, _version }) => {
   console.log('extension installed');
@@ -38,17 +38,20 @@ chrome.action.onClicked.addListener(async _ => {
   await chrome.tabs.create({ active: true, url: '/index.html' });
 });
 
+// registers handlers for all [chrome.alarms](https://developer.chrome.com/docs/extensions/reference/alarms/)
 const alarmRouter = new AlarmRouter();
 alarmRouter.on('dwn.push', pushDwnMessages);
 alarmRouter.on('dwn.pull', pullDwnMessages);
 
-const requestRouter = new RequestRouter();
-requestRouter.get('/profiles', getProfiles);
-requestRouter.post('/profiles', createProfile);
+// registers handlers for all requests made by UI
+const uiRequestRouter = new RequestRouter();
+uiRequestRouter.get('/profiles', getProfiles);
+uiRequestRouter.post('/profiles', createProfile);
 
-const messageRouter = new MessageRouter();
-messageRouter.on('web5.dwn.requestAccess', requestAccess);
-messageRouter.on('web5.dwn.processMessage', processMessage);
+// registers handlers for all inbound web5 messages
+const web5MessageRouter = new MessageRouter();
+web5MessageRouter.on('web5.dwn.requestAccess', requestAccess);
+web5MessageRouter.on('web5.dwn.processMessage', processMessage);
 
 // TODO: implement subscribe
 // messageRouter.on('web5.dwn.subscribe', subscribe);
