@@ -90,7 +90,7 @@ async function addTodo() {
 
 async function toggleTodoComplete(todoId) {
   
-  // look for the TODO of the given
+  // look for the TODO of the given record ID
   let todoToToggle;
   for (let todo of todos.value) {
     if (todo.id === todoId) {
