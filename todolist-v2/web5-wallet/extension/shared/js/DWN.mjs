@@ -9,6 +9,6 @@ export function generateDWNSignature(did, privateJWK) {
 			alg: privateJWK.alg,
 			kid: `${did}#${id}`,
 		},
-		jwkPrivate: privateJWK,
+		privateJwk: privateJWK,
 	};
 }

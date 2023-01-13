@@ -8,7 +8,7 @@
 	"dependencies": {
 		"@noble/ed25519": "1.6.0",
 		"@tailwindcss/forms": "^0.5.3",
-		"@tbd54566975/dwn-sdk-js": "0.0.14",
+		"@tbd54566975/dwn-sdk-js": "0.0.17-unstable.c38999d-2023.1.13-01-36-36",
 		"multiformats": "9.6.4",
 		"varint": "^6.0.0"
 	},
