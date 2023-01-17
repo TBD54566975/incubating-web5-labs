@@ -1,5 +1,7 @@
 # Web5 Wallet
 
+This wallet is a reference implementation of a wallet that contains a Decentralized Web Node and stores your DID and key material.
+
 ## Build instructions
 
 ```
