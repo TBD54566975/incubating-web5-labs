@@ -1,15 +1,11 @@
 # Addressable DWN
 
-## How to Run
-_assuming you're in the `p2p` directory_
-```bash
-# this is a workaround for a change that hasn't yet made it to dwn-sdk-js
-cd message-store-level-v2
-npm install
-node bundle.js
+This shows how to run a Decentralized Web Node (DWN) that is publicly addressable. This is useful for demos and testing.
 
-cd ../addressable-dwn
-npm install --install-links # --install-links installs `message-store-level-v2`
+## How to Run
+
+```bash
+npm install --install-links # --install-links installs `message-store-level-v2` which was built in the [pre-requisites](../README.md#pre-requisites-just-do-once)
 
 node src/index.js
 ```

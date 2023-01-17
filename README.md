@@ -1,17 +1,35 @@
-# P2P Lab
+# Web5 Example Apps
 
-## How to try
-* Build/Install the wallet. Instructions [here](./web5-wallet/README.md)
-* Run Addressable DWN. Instructions [here](./addressable-dwn/README.md)
-* Run Chat App (aka Dignal / 5ignal). Instructions [here](./chat-app/README.md)
-* Click on the wallet action in the sidebar and create an Identity. For DWN Host Provider, put the address of the addressable dwn you just started: `http://localhost:3000`
-  * _Note: in order to send messages to anyone you'll actually need to expose your DWN via `ngrok`. or piggy back on someone who's already running one that is **publicly addressable**_
-  * _Note: We should really rename "Identity" to "Profile"_
-  * _Note: We really need to change the Form title from "Create ION DID" to "Create Profile"_
-* Pop open a browser and head to `http://localhost:5173`
-* In the DWN Request Access Popup, select the Identity you just created.
-* find someone to send a message to
+A collection of Work In Progress example apps.
+
+## Example apps
+
+* `todo-app` the "canonical" todo app that every framework has to have. This is a good single user starting point for a "hello world" style of app. Stores your todos in your Decentralized web node. 
+* `chat-app` a more complex app that shows network style interaction and communication with other people via their decentralized identifier
+
+# Supporting repos
+
+* `web5-wallet` a draft implementation of a wallet to run as a browser extension to enable web5 apps (which has its own DWeb Node contained within it)
+* `addressable-dwn` This is a "DWN as a service" which can be used by the chat demo to allow people to sync messages.
+* `message-store-level-v2` a (temporary) implementation of data storage using LevelDB (this will soon be merged into the DWN SDK so will go away)
+ 
+## Getting Started
+
+# Pre-requisites (just do once)
+
+1. (temporary) Install the message-store-level-v2 patch: `cd message-store-level-v2 && npm install && node bundle.js`
+2. Build and then install the web5-wallet into chrome, follow the instructions [here](./web5-wallet/README.md)
+
+# To Do example app
+
+This app is the simplest starting point.
+
+* `cd todo-app && npm install && npm run dev`
+* Open a browser and navigate to `http://localhost:5173` - this will show the TODO app which stores your todos in your DWeb Node.
+* The code that powers it is all [here](./todo-app/src/App.vue)
 
 
-## Reflections
-**TODO: Fill out**
+# Chat App
+
+The chat app involves a few more moving parts currently, and you will need a friend, follow along [here](./chat-app/README.md).
+
