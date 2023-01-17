@@ -8,4 +8,4 @@ npm install
 npm run dev
 ```
 
-Pop open a browser and head to `http://localhost:5173`
+Pop open a browser and head to `http://localhost:5275`
