@@ -4,7 +4,7 @@ A collection of Work In Progress example apps.
 
 ## Examples
 
-* `todo-app` the "canonical" todo app that every framework has to have. This is a good single user starting point for a "hello world" style of app. Stores your todos in your Decentralized web node. 
+* [`todo-app`](./todo-app) the "canonical" todo app that every framework has to have. This is a good single user starting point for a "hello world" style of app. Stores your todos in your Decentralized web node. 
 * `chat-app` a more complex app that shows network style interaction and communication with other people via their decentralized identifier
 
 ## Supporting repos
