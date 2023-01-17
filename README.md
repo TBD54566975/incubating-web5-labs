@@ -10,7 +10,7 @@ A collection of Work In Progress example apps.
 ## Supporting repos
 
 * `web5-wallet` a draft implementation of a wallet to run as a browser extension to enable web5 apps (which has its own DWeb Node contained within it)
-* `addressable-dwn` This is a "DWN as a service" which can be used by the chat demo to allow people to sync messages.
+* [`addressable-dwn`](./addressable-dwn) This is a "DWN as a service" which can be used by the chat demo to allow people to sync messages.
 * `message-store-level-v2` a (temporary) implementation of data storage using LevelDB (this will soon be merged into the DWN SDK so will go away)
  
 # Getting Started
