@@ -46,7 +46,7 @@ onMounted(async () => {
 
     // TODO data itself does not have `recordId`, we add it after deserialization
     todo.id = entry.recordId;
-    todo.lineageParent = entry;
+    todo.unsignedEntry = entry;
     storedTodos.push(todo);
   }
 
@@ -84,7 +84,7 @@ async function addTodo() {
   // add DWeb message recordId and record as a way to reference the message for further operations
   // e.g. updating it or overwriting it
   todo.id = record.recordId;
-  todo.lineageParent = record;
+  todo.unsignedEntry = record;
   todos.value.push(todo);
 }
 
@@ -102,15 +102,14 @@ async function toggleTodoComplete(todoId) {
   // a copy for sending to DWN
   let toggledTodo = { ...toRaw(todoToToggle), completed: !todoToToggle.completed };
   delete toggledTodo.id;
-  delete toggledTodo.lineageParent;
+  delete toggledTodo.unsignedEntry;
   
   const { record, result } = await window.web5.dwn.processMessage({
-    method        : 'CollectionsWrite',
-    lineageParent : toRaw(todoToToggle.lineageParent),
-    data          : toggledTodo,
-    options       : {
-      schema     : 'http://some-schema-registry.org/todo',
-      dataFormat : 'application/json',
+    method    : 'CollectionsWrite',
+    baseEntry : toRaw(todoToToggle.unsignedEntry), // `baseEntry` will signal if this the initial create or a replace of existing record
+    data      : toggledTodo,
+    options   : {
+      dataFormat: 'application/json', // NOTE:a requirement by the wallet
     }
   });
 
