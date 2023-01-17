@@ -46,8 +46,8 @@ export async function handleAPI(messageId, { message }, host, windowId, tabId, f
 			let profile = profiles.find((profile) => profile.did === permission.did);
 
 			let collectionsWrite;
-			// if this is the lineage root
-			if (message.lineageParent === undefined) {
+			// if this is the initial write
+			if (message.baseEntry === undefined) {
 				let collectionsWriteOptions = {
 					...message.options,
 					target: profile.did,
@@ -57,18 +57,17 @@ export async function handleAPI(messageId, { message }, host, windowId, tabId, f
 				console.log(collectionsWriteOptions);
 
 				collectionsWrite = await CollectionsWrite.create(collectionsWriteOptions);
-			} else { // this is a lineage child
-				let lineageChildCollectionsWriteOptions = {
-					target: profile.did,
-					lineageParent: message.lineageParent.recordId, // hardcode to the recordId, this is technically wrong but works in this POC because we have not utilized "delete"
-					unsignedLineageParentMessage: message.lineageParent,
+			} else { // this is an "update" to an existing record
+				let createFromOptions = {
 					...message.options,
+					target: profile.did,
+					unsignedCollectionsWriteMessage: message.baseEntry,
 					signatureInput: generateDWNSignature(profile.did, profile.privateJWK),
 				};
-				console.log('LineageChildCollectionsWriteOptions:');
-				console.log(lineageChildCollectionsWriteOptions);
+				console.log('CreateFromOptions:');
+				console.log(createFromOptions);
 
-				collectionsWrite = await CollectionsWrite.createLineageChild(lineageChildCollectionsWriteOptions)
+				collectionsWrite = await CollectionsWrite.createFrom(createFromOptions)
 			}
 
 			let collectionsWriteMessage = collectionsWrite.toJSON();
