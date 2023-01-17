@@ -8,9 +8,13 @@ import CreateProfileForm from '../components/CreateProfileForm.vue';
 const showCreateProfileModal = ref(false);
 const profiles = ref([]);
 
-onMounted(async () => {
+async function fetchProfiles() {
   const { data } = await BackgroundRequest.get('/profiles');
   profiles.value = data;
+}
+
+onMounted(async () => {
+  await fetchProfiles();
 });
 
 async function copyDidToClipboard(profile) {
@@ -32,8 +36,7 @@ async function copyDidToClipboard(profile) {
         </p>
       </div>
       <div class="mt-4 sm:flex-none sm:ml-16 sm:mt-0">
-        <button
-          type="button" @click="showCreateProfileModal = true"
+        <button type="button" @click="showCreateProfileModal = true"
           class="bg-indigo-600 border border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 font-medium hover:bg-indigo-700 inline-flex items-center justify-center px-4 py-2 rounded-md shadow-sm sm:w-auto text-sm text-white">
           Create Profile
         </button>
@@ -55,7 +58,7 @@ async function copyDidToClipboard(profile) {
                   DID
                 </th>
                 <th scope="col" class="font-semibold px-3 py-3.5 text-gray-900 text-left text-sm">
-                  DID Doc 
+                  DID Doc
                 </th>
                 <th scope="col" class="font-semibold px-3 py-3.5 text-gray-900 text-left text-sm">
                   Date Created
@@ -70,7 +73,8 @@ async function copyDidToClipboard(profile) {
                 </td>
                 <td class="align-middle flex px-3 py-4 space-x-2 text-gray-500 text-sm whitespace-nowrap">
                   <span>{{ profile.didMethod }}</span>
-                  <ClipboardDocumentIcon class="cursor-pointer h-5 text-black w-5" @click="copyDidToClipboard(profile)" />
+                  <ClipboardDocumentIcon class="cursor-pointer h-5 text-black w-5"
+                    @click="copyDidToClipboard(profile)" />
                 </td>
                 <td class="px-3 py-4 text-gray-500 text-sm whitespace-nowrap">
                   <a href="#" class="hover:text-indigo-900 text-indigo-600">Resolve</a>
@@ -88,7 +92,7 @@ async function copyDidToClipboard(profile) {
 
   <Modal :open="showCreateProfileModal" @close="showCreateProfileModal = false">
     <template #default>
-      <CreateProfileForm @submitted="showCreateProfileModal = false" />
+      <CreateProfileForm @submitted="() => { fetchProfiles(); showCreateProfileModal = false }" />
     </template>
   </Modal>
 </template>
