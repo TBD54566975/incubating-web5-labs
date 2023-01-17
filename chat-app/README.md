@@ -11,7 +11,7 @@ This trivial chat app uses an addressable DWN (other approaches will soon be ava
 * Click on the wallet action in the sidebar and create a Profile. For DWN Host Provider, put the address of the addressable dwn you just started with the public https url from ngrok above.
   * _Note: currently in order to send messages to anyone you'll actually need to expose your DWN via `ngrok`.
 * Pop open a browser and head to `http://localhost:5275`
-* In the DWN Request Access Popup, select the Identity you just created.
+* In the DWN Request Access Popup, select the Profile you just created.
 * find someone to send a message to and talk to them, you can find your DID in the wallet sidebar sidebar and use the "copy" icon to share it.
 
 ## Interesting code
