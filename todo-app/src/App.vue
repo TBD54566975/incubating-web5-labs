@@ -85,7 +85,6 @@ async function addTodo() {
 }
 
 async function toggleTodoComplete(todoRecordId) {
-  console.log('hello?');
   let toggledTodo;
   let updatedTodoData;
 
@@ -100,17 +99,6 @@ async function toggleTodoComplete(todoRecordId) {
   }
 
   const { descriptor } = toggledTodo.dWebMessage;
-
-  console.log({
-    method  : 'CollectionsWrite',
-    data    : updatedTodoData,
-    message : {
-      recordId    : toggledTodo.dWebMessage.recordId,
-      dateCreated : descriptor.dateCreated,
-      schema      : descriptor.schema,
-      dataFormat  : descriptor.dataFormat,
-    }
-  });
 
   const result = await window.web5.dwn.processMessage({
     method  : 'CollectionsWrite',

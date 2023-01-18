@@ -26,6 +26,9 @@ export async function handleCollectionsWrite(ctx, data) {
   }
 
   let collectionsWrite;
+
+  // the following conditional is a convenience provided via the web5 api to clobber a
+  // `CollectionsWrite` without having to manually copy over the immutable properties
   // if this is the initial write
   if (data.baseEntry === undefined) {
     console.log('Initial CollectionsWrite');
@@ -49,9 +52,6 @@ export async function handleCollectionsWrite(ctx, data) {
   }
 
   const collectionsWriteJSON = collectionsWrite.toJSON();
-  console.log(collectionsWriteJSON);
-  console.log(JSON.stringify(collectionsWriteJSON));
-
 
   const dwn = await DWN.open();
   const result = await dwn.processMessage(collectionsWriteJSON);
