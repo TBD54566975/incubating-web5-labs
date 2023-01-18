@@ -33,3 +33,5 @@ This app is the simplest starting point.
 
 The chat app involves a few more moving parts currently, and you will need a friend, follow along [here](./chat-app/README.md).
 
+
+![./labs.png](./labs.png)
