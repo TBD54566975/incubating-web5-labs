@@ -23,7 +23,8 @@ onMounted(async () => {
     message : {
       filter: {
         schema: 'http://some-schema-registry.org/todo'
-      }
+      },
+      dateSort: 'createdAscending'
     }
   });
 
@@ -40,13 +41,12 @@ onMounted(async () => {
   const storedTodos = [];
 
   for (let entry of result.entries) {
+    let todo = { dWebMessage: entry };
+    
     const todoBytes = base64url.baseDecode(entry.encodedData);
     const todoStringified = textDecoder.decode(todoBytes);
-    const todo = JSON.parse(todoStringified);
+    todo.data = JSON.parse(todoStringified);
 
-    // TODO data itself does not have `recordId`, we add it after deserialization
-    todo.id = entry.recordId;
-    todo.unsignedEntry = entry;
     storedTodos.push(todo);
   }
 
@@ -55,7 +55,7 @@ onMounted(async () => {
 });
 
 async function addTodo() {
-  const todo = {
+  const todoData = {
     completed   : false,
     description : newTodoDescription.value
   };
@@ -65,7 +65,7 @@ async function addTodo() {
   // record is the DWeb message written to the DWN
   const { record, result } = await window.web5.dwn.processMessage({
     method  : 'CollectionsWrite',
-    data    : toRaw(todo),
+    data    : todoData,
     message : {
       schema     : 'http://some-schema-registry.org/todo',
       dataFormat : 'application/json',
@@ -76,48 +76,54 @@ async function addTodo() {
 
   // add DWeb message recordId as a way to reference the message for further operations
   // e.g. updating it or overwriting it
-  todo.id = record.recordId;
-  todo.unsignedEntry = record;
+  const todo = {
+    dWebMessage : record,
+    data        : todoData
+  };
+  
   todos.value.push(todo);
 }
 
-async function toggleTodoComplete(todoId) {
+async function toggleTodoComplete(todoRecordId) {
+  console.log('hello?');
+  let toggledTodo;
+  let updatedTodoData;
 
-  // look for the TODO of the given record ID
-  let todoToToggle;
   for (let todo of todos.value) {
-    if (todo.id === todoId) {
-      todoToToggle = todo;
+    if (todo.dWebMessage.recordId === todoRecordId) {
+      toggledTodo = todo;
+      todo.data.completed = !todo.data.completed;
+
+      updatedTodoData = { ...toRaw(todo.data) };
       break;
     }
   }
 
-  // a copy for sending to DWN
-  let toggledTodo = { ...toRaw(todoToToggle), completed: !todoToToggle.completed };
-  delete toggledTodo.id;
-  delete toggledTodo.unsignedEntry;
+  const { descriptor } = toggledTodo.dWebMessage;
 
-  const { record, result } = await window.web5.dwn.processMessage({
-    method    : 'CollectionsWrite',
-    baseEntry : toRaw(todoToToggle.unsignedEntry), // `baseEntry` will signal if this the initial create or a replace of existing record
-    data      : toggledTodo,
-    message   : {
-      dataFormat: 'application/json', // NOTE:a requirement by the wallet
+  console.log({
+    method  : 'CollectionsWrite',
+    data    : updatedTodoData,
+    message : {
+      recordId    : toggledTodo.dWebMessage.recordId,
+      dateCreated : descriptor.dateCreated,
+      schema      : descriptor.schema,
+      dataFormat  : descriptor.dataFormat,
     }
   });
 
-  // log some debug info
-  if (result.status.code !== 202) {
-    console.error(result);
-    toast.error(result.status.detail);
-    return;
-  }
-  else {
-    console.log(record);
-  }
+  const result = await window.web5.dwn.processMessage({
+    method  : 'CollectionsWrite',
+    data    : updatedTodoData,
+    message : {
+      recordId    : toggledTodo.dWebMessage.recordId,
+      dateCreated : descriptor.dateCreated,
+      schema      : descriptor.schema,
+      dataFormat  : descriptor.dataFormat,
+    }
+  });
 
-  // we've successfully sent the toggled TODO, modify the local copy to reflect in UI
-  todoToToggle.completed = !todoToToggle.completed;
+  console.log(result);
 }
 
 </script>
@@ -149,12 +155,12 @@ async function toggleTodoComplete(todoId) {
     </div>
 
     <div v-if="(todos.length > 0)" class="border-gray-200 border-t border-x mt-16 rounded-lg shadow-md sm:max-w-xl sm:mx-auto sm:w-full">
-      <div v-for="todo in todos" :key="todo.id" class="border-b border-gray-200 flex items-center p-4">
-        <div @click="toggleTodoComplete(todo.id)" class="cursor-pointer">
-          <CheckCircleIcon class="h-8 text-gray-200 w-8" :class="{ 'text-green-500': todo.completed }" />
+      <div v-for="todo in todos" :key="todo.dWebMessage.recordId" class="border-b border-gray-200 flex items-center p-4">
+        <div @click="toggleTodoComplete(todo.dWebMessage.recordId)" class="cursor-pointer">
+          <CheckCircleIcon class="h-8 text-gray-200 w-8" :class="{ 'text-green-500': todo.data.completed }" />
         </div>
         <div class="font-light ml-3 text-gray-500 text-xl">
-          {{ todo.description }}
+          {{ todo.data.description }}
         </div>
       </div>
     </div>
