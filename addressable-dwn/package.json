@@ -24,7 +24,8 @@
     "search-index": "3.3.0",
     "prompts": "2.4.2",
     "level": "8.0.0",
-    "multiformats": "10.0.3"
+    "multiformats": "10.0.3",
+    "ipfs-core": "^0.17.0"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.7",
