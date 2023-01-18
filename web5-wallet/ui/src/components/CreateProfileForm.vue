@@ -21,8 +21,6 @@ async function createProfile() {
     };
   }
 
-  console.log(payload);
-
   const resp = await BackgroundRequest.post('/profiles', payload);
 
   // TODO: handle non-201 status codes
