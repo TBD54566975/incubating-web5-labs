@@ -134,20 +134,13 @@ export class MessageStoreLevelv2 {
     return events;
   }
 
-  async query(includeCriteria, excludeCriteria = {}) {
+  async query(criteria) {
     const messages = [];
 
     // parse query into a query that is compatible with the index we're using
-    const includeQueryTerms = MessageStoreLevelv2.#buildIndexQueryTerms(includeCriteria);
-    const excludeQueryTerms = MessageStoreLevelv2.#buildIndexQueryTerms(excludeCriteria);
-    const finalQuery = {
-      NOT: {
-        INCLUDE: { AND: includeQueryTerms },
-        EXCLUDE: { AND: excludeQueryTerms }
-      }
-    };
+    const queryTerms = MessageStoreLevelv2.#buildIndexQueryTerms(criteria);
 
-    const { RESULT: indexResults } = await this.#index.QUERY(finalQuery);
+    const { RESULT: indexResults } = await this.#index.QUERY({ AND: queryTerms });
 
     for (const result of indexResults) {
       const cid = CID.parse(result._id);
@@ -168,17 +161,19 @@ export class MessageStoreLevelv2 {
   }
 
   async put(messageJson, indexes) {
+    // make a shallow copy so we don't mess up the references (e.g. `encodedData`) of original message
+    let messageCopy = { ...messageJson };
 
     // delete `encodedData` if it exists so `messageJson` is stored without it, `encodedData` will be decoded, chunked and stored separately below
     let encodedData = undefined;
-    if (messageJson['encodedData'] !== undefined) {
-      const messageJsonWithEncodedData = messageJson;
+    if (messageCopy['encodedData'] !== undefined) {
+      const messageJsonWithEncodedData = messageCopy;
       encodedData = messageJsonWithEncodedData.encodedData;
 
       delete messageJsonWithEncodedData.encodedData;
     }
 
-    const encodedBlock = await Block.encode({ value: messageJson, codec: cbor, hasher: sha256 });
+    const encodedBlock = await Block.encode({ value: messageCopy, codec: cbor, hasher: sha256 });
 
     await this.#db.put(encodedBlock.cid, encodedBlock.bytes);
 
