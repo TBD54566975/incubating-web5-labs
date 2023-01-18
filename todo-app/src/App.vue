@@ -46,6 +46,7 @@ onMounted(async () => {
 
     // TODO data itself does not have `recordId`, we add it after deserialization
     todo.id = entry.recordId;
+    todo.unsignedEntry = entry;
     storedTodos.push(todo);
   }
 
@@ -76,33 +77,47 @@ async function addTodo() {
   // add DWeb message recordId as a way to reference the message for further operations
   // e.g. updating it or overwriting it
   todo.id = record.recordId;
+  todo.unsignedEntry = record;
   todos.value.push(todo);
 }
 
 async function toggleTodoComplete(todoId) {
-  let toggledTodo;
 
+  // look for the TODO of the given record ID
+  let todoToToggle;
   for (let todo of todos.value) {
     if (todo.id === todoId) {
-      todo.completed = !todo.completed;
-
-      toggledTodo = { ...toRaw(todo) };
+      todoToToggle = todo;
       break;
     }
   }
 
+  // a copy for sending to DWN
+  let toggledTodo = { ...toRaw(todoToToggle), completed: !todoToToggle.completed };
   delete toggledTodo.id;
-  const result = await window.web5.dwn.processMessage({
-    method  : 'CollectionsWrite',
-    data    : toggledTodo,
-    message : {
-      schema     : 'http://some-schema-registry.org/todo',
-      dataFormat : 'application/json',
-      recordId   : todoId,
+  delete toggledTodo.unsignedEntry;
+
+  const { record, result } = await window.web5.dwn.processMessage({
+    method    : 'CollectionsWrite',
+    baseEntry : toRaw(todoToToggle.unsignedEntry), // `baseEntry` will signal if this the initial create or a replace of existing record
+    data      : toggledTodo,
+    message   : {
+      dataFormat: 'application/json', // NOTE:a requirement by the wallet
     }
   });
 
-  console.log(result);
+  // log some debug info
+  if (result.status.code !== 202) {
+    console.error(result);
+    toast.error(result.status.detail);
+    return;
+  }
+  else {
+    console.log(record);
+  }
+
+  // we've successfully sent the toggled TODO, modify the local copy to reflect in UI
+  todoToToggle.completed = !todoToToggle.completed;
 }
 
 </script>

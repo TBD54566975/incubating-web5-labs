@@ -9,11 +9,13 @@ import * as DWN from '../../../dwn';
 export async function handleCollectionsQuery(ctx, data) {
   const { profile, signatureMaterial } = ctx;
   
-  const collectionsQuery = await CollectionsQuery.create({
+  const queryOptions = {
     ...data.message,
     target         : profile.did,
     signatureInput : signatureMaterial
-  });
+  };
+  const collectionsQuery = await CollectionsQuery.create(queryOptions);
+  console.log(collectionsQuery.message);
 
   const dwn = await DWN.open();
   const result =  await dwn.processMessage(collectionsQuery.toJSON());

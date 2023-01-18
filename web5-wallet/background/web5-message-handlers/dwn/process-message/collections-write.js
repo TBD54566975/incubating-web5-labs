@@ -25,16 +25,38 @@ export async function handleCollectionsWrite(ctx, data) {
     }
   }
 
-  const collectionsWrite = await CollectionsWrite.create({
-    ...data.message,
-    target         : profile.did,
-    signatureInput : signatureMaterial
-  });
+  let collectionsWrite;
+  // if this is the initial write
+  if (data.baseEntry === undefined) {
+    console.log('Initial CollectionsWrite');
+    let collectionsWriteOptions = {
+      ...data.message,
+      target         : profile.did,
+      signatureInput : signatureMaterial,
+    };
+
+    collectionsWrite = await CollectionsWrite.create(collectionsWriteOptions);
+  } else { // this is an "update" to an existing record
+    console.log('Subsequent CollectionsWrite');
+    let createFromOptions = {
+      ...data.message,
+      target                          : profile.did,
+      unsignedCollectionsWriteMessage : data.baseEntry,
+      signatureInput                  : signatureMaterial,
+    };
+
+    collectionsWrite = await CollectionsWrite.createFrom(createFromOptions);
+  }
 
   const collectionsWriteJSON = collectionsWrite.toJSON();
+  console.log(collectionsWriteJSON);
+  console.log(JSON.stringify(collectionsWriteJSON));
+
 
   const dwn = await DWN.open();
   const result = await dwn.processMessage(collectionsWriteJSON);
+  console.log('CollectionsWrite result:');
+  console.log(result);
 
   if (result.status.code !== 202) {
     return {
