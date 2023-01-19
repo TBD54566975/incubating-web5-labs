@@ -1,4 +1,4 @@
-import { CollectionsQuery } from '@tbd54566975/dwn-sdk-js';
+import { RecordsQuery } from '@tbd54566975/dwn-sdk-js';
 import * as DWN from '../../../dwn';
 
 /**
@@ -6,7 +6,7 @@ import * as DWN from '../../../dwn';
  * @param {object} ctx 
  * @param {any} [data] 
  */
-export async function handleCollectionsQuery(ctx, data) {
+export async function handleRecordsQuery(ctx, data) {
   const { profile, signatureMaterial } = ctx;
   
   const queryOptions = {
@@ -14,7 +14,7 @@ export async function handleCollectionsQuery(ctx, data) {
     target         : profile.did,
     signatureInput : signatureMaterial
   };
-  const collectionsQuery = await CollectionsQuery.create(queryOptions);
+  const collectionsQuery = await RecordsQuery.create(queryOptions);
 
   const dwn = await DWN.open();
   const result =  await dwn.processMessage(collectionsQuery.toJSON());
