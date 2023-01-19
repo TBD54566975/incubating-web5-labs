@@ -60,7 +60,8 @@ export async function getMessage(host, tenant, cid) {
   const response = await fetch(url, {
     method  : 'GET',
     headers : {
-      authorization: tenant
+      'ngrok-skip-browser-warning' : 'any-value', // header to skip ngrok proxy warning
+      authorization                : tenant
     }
   });
 

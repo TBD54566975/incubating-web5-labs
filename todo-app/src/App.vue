@@ -19,7 +19,7 @@ onMounted(async () => {
   }
 
   const result = await window.web5.dwn.processMessage({
-    method  : 'CollectionsQuery',
+    method  : 'RecordsQuery',
     message : {
       filter: {
         schema: 'http://some-schema-registry.org/todo'
@@ -64,7 +64,7 @@ async function addTodo() {
 
   // record is the DWeb message written to the DWN
   const { record, result } = await window.web5.dwn.processMessage({
-    method  : 'CollectionsWrite',
+    method  : 'RecordsWrite',
     data    : todoData,
     message : {
       schema     : 'http://some-schema-registry.org/todo',
@@ -101,7 +101,7 @@ async function toggleTodoComplete(todoRecordId) {
   const { descriptor } = toggledTodo.dWebMessage;
 
   const result = await window.web5.dwn.processMessage({
-    method  : 'CollectionsWrite',
+    method  : 'RecordsWrite',
     data    : updatedTodoData,
     message : {
       recordId    : toggledTodo.dWebMessage.recordId,

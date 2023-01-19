@@ -4,7 +4,7 @@ import { DIDKey } from '../src/lib/did-key.js';
 
 import { base58btc } from 'multiformats/bases/base58';
 import { base64url } from 'multiformats/bases/base64';
-import { Dwn, CollectionsWrite, CollectionsQuery, ProtocolsConfigure } from "@tbd54566975/dwn-sdk-js";
+import { Dwn, RecordsWrite, RecordsQuery, ProtocolsConfigure } from "@tbd54566975/dwn-sdk-js";
 
 // const dwn = await Dwn.create({});
 
@@ -60,7 +60,7 @@ const thread = { subject: 'shimmy' };
 const threadStringified = JSON.stringify(thread);
 const threadBytes = encoder.encode(threadStringified);
 
-const threadMessage = await CollectionsWrite.create({
+const threadMessage = await RecordsWrite.create({
   data: threadBytes,
   dataFormat: 'application/json',
   recipient: alice.did,
@@ -80,7 +80,7 @@ console.log(threadMessage.toJSON());
 // const directMessageBytes = encoder.encode(directMessageStringified);
 
 // // oof. yikes variable name.
-// const directMessageMessage = await CollectionsWrite.create({
+// const directMessageMessage = await RecordsWrite.create({
 //   data: directMessageBytes,
 //   dataFormat: 'application/json',
 //   recipient: alice.did,
@@ -99,7 +99,7 @@ console.log(threadMessage.toJSON());
 // const yikesStringified = JSON.stringify(yikes);
 // const yikesBytes = encoder.encode(yikesStringified);
 
-// const yikesDM = await CollectionsWrite.create({
+// const yikesDM = await RecordsWrite.create({
 //   data: yikesBytes,
 //   dataFormat: 'application/json',
 //   recipient: alice.did,
@@ -114,7 +114,7 @@ console.log(threadMessage.toJSON());
 // result = await dwn.processMessage(yikesDM.toJSON());
 // console.log(result);
 
-// const threadsQuery = await CollectionsQuery.create({
+// const threadsQuery = await RecordsQuery.create({
 //   target: alice.did,
 //   signatureInput: alice.signatureMaterial,
 //   filter: {
@@ -126,7 +126,7 @@ console.log(threadMessage.toJSON());
 // result = await dwn.processMessage(threadsQuery.toJSON());
 
 // for (let entry of result.entries) {
-//   const chatQuery = await CollectionsQuery.create({
+//   const chatQuery = await RecordsQuery.create({
 //     target: alice.did,
 //     signatureInput: alice.signatureMaterial,
 //     filter: {

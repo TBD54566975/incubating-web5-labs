@@ -35,7 +35,6 @@ const message = await ProtocolsConfigure.create({
           "message": {
             "allow": {
               "anyone": {
-                "of": "thread",
                 "to": ["write"]
               }
             }
