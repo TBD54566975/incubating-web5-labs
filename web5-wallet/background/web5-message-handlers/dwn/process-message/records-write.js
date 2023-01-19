@@ -25,20 +25,20 @@ export async function handleRecordsWrite(ctx, data) {
     }
   }
 
-  let collectionsWrite;
+  let recordsWrite;
 
   // the following conditional is a convenience provided via the web5 api to clobber a
   // `RecordsWrite` without having to manually copy over the immutable properties
   // if this is the initial write
   if (data.baseEntry === undefined) {
     console.log('RecordsWrite without base entry');
-    let collectionsWriteOptions = {
+    let recordsWriteOptions = {
       ...data.message,
       target         : profile.did,
       signatureInput : signatureMaterial,
     };
 
-    collectionsWrite = await RecordsWrite.create(collectionsWriteOptions);
+    recordsWrite = await RecordsWrite.create(recordsWriteOptions);
   } else { // this is an "update" to an existing record
     console.log('RecordsWrite with base entry');
     let createFromOptions = {
@@ -48,19 +48,19 @@ export async function handleRecordsWrite(ctx, data) {
       signatureInput              : signatureMaterial,
     };
 
-    collectionsWrite = await RecordsWrite.createFrom(createFromOptions);
+    recordsWrite = await RecordsWrite.createFrom(createFromOptions);
   }
 
-  const collectionsWriteJSON = collectionsWrite.toJSON();
+  const recordsWriteJSON = recordsWrite.toJSON();
 
   const dwn = await DWN.open();
-  const result = await dwn.processMessage(collectionsWriteJSON);
+  const result = await dwn.processMessage(recordsWriteJSON);
   console.log('RecordsWrite result:');
   console.log(result);
 
   if (result.status.code !== 202) {
     return {
-      record: collectionsWriteJSON,
+      record: recordsWriteJSON,
       result
     };
   }
@@ -74,7 +74,7 @@ export async function handleRecordsWrite(ctx, data) {
   //! He then sends a reply message to alice _before_ the _original_ message synced to alice's DWN. 
   //! if that message is referenced as `parentId` in bob's message to alice
   //! then alice's remote dwn will reject the message 
-  const { recipient } = collectionsWrite.message.descriptor;
+  const { recipient } = recordsWrite.message.descriptor;
   if (recipient && recipient !== profile.did) {
     const dwnHosts = await DIDResolver.getDWNHosts(recipient);
 
@@ -85,7 +85,7 @@ export async function handleRecordsWrite(ctx, data) {
       const recipientRecordsWrite = await RecordsWrite.create({
         // copying over dateCreated is required because it is included in the deterministic
         // generation of recordId and contextId
-        dateCreated    : collectionsWrite.message.descriptor.dateCreated,
+        dateCreated    : recordsWrite.message.descriptor.dateCreated,
         target         : recipient,
         signatureInput : signatureMaterial,
         ...data.message,
@@ -103,7 +103,7 @@ export async function handleRecordsWrite(ctx, data) {
   }
 
   return {
-    record: collectionsWriteJSON,
+    record: recordsWriteJSON,
     result
   };
 }

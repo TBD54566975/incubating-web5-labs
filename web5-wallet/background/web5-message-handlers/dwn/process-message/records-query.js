@@ -14,10 +14,10 @@ export async function handleRecordsQuery(ctx, data) {
     target         : profile.did,
     signatureInput : signatureMaterial
   };
-  const collectionsQuery = await RecordsQuery.create(queryOptions);
+  const recordsQuery = await RecordsQuery.create(queryOptions);
 
   const dwn = await DWN.open();
-  const result =  await dwn.processMessage(collectionsQuery.toJSON());
+  const result =  await dwn.processMessage(recordsQuery.toJSON());
 
   return result;
 }

@@ -1,12 +1,12 @@
 import { PermissionStore, ProfileStore } from '../../../db';
-import { handleRecordsQuery } from './collections-query';
-import { handleRecordsWrite } from './collections-write';
+import { handleRecordsQuery } from './records-query';
+import { handleRecordsWrite } from './records-write';
 import { handleProtocolsConfigure } from './protocols-configure';
 import { handleProtocolsQuery } from './protocols-query';
 
 const dwnMethodHandlers = {
-  'RecordsQuery'   : handleRecordsQuery,
-  'RecordsWrite'   : handleRecordsWrite,
+  'RecordsQuery'       : handleRecordsQuery,
+  'RecordsWrite'       : handleRecordsWrite,
   'ProtocolsConfigure' : handleProtocolsConfigure,
   'ProtocolsQuery'     : handleProtocolsQuery,
 };
