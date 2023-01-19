@@ -6,7 +6,7 @@ import path from 'path'
 const topic = process.env.DWN_ID;
 const responseTopic = topic + "-response";
 
-
+var correlationId = 42;
 
 async function main() {
   // Create an IPFS instance
@@ -49,8 +49,8 @@ async function main() {
 
 
 
-  // make request
-  await ipfs.pubsub.publish(topic, Buffer.from(JSON.stringify({path: "/ping"})))
+  // make request - need correlationId so when we see a response in responseTopic, we know what request it was for. It will be echoed back.
+  await ipfs.pubsub.publish(topic, Buffer.from(JSON.stringify({path: "/ping", correlationId: correlationId})))
 
   console.log("published message to topic")
 }

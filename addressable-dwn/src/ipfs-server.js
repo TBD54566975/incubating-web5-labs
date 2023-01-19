@@ -28,6 +28,12 @@ async function main() {
       }
     }
   })
+
+  // reply to the response topic, using the request's correlationId to ensure it goes back to the right place
+  function response(req, messageObject) {
+    messageObject['correlationId'] = req['correlationId'];
+    ipfs.pubsub.publish(topic, Buffer.from(JSON.stringify(messageObject)));
+  }
   
   ipfs.pubsub.subscribe(topic, async (msg) => {
 
@@ -36,12 +42,12 @@ async function main() {
     const req = JSON.parse(msg.data.toString());
     switch (req['path']) {
       case '/ping':
-        ipfs.pubsub.publish(responseTopic, Buffer.from(JSON.stringify({status:200, data:"pong"})));   
+        response(req, {status:200, data:"pong"})        
         break;     
       case '/dwn':
         const result = await dwn.processMessage(req['body']);
         console.log(new Date(), '/dwn', JSON.stringify(result));        
-        ipfs.pubsub.publish(responseTopic, Buffer.from(JSON.stringify({status:200, data:result})));        
+        response(req, {status:200, data:result});        
         break;
 
       case '/dwn/event-log':
@@ -51,9 +57,9 @@ async function main() {
         try {
           const eventLog = await messageStore.getEventLog(tenant, watermark);
           console.log(new Date(), '[/dwn/event-log]', eventLog);
-          ipfs.pubsub.publish(responseTopic, Buffer.from(JSON.stringify({status:200, data:eventLog})));                  
+          response(req, {status:200, data:eventLog});                  
         } catch (e) {
-          ipfs.pubsub.publish(responseTopic, Buffer.from(JSON.stringify({status:500})));        
+          response(req, {status:500})          
           console.error(`[/dwn/event-log] error: ${e}`);
         }
         break;
@@ -72,27 +78,25 @@ async function main() {
           console.log(new Date(), '[/dwn/messages/cid]', JSON.stringify(message, null, 4));
 
           if (message) {
-            ipfs.pubsub.publish(responseTopic, Buffer.from(JSON.stringify({status:200, data:message})));        
-            
+            response(req, {status:200, data:message});                        
           } else {
-            ipfs.pubsub.publish(responseTopic, Buffer.from(JSON.stringify({status:404})));        
+            response(req, {status:404});            
           }
         } catch (e) {
           console.error(`[/dwn/message/:cid] error: ${e}`);
-          ipfs.pubsub.publish(responseTopic, Buffer.from(JSON.stringify({status:500})));        
+          response(req, {status:500})          
         }
         break;
 
         case '/tenants/challenge':
           const challenge = await Challenge.create();
-
-          ipfs.pubsub.publish(responseTopic, Buffer.from(JSON.stringify({status:200, data:challenge})));        
+          response(req, {status:200, data:challenge});          
           break;
 
         case '/tenants':
           const { proof } = req['body'];
           if (!proof) {
-            ipfs.pubsub.publish(responseTopic, Buffer.from(JSON.stringify({status:400, error:'proof required'})));        
+            response(req, {status:400, error:'proof required'});            
           }  
           break;
 
@@ -102,5 +106,7 @@ async function main() {
     console.log(`Received message: ${msg.data.toString()}`)
   })
 }
+
+
 
 main()
