@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { fileURLToPath } from 'url';
-import { ProtocolsQuery, CollectionsQuery, CollectionsWrite, ProtocolsConfigure } from "@tbd54566975/dwn-sdk-js";
+import { ProtocolsQuery, RecordsQuery, RecordsWrite, ProtocolsConfigure } from "@tbd54566975/dwn-sdk-js";
 import { generateKeyPair, DID, resolve } from '@decentralized-identity/ion-tools';
 import { DIDKey } from '../src/lib/did-key.js';
 
@@ -145,14 +145,14 @@ export async function protocolsConfigure(didState, name, definition) {
   return await sendDWNMessage(dwnHost, message);
 }
 
-export async function collectionsQuery(didState, filter) {
+export async function recordsQuery(didState, filter) {
   const [dwnHost] = await getDWNHosts(didState.longFormDID);
 
   if (!dwnHost) {
     throw new Error('no dwn host found');
   }
 
-  const message = await CollectionsQuery.create({
+  const message = await RecordsQuery.create({
     target: didState.longFormDID,
     signatureInput: didState.signatureMaterial,
     filter
@@ -162,7 +162,7 @@ export async function collectionsQuery(didState, filter) {
   return await sendDWNMessage(dwnHost, message);
 }
 
-export async function collectionsWrite(didState, data, options) {
+export async function recordsWrite(didState, data, options) {
   const [dwnHost] = await getDWNHosts(didState.longFormDID);
 
   if (!dwnHost) {
@@ -174,7 +174,7 @@ export async function collectionsWrite(didState, data, options) {
   const dataStringified = JSON.stringify(data);
   const dataBytes = encoder.encode(dataStringified);
 
-  const message = await CollectionsWrite.create({
+  const message = await RecordsWrite.create({
     data: dataBytes,
     dataFormat: 'application/json',
     signatureInput: didState.signatureMaterial,

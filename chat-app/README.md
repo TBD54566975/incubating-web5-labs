@@ -5,7 +5,7 @@ This trivial chat app uses an addressable DWN (other approaches will soon be ava
 ## Building and Running Chat app
 
 * Make sure you have run the pre-requisite steps in the [README](../README.md)
-* Build and run the addressable DWN in a separate termional window: instructions [here](./addressable-dwn/README.md)
+* Build and run the addressable DWN in a separate termional window: instructions [here](../addressable-dwn/README.md)
 * use [ngrok](https://ngrok.com/) to open a public port to your local DWN by running `ngrok http 3000` - take note of the public https URL that it returns. You'll need this later.
 * Build and run the chat-app in another terminal window: `cd chat-app && npm install && npm run dev`
 * Click on the wallet action in the sidebar and create a Profile. For DWN Host Provider, put the address of the addressable dwn you just started with the public https url from ngrok above.

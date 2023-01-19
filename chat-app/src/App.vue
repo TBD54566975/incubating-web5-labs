@@ -96,7 +96,7 @@ onMounted(async () => {
 
   useIntervalFn(async () => {
     const { status, entries } = await web5.dwn.processMessage({
-      method: 'CollectionsQuery',
+      method: 'RecordsQuery',
       message: {
         filter: {
           protocol: 'chat',
@@ -140,7 +140,7 @@ async function createThread(newThreadInfo) {
   const { name, did, text } = newThreadInfo;
 
   const { record: thread, result: createThreadResult } = await web5.dwn.processMessage({
-    method: 'CollectionsWrite',
+    method: 'RecordsWrite',
     message: {
       protocol: 'chat',
       schema: 'chat/thread',
@@ -163,7 +163,7 @@ async function createThread(newThreadInfo) {
 
   // TODO: create message
   const result = await web5.dwn.processMessage({
-    method: 'CollectionsWrite',
+    method: 'RecordsWrite',
     message: {
       protocol: 'chat',
       schema: 'chat/message',
@@ -189,7 +189,7 @@ async function sendMessage(messageText) {
   const recipient = firstMessage.data.to.did === userDid.value ? firstMessage.data.from : firstMessage.data.to;
 
   const result = await web5.dwn.processMessage({
-    method: 'CollectionsWrite',
+    method: 'RecordsWrite',
     message: {
       protocol: 'chat',
       schema: 'chat/message',
@@ -228,7 +228,7 @@ function selectThread(threadId) {
 
   chatRefreshFn = useIntervalFn(async () => {
     const { status, entries } = await web5.dwn.processMessage({
-      method: 'CollectionsQuery',
+      method: 'RecordsQuery',
       message: {
         filter: {
           protocol: 'chat',

@@ -1,4 +1,4 @@
-import { Dwn, CollectionsWrite } from '@tbd54566975/dwn-sdk-js';
+import { Dwn, RecordsWrite } from '@tbd54566975/dwn-sdk-js';
 import { MessageStoreLevelv2 } from '../src/message-store-level-v2.js';
 import { DIDKey } from '../src/lib/did-key.js';
 
@@ -62,7 +62,7 @@ for (let i = 0; i < 30; i += 1) {
   const randomNum = randomInt(0, 101);
   const identity = identities[randomNum % identities.length];
 
-  const message = await CollectionsWrite.create({
+  const message = await RecordsWrite.create({
     target: identity.did,
     recipient: identity.did,
     schema: 'https://schemas.org/todo',

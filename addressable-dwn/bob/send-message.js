@@ -3,7 +3,7 @@ import path from 'path';
 import prompts from 'prompts';
 
 import { fileURLToPath } from 'url';
-import { CollectionsWrite } from '@tbd54566975/dwn-sdk-js';
+import { RecordsWrite } from '@tbd54566975/dwn-sdk-js';
 import { resolve } from '@decentralized-identity/ion-tools';
 
 // __filename and __dirname are not defined in ES module scope
@@ -94,7 +94,7 @@ async function createThread(recipientDid, recipientName, senderDid, senderName) 
   const threadStringified = JSON.stringify(thread);
   const threadBytes = encoder.encode(threadStringified);
 
-  const threadMessage = await CollectionsWrite.create({
+  const threadMessage = await RecordsWrite.create({
     data: threadBytes,
     dataFormat: 'application/json',
     recipient: recipientDid,
@@ -145,7 +145,7 @@ async function createChatMessage(recipientDid, recipientName, senderDid, senderN
   const directMessageBytes = encoder.encode(directMessageStringified);
 
   // oof. yikes variable name.
-  const directMessageMessage = await CollectionsWrite.create({
+  const directMessageMessage = await RecordsWrite.create({
     data: directMessageBytes,
     dataFormat: 'application/json',
     recipient: recipientDid,

@@ -1,4 +1,4 @@
-import { CollectionsWrite, ProtocolsConfigure, Dwn } from '@tbd54566975/dwn-sdk-js';
+import { RecordsWrite, ProtocolsConfigure, Dwn } from '@tbd54566975/dwn-sdk-js';
 import { MessageStore } from 'message-store-level-v2';
 import { randomBytes, createProfile } from '../bob/utils.js';
 
@@ -67,7 +67,7 @@ const threadInput = {
 };
 
 // bob creating a thread with alice and storing it in his own DWN first
-const bobToAliceCreateThreadForBobDwn = await CollectionsWrite.create({
+const bobToAliceCreateThreadForBobDwn = await RecordsWrite.create({
   ...threadInput,
   target: bob.did,
 });
@@ -76,7 +76,7 @@ result = await dwn.processMessage(bobToAliceCreateThreadForBobDwn.toJSON());
 console.log('bob -> alice (bob dwn) thread create result:', result);
 
 // bob sending that thread creation to alice's DWN
-const bobToAliceCreateThreadForAliceDwn = await CollectionsWrite.create({
+const bobToAliceCreateThreadForAliceDwn = await RecordsWrite.create({
   ...threadInput,
   target: alice.did,
   dateCreated: bobToAliceCreateThreadForBobDwn.message.descriptor.dateCreated,
@@ -98,7 +98,7 @@ const messageInput = {
 };
 
 // bob creating a message to send to alice and storing it in his dwn
-const bobToAliceCreateMessageForBobDwn = await CollectionsWrite.create({
+const bobToAliceCreateMessageForBobDwn = await RecordsWrite.create({
   ...messageInput,
   target: bob.did,
 });
@@ -107,7 +107,7 @@ result = await dwn.processMessage(bobToAliceCreateMessageForBobDwn.toJSON());
 console.log('bob -> alice (bob dwn) message create result:', result);
 
 // bob sending that message to alice dwn
-const bobToAliceCreateMessageForAliceDwn = await CollectionsWrite.create({
+const bobToAliceCreateMessageForAliceDwn = await RecordsWrite.create({
   ...messageInput,
   target: alice.did,
   dateCreated: bobToAliceCreateMessageForBobDwn.message.descriptor.dateCreated,
@@ -129,7 +129,7 @@ const replyInput = {
 };
 
 // alice creating a reply message to send to bob and storing it in her dwn
-const aliceToBobCreateMessageForAliceDwn = await CollectionsWrite.create({
+const aliceToBobCreateMessageForAliceDwn = await RecordsWrite.create({
   ...replyInput,
   target: alice.did,
 });
@@ -138,7 +138,7 @@ result = await dwn.processMessage(aliceToBobCreateMessageForAliceDwn.toJSON());
 console.log('alice -> bob (alice dwn) message create result:', result);
 
 // alice sending that reply to bob dwn
-const aliceToBobCreateMessageForBobDwn = await CollectionsWrite.create({
+const aliceToBobCreateMessageForBobDwn = await RecordsWrite.create({
   ...replyInput,
   target: bob.did,
   dateCreated: aliceToBobCreateMessageForAliceDwn.message.descriptor.dateCreated,

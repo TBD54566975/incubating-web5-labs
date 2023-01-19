@@ -17,7 +17,7 @@
     "sqlite3": "5.1.2",
     "uuid": "8.3.2",
     "ws": "8.11.0",
-    "@tbd54566975/dwn-sdk-js": "0.0.16",
+    "@tbd54566975/dwn-sdk-js": "0.0.17-unstable.58656ed-2023.1.18-23-41-34",
     "@js-temporal/polyfill": "0.4.3",
     "pouchdb": "8.0.0",
     "pouchdb-find": "8.0.0",

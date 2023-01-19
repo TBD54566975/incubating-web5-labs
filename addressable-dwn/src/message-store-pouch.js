@@ -141,13 +141,13 @@ export class MessageStorePouch {
   }
 
   async delete() {
-    // TODO: Implement data deletion in Collections - https://github.com/TBD54566975/dwn-sdk-js/issues/84
+    // TODO: Implement data deletion in Records - https://github.com/TBD54566975/dwn-sdk-js/issues/84
     await this.#messageStore.delete(cid);
     return;
   }
 
   /**
-   * TODO: decide whether the first arg should be a generalized query or explictly `target`
+   * TODO: decide whether the first arg should be a generalized query or explicitly `target`
    * @param {string} target - the target to get event log for
    * @param {string} [watermark]  - where to start
    * @returns 
