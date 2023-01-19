@@ -32,7 +32,7 @@ async function main() {
   // reply to the response topic, using the request's correlationId to ensure it goes back to the right place
   function response(req, messageObject) {
     messageObject['correlationId'] = req['correlationId'];
-    ipfs.pubsub.publish(topic, Buffer.from(JSON.stringify(messageObject)));
+    ipfs.pubsub.publish(responseTopic, Buffer.from(JSON.stringify(messageObject)));
   }
   
   ipfs.pubsub.subscribe(topic, async (msg) => {
