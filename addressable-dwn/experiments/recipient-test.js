@@ -32,7 +32,6 @@ const protocolDefinition = {
         "message": {
           "allow": {
             "anyone": {
-              "of": "thread",
               "to": ["write"]
             }
           }

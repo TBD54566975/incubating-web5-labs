@@ -68,7 +68,6 @@ onMounted(async () => {
                 'message': {
                   'allow': {
                     'anyone': {
-                      'of': 'thread',
                       'to': [
                         'write'
                       ]
