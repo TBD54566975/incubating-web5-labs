@@ -31,7 +31,7 @@ export async function handleCollectionsWrite(ctx, data) {
   // `CollectionsWrite` without having to manually copy over the immutable properties
   // if this is the initial write
   if (data.baseEntry === undefined) {
-    console.log('Initial CollectionsWrite');
+    console.log('CollectionsWrite without base entry');
     let collectionsWriteOptions = {
       ...data.message,
       target         : profile.did,
@@ -40,7 +40,7 @@ export async function handleCollectionsWrite(ctx, data) {
 
     collectionsWrite = await CollectionsWrite.create(collectionsWriteOptions);
   } else { // this is an "update" to an existing record
-    console.log('Subsequent CollectionsWrite');
+    console.log('CollectionsWrite with base entry');
     let createFromOptions = {
       ...data.message,
       target                          : profile.did,
