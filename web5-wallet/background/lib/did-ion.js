@@ -27,8 +27,6 @@ export class DIDIon {
    * @returns {DIDIonGenerateResult}
    */
   static async generate(options = {}) {
-    const updateKeyPair = await generateKeyPair('secp256k1');
-    const recoveryKeyPair = await generateKeyPair('secp256k1');
     
     const authnKeyPair = await generateKeyPair('Ed25519');
     const authnKeyId = 'key-1';
@@ -70,8 +68,6 @@ export class DIDIon {
       authnKeyPair,
       longFormDID,
       ops,
-      recoveryKeyPair,
-      updateKeyPair,
     };
   }
 
