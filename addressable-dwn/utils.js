@@ -5,7 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { ProtocolsQuery, RecordsQuery, RecordsWrite, ProtocolsConfigure } from "@tbd54566975/dwn-sdk-js";
 import { generateKeyPair, DID, resolve } from '@decentralized-identity/ion-tools';
-import { DIDKey } from '../src/lib/did-key.js';
+import { DIDKey } from './src/lib/did-key.js';
 
 // __filename and __dirname are not defined in ES module scope
 const __filename = fileURLToPath(import.meta.url);
@@ -184,16 +184,59 @@ export async function recordsWrite(didState, data, options) {
   return await sendDWNMessage(dwnHost, message);
 }
 
-export async function createProfile() {
-  const { did, publicJWK, privateJWK } = await DIDKey.generate();
-  const { alg, kid } = publicJWK;
+export async function createProfile(didMethod = 'key', options = {}) {
+  if (didMethod === 'key') {
+    const { did, publicJWK, privateJWK } = await DIDKey.generate();
+    const { alg, kid } = publicJWK;
 
-  const signatureMaterial = {
-    protectedHeader: { alg, kid },
-    privateJwk: privateJWK
-  };
+    const signatureMaterial = {
+      protectedHeader: { alg, kid },
+      privateJwk: privateJWK
+    };
 
-  return { did, publicJWK, privateJWK, signatureMaterial }
+    return { did, publicJWK, privateJWK, signatureMaterial }
+  } else if (didMethod === 'ion') {
+    const authnKeyPair = await generateKeyPair('Ed25519');
+    const authnKeyId = 'key-1';
+
+    const createOptions = {
+      publicKeys: [
+        {
+          id: authnKeyId,
+          type: 'JsonWebKey2020',
+          publicKeyJwk: authnKeyPair.publicJwk,
+          purposes: ['authentication']
+        }
+      ],
+    };
+
+    if (options.serviceEndpoint) {
+      createOptions.services = [
+        {
+          'id': 'dwn',
+          'type': 'DecentralizedWebNode',
+          'serviceEndpoint': {
+            'nodes': [options.serviceEndpoint]
+          }
+        }
+      ];
+    }
+
+    const did = new DID({ content: createOptions });
+    const longFormDID = await did.getURI('long');
+
+    const signatureMaterial = {
+      protectedHeader: { alg: 'EdDSA', kid: `${longFormDID}#${authnKeyId}` },
+      privateJwk: authnKeyPair.privateJwk
+    };
+
+    return {
+      did: longFormDID,
+      publicJWK: authnKeyPair.publicJwk,
+      privateJWK: authnKeyPair.privateJwk,
+      signatureMaterial
+    };
+  }
 }
 
 /**
