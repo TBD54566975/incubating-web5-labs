@@ -42,6 +42,16 @@ const protocolDefinition = {
   }
 };
 
+
+/**
+ * colorizes schema output
+ * @param {string} schema 
+ * @returns 
+ */
+function schemaLabel(schema) {
+  return chalk.bgRed(schema);
+}
+
 const alice = await createProfile('key');
 const aliceLabel = chalk.bold.underline.cyan('alice');
 
@@ -52,11 +62,11 @@ const dwn = await Dwn.create({});
 
 const aliceCreateProtocol = await createProtocol(alice, protocolName, protocolDefinition);
 let result = await dwn.processMessage(aliceCreateProtocol.toJSON());
-console.log(`${aliceLabel} (${aliceLabel} dwn) install chat result:`, result);
+console.log(`${aliceLabel} (${aliceLabel} dwn) install ${schemaLabel('chat')} result:`, result);
 
 const bobCreateProtocol = await createProtocol(bob, protocolName, protocolDefinition);
 result = await dwn.processMessage(bobCreateProtocol.toJSON());
-console.log(`${bobLabel} (${bobLabel} dwn) install chat result:`, result);
+console.log(`${bobLabel} (${bobLabel} dwn) install ${schemaLabel('chat')} result:`, result);
 
 const threadInput = {
   data: randomBytes(10),
@@ -74,10 +84,10 @@ const bobToAliceCreateThreadForBobDwn = await RecordsWrite.create({
   target: bob.did,
 });
 
-console.log(`${bobLabel} -> ${aliceLabel} (${bobLabel} dwn) chat/thread`, JSON.stringify(bobToAliceCreateThreadForBobDwn.toJSON(), null, 4));
+console.log(`${bobLabel} -> ${aliceLabel} (${bobLabel} dwn) ${schemaLabel('chat/thread')}`, JSON.stringify(bobToAliceCreateThreadForBobDwn.toJSON(), null, 4));
 
 result = await dwn.processMessage(bobToAliceCreateThreadForBobDwn.toJSON());
-console.log(`${bobLabel} -> ${aliceLabel} (${bobLabel} dwn) chat/thread result:`, result);
+console.log(`${bobLabel} -> ${aliceLabel} (${bobLabel} dwn) ${schemaLabel('chat/thread')} result:`, result);
 
 // bob sending that thread creation to alice's DWN
 const bobToAliceCreateThreadForAliceDwn = await RecordsWrite.create({
@@ -87,10 +97,10 @@ const bobToAliceCreateThreadForAliceDwn = await RecordsWrite.create({
   dateModified: bobToAliceCreateThreadForBobDwn.message.descriptor.dateModified
 });
 
-console.log(`${bobLabel} -> ${aliceLabel} (${aliceLabel} dwn) chat/thread`, JSON.stringify(bobToAliceCreateThreadForAliceDwn.toJSON(), null, 4));
+console.log(`${bobLabel} -> ${aliceLabel} (${aliceLabel} dwn) ${schemaLabel('chat/thread')}`, JSON.stringify(bobToAliceCreateThreadForAliceDwn.toJSON(), null, 4));
 
 result = await dwn.processMessage(bobToAliceCreateThreadForAliceDwn.toJSON());
-console.log(`${bobLabel} -> ${aliceLabel} (${aliceLabel} dwn) chat/thread result:`, result);
+console.log(`${bobLabel} -> ${aliceLabel} (${aliceLabel} dwn) ${schemaLabel('chat/thread')} result:`, result);
 
 const messageInput = {
   data: randomBytes(10),
@@ -110,10 +120,10 @@ const bobToAliceCreateMessageForBobDwn = await RecordsWrite.create({
   target: bob.did,
 });
 
-console.log(`${bobLabel} -> ${aliceLabel} (${bobLabel} dwn) chat/message`, JSON.stringify(bobToAliceCreateMessageForBobDwn.toJSON(), null, 4));
+console.log(`${bobLabel} -> ${aliceLabel} (${bobLabel} dwn) ${schemaLabel('chat/message')}`, JSON.stringify(bobToAliceCreateMessageForBobDwn.toJSON(), null, 4));
 
 result = await dwn.processMessage(bobToAliceCreateMessageForBobDwn.toJSON());
-console.log(`${bobLabel} -> ${aliceLabel} (${bobLabel} dwn) chat/message result:`, result);
+console.log(`${bobLabel} -> ${aliceLabel} (${bobLabel} dwn) ${schemaLabel('chat/message')} result:`, result);
 
 // bob sending that message to ${aliceLabel} dwn
 const bobToAliceCreateMessageForAliceDwn = await RecordsWrite.create({
@@ -123,10 +133,10 @@ const bobToAliceCreateMessageForAliceDwn = await RecordsWrite.create({
   dateModified: bobToAliceCreateMessageForBobDwn.message.descriptor.dateModified
 });
 
-console.log(`${bobLabel} -> ${aliceLabel} (${aliceLabel} dwn) chat/message`, JSON.stringify(bobToAliceCreateMessageForAliceDwn.toJSON(), null, 4));
+console.log(`${bobLabel} -> ${aliceLabel} (${aliceLabel} dwn) ${schemaLabel('chat/message')}`, JSON.stringify(bobToAliceCreateMessageForAliceDwn.toJSON(), null, 4));
 
 result = await dwn.processMessage(bobToAliceCreateMessageForAliceDwn.toJSON());
-console.log(`${bobLabel} -> ${aliceLabel} (${aliceLabel} dwn) chat/message result:`, result);
+console.log(`${bobLabel} -> ${aliceLabel} (${aliceLabel} dwn) ${schemaLabel('chat/message')} result:`, result);
 
 const replyInput = {
   data: randomBytes(10),
@@ -146,10 +156,10 @@ const aliceToBobCreateMessageForAliceDwn = await RecordsWrite.create({
   target: alice.did,
 });
 
-console.log(`${aliceLabel} -> ${bobLabel} (${aliceLabel} dwn) chat/message`, JSON.stringify(aliceToBobCreateMessageForAliceDwn.toJSON(), null, 4));
+console.log(`${aliceLabel} -> ${bobLabel} (${aliceLabel} dwn) ${schemaLabel('chat/message')}`, JSON.stringify(aliceToBobCreateMessageForAliceDwn.toJSON(), null, 4));
 
 result = await dwn.processMessage(aliceToBobCreateMessageForAliceDwn.toJSON());
-console.log(`${aliceLabel} -> ${bobLabel} (${aliceLabel} dwn) chat/message result:`, result);
+console.log(`${aliceLabel} -> ${bobLabel} (${aliceLabel} dwn) ${schemaLabel('chat/message')} result:`, result);
 
 // alice sending that reply to bob dwn
 const aliceToBobCreateMessageForBobDwn = await RecordsWrite.create({
@@ -162,4 +172,4 @@ const aliceToBobCreateMessageForBobDwn = await RecordsWrite.create({
 console.log(`${aliceLabel} -> ${bobLabel} (${bobLabel} dwn) chat/message:`, JSON.stringify(aliceToBobCreateMessageForBobDwn.toJSON(), null, 4));
 
 result = await dwn.processMessage(aliceToBobCreateMessageForBobDwn.toJSON());
-console.log(`${aliceLabel} -> ${bobLabel} (${bobLabel} dwn) chat/message result:`, result);
+console.log(`${aliceLabel} -> ${bobLabel} (${bobLabel} dwn) ${schemaLabel('chat/message')} result:`, result);
