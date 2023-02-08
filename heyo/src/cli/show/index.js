@@ -4,7 +4,7 @@ import { cmd as showConvoCmd } from './convo.js';
 
 export const cmd = new Command('show');
 
-cmd.description('shows you things');
+cmd.description('show things');
 
 cmd.addCommand(showContactsCmd);
 cmd.addCommand(showConvoCmd);

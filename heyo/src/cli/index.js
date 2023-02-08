@@ -12,7 +12,7 @@ import { DidLoader } from '../did/did-loader.js';
 await Heyo.initializeProtocol(DidLoader.getDid(), DidLoader.getSignatureMaterial());
 
 export const cli = new Command('heyo');
-cli.description('holla atchya did');
+cli.description('d2d messaging');
 cli.version('0.0.1');
 
 cli.addCommand(addCmd);
