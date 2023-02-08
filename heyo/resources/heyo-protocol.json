@@ -1,0 +1,35 @@
+{
+  "protocol": "heyo",
+  "definition": {
+    "labels": {
+      "thread": {
+        "schema": "heyo/thread"
+      },
+      "message": {
+        "schema": "heyo/dm"
+      }
+    },
+    "records": {
+      "thread": {
+        "allow": {
+          "anyone": {
+            "to": [
+              "write"
+            ]
+          }
+        },
+        "records": {
+          "message": {
+            "allow": {
+              "anyone": {
+                "to": [
+                  "write"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

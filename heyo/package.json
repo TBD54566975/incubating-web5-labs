@@ -1,0 +1,17 @@
+{
+    "type": "module",
+    "dependencies": {
+        "@scure/base": "1.1.1",
+        "commander": "10.0.0",
+        "mkdirp": "2.1.3",
+        "lodash": "4.17.21",
+        "uuid": "9.0.0",
+        "multiformats": "11.0.1",
+        "prompts": "2.4.2",
+        "@decentralized-identity/ion-tools": "1.0.3",
+        "@tbd54566975/dwn-sdk-js": "0.0.19"
+    },
+    "devDependencies": {
+        "eslint": "8.33.0"
+    }
+}

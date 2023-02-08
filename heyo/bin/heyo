@@ -1,0 +1,6 @@
+#! /bin/bash
+
+SELF_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+
+node $SELF_DIR/../src/index.js "$@"
