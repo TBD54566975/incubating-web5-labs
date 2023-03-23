@@ -14,12 +14,12 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@koa/cors": "^4.0.0",
-    "@koa/router": "^12.0.0",
-    "@tbd54566975/web5": "^0.0.1-unstable.2b1701e-2023.3.07-20-43-27",
-    "koa": "^2.14.1",
-    "koa-body": "^6.0.1",
-    "mkdirp": "^2.1.5",
-    "raw-body": "^2.5.2"
+    "@koa/cors": "4.0.0",
+    "@koa/router": "12.0.0",
+    "@tbd54566975/web5": "0.3.1-unstable.e2dfe57-2023.3.23-19-07-37",
+    "koa": "2.14.1",
+    "koa-body": "6.0.1",
+    "mkdirp": "2.1.5",
+    "raw-body": "2.5.2"
   }
 }

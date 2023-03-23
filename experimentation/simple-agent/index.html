@@ -6,9 +6,72 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Local and Remote DWN Example</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'IBM Plex Mono';
+    }
+
+    input, button {
+      font-family: 'IBM Plex Mono'; 
+    }
+
+    .box {
+      max-width: 52rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .box>.row {
+      display: flex;
+      align-items: start;
+      padding-top: 0.5em;
+    }
+
+    .box>.row>label {
+      padding-right: 0.5em;
+      padding-left: 0.5em;
+    }
+
+    .box>.row>button {
+      margin-left: auto;
+      display: block;
+    }
+
+    .box>.row>input[type=text] {
+      width: 8em;
+    }
+
+    .box>.row>textarea {
+      width: 250px;
+      height: 125px;
+    }
+    .box .row #write_text_result {
+      display: block;
+    }
+    .green {
+      color: green;
+    }
+    .red {
+      color: red;
+    }
+  </style>
 </head>
 
 <body>
+  <p style="font-size: large">Write Records</p>
+
+  <div class="box">
+    <div class="row">
+      <textarea id="write_text_data">...data to save</textarea>
+      <button type="button" id="write_text_button">Write Text Data</button>
+    </div>
+    <div id="write_text_result" class="green"></div>
+  </div>
+
+
   <script type="module">
     import { Web5 } from 'https://cdn.jsdelivr.net/npm/@tbd54566975/web5@0.3.1-unstable.e2dfe57-2023.3.23-19-07-37/dist/browser.mjs';
 
@@ -73,13 +136,23 @@
     console.log('QUERY REPONSE:', response.entries[0]);
     console.log('RESPONSE DATA:', base64UrlToObject(response.entries[0].encodedData));
 
-    async function logConsole(obj, message = '') {
-      if (obj instanceof Response) {
-        console.log(message, await obj.json());
+    write_text_button.addEventListener('click', async event => {
+      const response = await web5.dwn.records.write(myDid.id, {
+        author: myDid.id,
+        data: write_text_data.value,
+        message: {
+          schema: 'test/post',
+        }
+      });
+      const responseJSON = await logConsole(response);
+      if (responseJSON.status.code === 202) {
+        write_text_result.textContent = 'Success';
+        write_text_result.classList.add('green');
       } else {
-        console.log(message, obj);
+        write_text_result.textContent = 'Failed';
+        write_text_result.classList.add('red');
       }
-    }
+    });
 
 
     
@@ -118,6 +191,18 @@
 
     function base64UrlToObject(encodedData) {
       return web5.dwn.SDK.Encoder.base64UrlToObject(encodedData);
+    }
+
+    async function logConsole(obj, message = '') {
+      let result;
+      if (obj instanceof Response) {
+        result = await obj.json();
+        console.log(message, result);
+      } else {
+        result = obj;
+        console.log(message, result);
+      }
+      return result;
     }
   </script>
 </body>
