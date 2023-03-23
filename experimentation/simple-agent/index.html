@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Local and Remote DWN Example</title>
+</head>
+
+<body>
+  <script type="module">
+    import { Web5 } from 'https://cdn.jsdelivr.net/npm/@tbd54566975/web5@0.3.1-unstable.e2dfe57-2023.3.23-19-07-37/dist/browser.mjs';
+
+    const web5 = new Web5();
+    let response;
+
+    // Create a new ION DID and public-private key pair.
+    const myDid = await web5.did.create('ion');
+    console.log('DID:', myDid);
+
+    // Register the DID as one which is running in browser memory and for which keys are available to sign messages.
+    web5.did.register({
+      connected: true,
+      did: myDid.id,
+      endpoint: 'app://dwn',
+      keys: myDid.keys[0].keypair
+    });
+
+    // Write a plain text record to the in-memory DWN.
+    response = await web5.dwn.records.write(myDid.id, {
+      author: myDid.id,
+      data: 'Hello, world!',
+      message: {
+        schema: 'foo/bar',
+        dataFormat: 'text/plain'
+      }
+    });
+    console.log('WRITE RESPONSE:', response.status);
+
+    // Query for the record that was just created.
+    response = await web5.dwn.records.query(myDid.id, {
+      author: myDid.id,
+      message: {
+        filter: {
+          schema: 'foo/bar'
+        }
+      }
+    });
+    console.log('QUERY REPONSE:', response.entries[0]);
+    console.log('RESPONSE DATA:', base64UrlToString(response.entries[0].encodedData));
+
+    // Write a JSON record to the in-memory DWN.
+    response = await web5.dwn.records.write(myDid.id, {
+      author: myDid.id,
+      data: { random: 'stuff' },
+      message: {
+        schema: 'foo/baz',
+        dataFormat: 'application/json'
+      }
+    });
+    console.log('WRITE RESPONSE:', response.status);
+
+    // Query for the record that was just created.
+    response = await web5.dwn.records.query(myDid.id, {
+      author: myDid.id,
+      message: {
+        filter: {
+          schema: 'foo/baz'
+        }
+      }
+    });
+    console.log('QUERY REPONSE:', response.entries[0]);
+    console.log('RESPONSE DATA:', base64UrlToObject(response.entries[0].encodedData));
+
+    async function logConsole(obj, message = '') {
+      if (obj instanceof Response) {
+        console.log(message, await obj.json());
+      } else {
+        console.log(message, obj);
+      }
+    }
+
+
+    
+    // Long form ION DID with the DWN Service Endpoint:
+    //   service: [
+    //     {
+    //       'id': 'dwn',
+    //       'type': 'DecentralizedWebNode',
+    //       'serviceEndpoint': {
+    //         'nodes': [
+    //            'http://localhost:8085/dwn/',
+    //            'http://localhost:8086/dwn/',
+    //            'http://localhost:8087/dwn/',
+    //         ]
+    //       }
+    //     }
+    //   ]
+    const bobDid = 'did:ion:EiAa0ZGOuDaAz0IP9dtzfgcr9dqoVLMVjjce3qJVCeAE4g:eyJkZWx0YSI6eyJwYXRjaGVzIjpbeyJhY3Rpb24iOiJyZXBsYWNlIiwiZG9jdW1lbnQiOnsicHVibGljS2V5cyI6W3siaWQiOiJrZXktMSIsInB1YmxpY0tleUp3ayI6eyJjcnYiOiJzZWNwMjU2azEiLCJrdHkiOiJFQyIsIngiOiJPMzhYcDIzR3lNSHBMWTl0SXFFR1dla2MtYU8tYk5pUzQ3VFYtend5ZGMwIiwieSI6Il9OeG0tQ05zWHB3a2NiQ05pT0ZxWnFtUUpDQ2VQbnI3a3JrbklPc1hNd2MifSwicHVycG9zZXMiOlsiYXV0aGVudGljYXRpb24iXSwidHlwZSI6Ikpzb25XZWJLZXkyMDIwIn1dLCJzZXJ2aWNlcyI6W3siaWQiOiJkd24iLCJzZXJ2aWNlRW5kcG9pbnQiOnsibm9kZXMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDg1L2R3biIsImh0dHA6Ly9sb2NhbGhvc3Q6ODA4Ni9kd24iLCJodHRwOi8vbG9jYWxob3N0OjgwODcvZHduIl19LCJ0eXBlIjoiRGVjZW50cmFsaXplZFdlYk5vZGUifV19fV0sInVwZGF0ZUNvbW1pdG1lbnQiOiJFaURtQ3Utcmo2V2J6QURLcjhoc2FfSnZzd2QwaGdOYzNPVmo0NFkzZzJvUzVnIn0sInN1ZmZpeERhdGEiOnsiZGVsdGFIYXNoIjoiRWlBU3NvZlJ3VGtmOGZNa0RwRTJlZUJiTHZyVkNQT1VXUmdaY3lKQ3laamJSQSIsInJlY292ZXJ5Q29tbWl0bWVudCI6IkVpQ05NVHNrZDRScWZvcmY0QTRwdTZCbmtpUTBPVDA4WWpVM2hSY0VWRjBFOVEifX0';
+    
+    // Write a JSON record to the remote DWN.
+    response = await web5.dwn.records.write(bobDid, {
+      author: myDid.id,
+      data: { random: 'stuff' },
+      message: {
+        protocol: 'test',
+        schema: 'test/post',
+        dataFormat: 'application/json'
+      }
+    });
+    logConsole(response, 'WRITE RESPONSE:');
+
+    // Convenience functions to decode data returned by queries
+    function base64UrlToString(encodedData) {
+      return web5.dwn.SDK.Encoder.bytesToString(web5.dwn.SDK.Encoder.base64UrlToBytes(encodedData));
+    }
+
+    function base64UrlToObject(encodedData) {
+      return web5.dwn.SDK.Encoder.base64UrlToObject(encodedData);
+    }
+  </script>
+</body>
+
+</html>
