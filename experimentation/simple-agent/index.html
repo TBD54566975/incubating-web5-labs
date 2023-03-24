@@ -78,8 +78,27 @@
     const web5 = new Web5();
     let response;
 
-    // Create a new ION DID and public-private key pair.
-    const myDid = await web5.did.create('ion');
+    let myDid;    
+    if (localStorage.getItem('myDid')) {
+        myDid = JSON.parse(localStorage.getItem('myDid'));
+        console.log("Loading previous did from localStorage");
+    } else {
+      console.log("Creating new did and storing in local storage");
+        myDid = await web5.did.create('ion', {
+            services: [{
+                'id': 'dwn',
+                'type': 'DecentralizedWebNode',
+                'serviceEndpoint': {
+                    'nodes': ['http://localhost:8085/dwn/',
+                              'http://localhost:8086/dwn/',
+                              'http://localhost:8087/dwn/',]
+                }
+            }]
+        });        
+        localStorage.setItem('myDid', JSON.stringify(myDid));
+    }
+
+
     console.log('DID:', myDid);
 
     // Register the DID as one which is running in browser memory and for which keys are available to sign messages.
