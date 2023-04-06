@@ -36,7 +36,7 @@ onMounted(async () => {
 
   console.log('DWN Running with DID: ' + registerInfo.did);
 
-  // Populate Todos from DWN
+  // Populate todos from DWN
   const queryResponse = await web5.dwn.records.query(dwnDID.value, {
     author  : dwnDID.value,
     message : {
@@ -80,7 +80,7 @@ async function addTodo() {
     }
   });
 
-  console.log('Write result');
+  console.log('Write result:');
   console.log(result);
 
   // TODO: Get record ID from write result
@@ -103,6 +103,7 @@ async function addTodo() {
     data        : todoData
   };
   
+  console.log('TODO Added:');
   console.log(todo);
   todos.value.push(todo);
 }
@@ -134,6 +135,7 @@ async function toggleTodoComplete(todoRecordId) {
     }
   });
 
+  console.log('Write result:');
   console.log(result);
 }
 
@@ -158,6 +160,7 @@ async function deleteTodo(todoRecordId) {
     }
   });
 
+  console.log('Delete response:');
   console.log(deleteResponse);
 }
 
