@@ -2,13 +2,11 @@
 
 The main code that powers this app is [here](./src/App.vue)
 
+This Todo app uses the Web5 JS SDK (https://www.npmjs.com/package/@tbd54566975/web5) to create a DWN in your browser and add todos
+
 ## Run and Build:
-Step 1: Pre-requisites (just do once)
-- (temporary) Install the message-store-level-v2 patch: `cd message-store-level-v2 && npm install && node bundle.js`
-- Build and then install the web5-wallet into chrome, follow the instructions [here](../web5-wallet/README.md)
+Step 1: `npm install && npm run dev`
 
-Step 2: `npm install && npm run dev`
-
-Step 3: Navigate to `http://localhost:5173` <br />
+Step 2: Navigate to `http://localhost:5173` <br />
 
 All todos are being stored in your DWN
