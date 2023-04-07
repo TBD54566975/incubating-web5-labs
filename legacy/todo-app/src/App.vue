@@ -1,44 +1,25 @@
 <script setup>
 import { onMounted, ref, toRaw } from 'vue';
 import { base64url } from 'multiformats/bases/base64';
+import { useToast } from 'vue-toastification';
 import { PlusIcon as PlusIconMini } from '@heroicons/vue/solid';
-import { CheckCircleIcon, TrashIcon } from '@heroicons/vue/outline';
-
-import { Web5 } from '@tbd54566975/web5';
-
-const web5 = new Web5();
+import { CheckCircleIcon } from '@heroicons/vue/outline';
 
 const newTodoDescription = ref('');
 const todos = ref([]);
-const dwnDID = ref('');
+
+const toast = useToast();
 
 onMounted(async () => {
-  let registerInfo;
-
-  // Load DWN DID from local storage or create a new one
-  if(!localStorage.getItem('dwn-info')){
-    const myDid = await web5.did.create('ion');
-
-    registerInfo = {
-      connected : true,
-      did       : myDid.id,
-      endpoint  : 'app://dwn', 
-      keys      : myDid.keys[0].keypair
-    };
-
-    localStorage.setItem('dwn-info', JSON.stringify(registerInfo));
-  } else {
-    registerInfo = JSON.parse(localStorage.getItem('dwn-info'));
+  const { isAllowed } = await window.web5.dwn.requestAccess();
+  
+  if (!isAllowed) {
+    toast.error('Access to DWN is forbidden. cannot write TODOs to DWN');
+    return;
   }
 
-  web5.did.register(registerInfo);
-  dwnDID.value = registerInfo.did;
-
-  console.log('DWN Running with DID: ' + registerInfo.did);
-
-  // Populate todos from DWN
-  const queryResponse = await web5.dwn.records.query(dwnDID.value, {
-    author  : dwnDID.value,
+  const result = await window.web5.dwn.processMessage({
+    method  : 'RecordsQuery',
     message : {
       filter: {
         schema: 'http://some-schema-registry.org/todo'
@@ -46,11 +27,20 @@ onMounted(async () => {
       dateSort: 'createdAscending'
     }
   });
-  
+
+  console.log(result);
+
+  if (result.status.code !== 200) {
+    toast.error('Failed to fetch todos from DWN. check console for error');
+    console.error(result);
+
+    return;
+  }
+
   const textDecoder = new TextDecoder();
   const storedTodos = [];
 
-  for (let entry of queryResponse.entries) {
+  for (let entry of result.entries) {
     let todo = { dWebMessage: entry };
     
     const todoBytes = base64url.baseDecode(entry.encodedData);
@@ -61,6 +51,7 @@ onMounted(async () => {
   }
 
   todos.value = storedTodos;
+
 });
 
 async function addTodo() {
@@ -71,30 +62,17 @@ async function addTodo() {
   
   newTodoDescription.value = '';
 
-  const result  = await web5.dwn.records.write(dwnDID.value, {
-    author  : dwnDID.value,
+  // record is the DWeb message written to the DWN
+  const { record, result } = await window.web5.dwn.processMessage({
+    method  : 'RecordsWrite',
     data    : todoData,
     message : {
       schema     : 'http://some-schema-registry.org/todo',
-      dataFormat : 'application/json'
+      dataFormat : 'application/json',
     }
   });
 
-  console.log('Write result:');
   console.log(result);
-
-  // TODO: Get record ID from write result
-  const queryResponse = await web5.dwn.records.query(dwnDID.value, {
-    author  : dwnDID.value,
-    message : {
-      filter: {
-        schema: 'http://some-schema-registry.org/todo'
-      },
-      dateSort: 'createdAscending'
-    }
-  });
-
-  const record = queryResponse.entries[queryResponse.entries.length - 1];
 
   // add DWeb message recordId as a way to reference the message for further operations
   // e.g. updating it or overwriting it
@@ -103,8 +81,6 @@ async function addTodo() {
     data        : todoData
   };
   
-  console.log('TODO Added:');
-  console.log(todo);
   todos.value.push(todo);
 }
 
@@ -124,8 +100,8 @@ async function toggleTodoComplete(todoRecordId) {
 
   const { descriptor } = toggledTodo.dWebMessage;
 
-  const result  = await web5.dwn.records.write(dwnDID.value, {
-    author  : dwnDID.value,
+  const result = await window.web5.dwn.processMessage({
+    method  : 'RecordsWrite',
     data    : updatedTodoData,
     message : {
       recordId    : toggledTodo.dWebMessage.recordId,
@@ -135,33 +111,7 @@ async function toggleTodoComplete(todoRecordId) {
     }
   });
 
-  console.log('Write result:');
   console.log(result);
-}
-
-async function deleteTodo(todoRecordId) {
-  let deletedTodo;
-
-  let index = 0;
-  for (let todo of todos.value) {
-    if (todo.dWebMessage.recordId === todoRecordId) {
-      deletedTodo = todo;
-      break;
-    }
-    index ++;
-  }
-
-  todos.value.splice(index, 1);
-
-  const deleteResponse = await web5.dwn.records.delete(dwnDID.value, {
-    author  : dwnDID.value,
-    message : {
-      recordId: deletedTodo.dWebMessage.recordId
-    }
-  });
-
-  console.log('Delete response:');
-  console.log(deleteResponse);
 }
 
 </script>
@@ -199,11 +149,6 @@ async function deleteTodo(todoRecordId) {
         </div>
         <div class="font-light ml-3 text-gray-500 text-xl">
           {{ todo.data.description }}
-        </div>
-        <div class="ml-auto">
-          <div @click="deleteTodo(todo.dWebMessage.recordId)" class="cursor-pointer">
-            <TrashIcon class="h-8 text-gray-200 w-8" :class="'text-red-500'" />
-          </div>
         </div>
       </div>
     </div>
