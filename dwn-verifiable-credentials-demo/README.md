@@ -1,6 +1,4 @@
-# Issue Verifiable Credenti
-
-
+## Issue Verifiable Credentials On A DWN
 
 To run the demo simply run:
 ```
