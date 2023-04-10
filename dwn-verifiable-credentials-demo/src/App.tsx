@@ -52,7 +52,8 @@ function App() {
   // VC VALIDATION
   const [wellknownURL, setWellknownURL] = useState('https://www.tbd.website/.well-known/did-configuration.json');
   const [issuerDidToValidateAgainst, setIssuerDidToValidateAgainst] = useState('did:key:z6Mkuxr8y6uyaze1UoXXGHhuZBcuon8yiNEh12Hh85V8hEx4');
-  const [valid, setValid] = useState(false);
+  const [validJWTVC, setValidJWTVC] = useState(false);
+  const [validDWNVC, setValidDWNVC] = useState(false);
 
 
   const initDWN = async () => {
@@ -107,7 +108,7 @@ function App() {
     const result = window.createVerifiableCredential(issuerPublicKey, issuerPrivateKey, credentialSubject);
     console.log(result)
     setVCOutput(JSON.stringify(result.vc, null, 2));
-    setVCJWTOutput(JSON.stringify(result.vcJWT, null, 2))
+    setVCJWTOutput(JSON.stringify(result.vcJWT, null, 2).replaceAll('"', ''));
   };
 
   const recordWrite = async (data: any) => {
@@ -124,14 +125,37 @@ function App() {
     setDWNWriteResult(writeResponse)
   }
 
-  const handleVerifyVCJWT = async () => {
-    // TODO: To call the website direclty but we have a cors issue
+  const recordQuery = async () => {
+    // Query for the record that was just created.
+    const queryResponse = await web5.dwn.records.query(dwnDID, {
+      author: dwnDID,
+      message: {
+        filter: {
+          schema: 'my/vcs'
+        }
+      }
+    });
+
+    console.log("DWN Response:", queryResponse)
+
+    const dwnVCJWT = base64UrlToString(queryResponse.entries[0].encodedData)
+    const result = await window.verifyJWTCredential(dwnVCJWT, issuerDidToValidateAgainst);
+    setValidDWNVC(result)
+  }
+
+  const base64UrlToString = (encodedData: any) => {
+    return web5.dwn.SDK.Encoder.bytesToString(web5.dwn.SDK.Encoder.base64UrlToBytes(encodedData));
+  }
+
+
+  const handleVerifyVCJWT = async (vcJWTOutput: string, issuerDidToValidateAgainst: string) => {
+    // TODO: To get wellknown from the website directly but we have a cors issue
     // fetch(wellknownURL)
     //   .then(response => response.json())
     //   .then(data => console.log(data));
 
-    const result = await window.verifyJWTCredential(vcJWTOutput.replaceAll('"', ''), issuerDidToValidateAgainst);
-    setValid(result)
+    const result = await window.verifyJWTCredential(vcJWTOutput, issuerDidToValidateAgainst);
+    setValidJWTVC(result)
   };
 
   return (
@@ -214,10 +238,7 @@ function App() {
             </WrappedTextBox>
           )}
 
-
         </FormBox>
-
-
       </Background>
 
       <hr></hr>
@@ -278,7 +299,7 @@ function App() {
             variant="contained"
             color="primary"
             style={{ backgroundColor: '#9a1aff' }}
-            onClick={handleVerifyVCJWT}
+            onClick={(e) => handleVerifyVCJWT(vcJWTOutput.replaceAll('"', ''), issuerDidToValidateAgainst)}
           >
             Verify VC JWT
           </Button>
@@ -286,7 +307,7 @@ function App() {
           <OutputBox>
             VC IS Valid?
             <Typography component="pre" style={{ fontSize: '1rem', color: 'green' }}>
-              {valid + ""}
+              {validJWTVC + ""}
             </Typography>
           </OutputBox>
 
@@ -297,7 +318,7 @@ function App() {
 
       <Background>
         <FormBox>
-          <h1 style={{ textAlign: "center", color: "black" }}>Verify VC is Authentic</h1>
+          <h1 style={{ textAlign: "center", color: "black" }}>Verify VC on DWN is Authentic</h1>
           <TextField
             disabled={true}
             label="Issuer Website Wellknown URL"
@@ -307,7 +328,6 @@ function App() {
           />
 
           <TextField
-
             label="Issuer DID to validate against"
             variant="outlined"
             value={issuerDidToValidateAgainst}
@@ -318,15 +338,22 @@ function App() {
             variant="contained"
             color="primary"
             style={{ backgroundColor: '#9a1aff' }}
-            onClick={e => console.log("Send VC to a DWN ")}
+            onClick={e => recordQuery()}
           >
-            Verify VCs On DWN (TODO)
+            Verify VC On DWN
           </Button>
+
+          <OutputBox>
+            VC On DWN IS Valid?
+            <Typography component="pre" style={{ fontSize: '1rem', color: 'green' }}>
+              {validDWNVC + ""}
+            </Typography>
+          </OutputBox>
         </FormBox>
       </Background>
 
       <hr></hr>
-      <a href="https://www.tbd.website/.well-known/did-configuration.json">tbd did wellknown config</a>
+      <a href="https://www.tbd.website/.well-known/did-configuration.json">TBD DID Wellknown Config</a>
     </div>
   );
 }
