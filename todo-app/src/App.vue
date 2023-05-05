@@ -11,34 +11,34 @@ const web5 = new Web5();
 const newTodoDescription = ref('');
 const todos = ref([]);
 const dwnDID = ref('');
+let myDid;
 
 onMounted(async () => {
   let registerInfo;
-
   // Load DWN DID from local storage or create a new one
-  if(!localStorage.getItem('dwn-info')){
-    const myDid = await web5.did.create('ion');
+  if(!localStorage.getItem('dwn-info') || !localStorage.getItem('myDid')) {
+    myDid = await web5.did.create('ion');
 
     registerInfo = {
       connected : true,
-      did       : myDid.id,
       endpoint  : 'app://dwn', 
       keys      : myDid.keys[0].keypair
     };
 
     localStorage.setItem('dwn-info', JSON.stringify(registerInfo));
+    localStorage.setItem('myDid', JSON.stringify(myDid));
   } else {
     registerInfo = JSON.parse(localStorage.getItem('dwn-info'));
+    myDid = JSON.parse(localStorage.getItem('myDid'));
   }
 
-  web5.did.register(registerInfo);
-  dwnDID.value = registerInfo.did;
+  await web5.did.manager.set(myDid.id, registerInfo);
 
-  console.log('DWN Running with DID: ' + registerInfo.did);
+  console.log('DWN Running with DID: ' + myDid.id);
 
   // Populate todos from DWN
-  const queryResponse = await web5.dwn.records.query(dwnDID.value, {
-    author  : dwnDID.value,
+  const queryResponse = await web5.dwn.records.query(myDid.id, {
+    author  : myDid.id,
     message : {
       filter: {
         schema: 'http://some-schema-registry.org/todo'
@@ -71,8 +71,8 @@ async function addTodo() {
   
   newTodoDescription.value = '';
 
-  const result  = await web5.dwn.records.write(dwnDID.value, {
-    author  : dwnDID.value,
+  const result  = await web5.dwn.records.write(myDid.id, {
+    author  : myDid.id,
     data    : todoData,
     message : {
       schema     : 'http://some-schema-registry.org/todo',
@@ -84,8 +84,8 @@ async function addTodo() {
   console.log(result);
 
   // TODO: Get record ID from write result
-  const queryResponse = await web5.dwn.records.query(dwnDID.value, {
-    author  : dwnDID.value,
+  const queryResponse = await web5.dwn.records.query(myDid.id, {
+    author  : myDid.id,
     message : {
       filter: {
         schema: 'http://some-schema-registry.org/todo'
@@ -124,8 +124,8 @@ async function toggleTodoComplete(todoRecordId) {
 
   const { descriptor } = toggledTodo.dWebMessage;
 
-  const result  = await web5.dwn.records.write(dwnDID.value, {
-    author  : dwnDID.value,
+  const result  = await web5.dwn.records.write(myDid.id, {
+    author  : myDid.id,
     data    : updatedTodoData,
     message : {
       recordId    : toggledTodo.dWebMessage.recordId,
@@ -153,8 +153,8 @@ async function deleteTodo(todoRecordId) {
 
   todos.value.splice(index, 1);
 
-  const deleteResponse = await web5.dwn.records.delete(dwnDID.value, {
-    author  : dwnDID.value,
+  const deleteResponse = await web5.dwn.records.delete(myDid.id, {
+    author  : myDid.id,
     message : {
       recordId: deletedTodo.dWebMessage.recordId
     }
