@@ -1,44 +1,41 @@
 <script setup>
-import { onMounted, ref, toRaw } from 'vue';
+import { onBeforeMount, ref, toRaw } from 'vue';
 import { base64url } from 'multiformats/bases/base64';
 import { PlusIcon as PlusIconMini } from '@heroicons/vue/solid';
 import { CheckCircleIcon, TrashIcon } from '@heroicons/vue/outline';
-
 import { Web5 } from '@tbd54566975/web5';
 
 const web5 = new Web5();
-
-const newTodoDescription = ref('');
-const todos = ref([]);
 const dwnDID = ref('');
+const todos = ref([]);
+let myDid;
 
-onMounted(async () => {
+onBeforeMount(async () => {
   let registerInfo;
-
   // Load DWN DID from local storage or create a new one
-  if(!localStorage.getItem('dwn-info')){
-    const myDid = await web5.did.create('ion');
-
+  if(localStorage.getItem('dwn-info')){
+    // User has an "account," so load their data
+    registerInfo = JSON.parse(localStorage.getItem('dwn-info'));
+    } else {
+    // User does not have an "account," so create one for them
+    myDid = await web5.did.create('ion');
     registerInfo = {
       connected : true,
-      did       : myDid.id,
       endpoint  : 'app://dwn', 
-      keys      : myDid.keys[0].keypair
+      keys: {
+        ['#dwn']: {
+          keyPair: myDid.keys[0].keyPair,
+        },
+      }
     };
-
-    localStorage.setItem('dwn-info', JSON.stringify(registerInfo));
-  } else {
-    registerInfo = JSON.parse(localStorage.getItem('dwn-info'));
+    await web5.did.manager.set(myDid.id, registerInfo);
+    localStorage.setItem('myDid', JSON.stringify(myDid));
+    localStorage.setItem('registerInfo', JSON.stringify(registerInfo));
   }
 
-  web5.did.register(registerInfo);
-  dwnDID.value = registerInfo.did;
-
-  console.log('DWN Running with DID: ' + registerInfo.did);
-
   // Populate todos from DWN
-  const queryResponse = await web5.dwn.records.query(dwnDID.value, {
-    author  : dwnDID.value,
+  const queryResponse = await web5.dwn.records.query(myDid.id, {
+    author  : myDid.id,
     message : {
       filter: {
         schema: 'http://some-schema-registry.org/todo'
@@ -47,6 +44,7 @@ onMounted(async () => {
     }
   });
   
+  // Serialize Todo
   const textDecoder = new TextDecoder();
   const storedTodos = [];
 
@@ -56,23 +54,24 @@ onMounted(async () => {
     const todoBytes = base64url.baseDecode(entry.encodedData);
     const todoStringified = textDecoder.decode(todoBytes);
     todo.data = JSON.parse(todoStringified);
-
     storedTodos.push(todo);
   }
-
   todos.value = storedTodos;
 });
+
+// Adding Todos
+const newTodoDescription = ref('');
 
 async function addTodo() {
   const todoData = {
     completed   : false,
     description : newTodoDescription.value
   };
-  
+
   newTodoDescription.value = '';
 
-  const result  = await web5.dwn.records.write(dwnDID.value, {
-    author  : dwnDID.value,
+  const result  = await web5.dwn.records.write(myDid.id, {
+    author  : myDid.id,
     data    : todoData,
     message : {
       schema     : 'http://some-schema-registry.org/todo',
@@ -80,12 +79,10 @@ async function addTodo() {
     }
   });
 
-  console.log('Write result:');
-  console.log(result);
-
   // TODO: Get record ID from write result
-  const queryResponse = await web5.dwn.records.query(dwnDID.value, {
-    author  : dwnDID.value,
+  // Query DWN for record
+  const queryResponse = await web5.dwn.records.query(myDid.id, {
+    author  : myDid.id,
     message : {
       filter: {
         schema: 'http://some-schema-registry.org/todo'
@@ -102,47 +99,13 @@ async function addTodo() {
     dWebMessage : record,
     data        : todoData
   };
-  
-  console.log('TODO Added:');
-  console.log(todo);
   todos.value.push(todo);
-}
-
-async function toggleTodoComplete(todoRecordId) {
-  let toggledTodo;
-  let updatedTodoData;
-
-  for (let todo of todos.value) {
-    if (todo.dWebMessage.recordId === todoRecordId) {
-      toggledTodo = todo;
-      todo.data.completed = !todo.data.completed;
-
-      updatedTodoData = { ...toRaw(todo.data) };
-      break;
-    }
-  }
-
-  const { descriptor } = toggledTodo.dWebMessage;
-
-  const result  = await web5.dwn.records.write(dwnDID.value, {
-    author  : dwnDID.value,
-    data    : updatedTodoData,
-    message : {
-      recordId    : toggledTodo.dWebMessage.recordId,
-      dateCreated : descriptor.dateCreated,
-      schema      : descriptor.schema,
-      dataFormat  : descriptor.dataFormat,
-    }
-  });
-
-  console.log('Write result:');
-  console.log(result);
 }
 
 async function deleteTodo(todoRecordId) {
   let deletedTodo;
-
   let index = 0;
+
   for (let todo of todos.value) {
     if (todo.dWebMessage.recordId === todoRecordId) {
       deletedTodo = todo;
@@ -153,15 +116,40 @@ async function deleteTodo(todoRecordId) {
 
   todos.value.splice(index, 1);
 
-  const deleteResponse = await web5.dwn.records.delete(dwnDID.value, {
-    author  : dwnDID.value,
+  const deleteResponse = await web5.dwn.records.delete(myDid.id, {
+    author  : myDid.id,
     message : {
       recordId: deletedTodo.dWebMessage.recordId
     }
   });
+}
 
-  console.log('Delete response:');
-  console.log(deleteResponse);
+// Toggling Todo Status
+async function toggleTodoComplete(todoRecordId) {
+  let toggledTodo;
+  let updatedTodoData;
+
+  for (let todo of todos.value) {
+    if (todo.dWebMessage.recordId === todoRecordId) {
+      toggledTodo = todo;
+      todo.data.completed = !todo.data.completed;
+      updatedTodoData = { ...toRaw(todo.data) };
+      break;
+    }
+  }
+
+  const { descriptor } = toggledTodo.dWebMessage;
+
+  const result  = await web5.dwn.records.write(myDid.id, {
+    author  : myDid.id,
+    data    : updatedTodoData,
+    message : {
+      recordId    : toggledTodo.dWebMessage.recordId,
+      dateCreated : descriptor.dateCreated,
+      schema      : descriptor.schema,
+      dataFormat  : descriptor.dataFormat,
+    }
+  });
 }
 
 </script>
@@ -191,7 +179,7 @@ async function deleteTodo(todoRecordId) {
         </button>
       </form>
     </div>
-
+    <!-- Todos -->
     <div v-if="(todos.length > 0)" class="border-gray-200 border-t border-x mt-16 rounded-lg shadow-md sm:max-w-xl sm:mx-auto sm:w-full">
       <div v-for="todo in todos" :key="todo.dWebMessage.recordId" class="border-b border-gray-200 flex items-center p-4">
         <div @click="toggleTodoComplete(todo.dWebMessage.recordId)" class="cursor-pointer">
@@ -200,6 +188,7 @@ async function deleteTodo(todoRecordId) {
         <div class="font-light ml-3 text-gray-500 text-xl">
           {{ todo.data.description }}
         </div>
+        <!-- Delete Todo -->
         <div class="ml-auto">
           <div @click="deleteTodo(todo.dWebMessage.recordId)" class="cursor-pointer">
             <TrashIcon class="h-8 text-gray-200 w-8" :class="'text-red-500'" />
