@@ -45,6 +45,7 @@ onBeforeMount(async () => {
     }
   });
   
+  // Serialize Todo
   const textDecoder = new TextDecoder();
   const storedTodos = [];
 
