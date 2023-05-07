@@ -13,10 +13,11 @@ let myDid;
 onBeforeMount(async () => {
   let registerInfo;
   // Load DWN DID from local storage or create a new one
-  if(localStorage.getItem('dwn-info')){
+  if(localStorage.getItem('dwn-info') && localStorage.getItem('myDid')){
     // User has an "account," so load their data
     registerInfo = JSON.parse(localStorage.getItem('dwn-info'));
-    } else {
+    myDid = JSON.parse(localStorage.getItem('myDid'));
+  } else {
     // User does not have an "account," so create one for them
     myDid = await web5.did.create('ion');
     registerInfo = {
