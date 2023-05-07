@@ -30,6 +30,8 @@ onBeforeMount(async () => {
       }
     };
     await web5.did.manager.set(myDid.id, registerInfo);
+    localStorage.setItem('myDid', JSON.stringify(myDid));
+    localStorage.setItem('registerInfo', JSON.stringify(registerInfo));
   }
 
   // Populate todos from DWN
