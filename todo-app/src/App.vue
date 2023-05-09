@@ -117,15 +117,15 @@ async function toggleTodoComplete(todoItem) {
     }
   }
 
-  await web5.dwn.records.write(myDid.id, {
+  // Update the record in the DWN, first get the record
+  const { record } = await web5.dwn.records.read(myDid.id, {
     author  : myDid.id,
-    data    : updatedTodoData,
     message : {
-      recordId    : toggledTodo.id,
+      recordId: toggledTodo.id,
     }
   });
-
-//   await toggledTodo.record.update({ data: updatedTodoData });
+  // Now update it
+  record.update({ data: updatedTodoData });
 }
 
 </script>
