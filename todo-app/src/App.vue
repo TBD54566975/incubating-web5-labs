@@ -59,7 +59,7 @@ const newTodoDescription = ref('');
 
 async function addTodo() {
   const todoData = {
-    completed   : true,
+    completed   : false,
     description : newTodoDescription.value
   };
 
