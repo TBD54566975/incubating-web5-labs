@@ -22,7 +22,7 @@ onBeforeMount(async () => {
     registerInfo = {
       connected : true,
       endpoint  : 'app://dwn', 
-      keys: {
+      keys      : {
         ['#dwn']: {
           keyPair: myDid.keys[0].keyPair,
         },
@@ -108,6 +108,8 @@ async function toggleTodoComplete(todoItem) {
   let toggledTodo;
   let updatedTodoData;
 
+  console.log(updatedTodoData);
+
   for (let todo of todos.value) {
     if (todoItem.id === todo.id) {
       toggledTodo = todo;
@@ -117,15 +119,26 @@ async function toggleTodoComplete(todoItem) {
     }
   }
 
+
+  await web5.dwn.records.delete(myDid.id, {
+    author  : myDid.id,
+    message : {
+      recordId: toggledTodo.id
+    }
+  });  
+
   await web5.dwn.records.write(myDid.id, {
     author  : myDid.id,
     data    : updatedTodoData,
     message : {
-      recordId    : toggledTodo.id,
+      schema     : 'http://some-schema-registry.org/todo',
+      dataFormat : 'application/json'
     }
   });
 
-//   await toggledTodo.record.update({ data: updatedTodoData });
+
+
+   
 }
 
 </script>
