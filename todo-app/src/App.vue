@@ -1,45 +1,18 @@
 <script setup>
 import { onBeforeMount, ref, toRaw } from 'vue';
-import { base64url } from 'multiformats/bases/base64';
 import { PlusIcon as PlusIconMini } from '@heroicons/vue/solid';
 import { CheckCircleIcon, TrashIcon } from '@heroicons/vue/outline';
 import { Web5 } from '@tbd54566975/web5';
 
-const web5 = new Web5();
-const todos = ref([]);
+let web5;
 let myDid;
+const todos = ref([]);
 
 onBeforeMount(async () => {
-  let registerInfo;
-  // Load DWN DID from local storage or create a new one
-  if(localStorage.getItem('registerInfo') && localStorage.getItem('myDid')){
-    // User has an "account," so load their data
-    registerInfo = JSON.parse(localStorage.getItem('registerInfo'));
-    myDid = JSON.parse(localStorage.getItem('myDid'));
-  } else {
-    // User does not have an "account," so create one for them
-    myDid = await web5.did.create('ion');
-    registerInfo = {
-      connected : true,
-      endpoint  : 'app://dwn', 
-      keys: {
-        ['#dwn']: {
-          keyPair: myDid.keys[0].keyPair,
-        },
-      }
-    };
-
-    localStorage.setItem('myDid', JSON.stringify(myDid));
-    localStorage.setItem('registerInfo', JSON.stringify(registerInfo));
-  }
-
-  // Associated DID with DWN
-  await web5.did.manager.set(myDid.id, registerInfo);
-
+  ({ web5, did: myDid } = await Web5.connect());
   // Populate todos from DWN
-  const queryResponse = await web5.dwn.records.query(myDid.id, {
-    author  : myDid.id,
-    message : {
+  const { records } = await web5.dwn.records.query({
+    message: {
       filter: {
         schema: 'http://some-schema-registry.org/todo'
       },
@@ -48,8 +21,9 @@ onBeforeMount(async () => {
   });
   
   // Add entry to Todo array
-  for (let record of queryResponse.entries) {
-    const todo = { record, data: await record.data.json(), id: record.id };
+  for (let record of records) {
+    const data = await record.data.json();
+    const todo = { record, data, id: record.id };
     todos.value.push(todo);
   }
 });
@@ -64,9 +38,10 @@ async function addTodo() {
   };
 
   newTodoDescription.value = '';
+  console.log(todoData);
 
-  const { record } = await web5.dwn.records.write(myDid.id, {
-    author  : myDid.id,
+  // Create the record.
+  const { record } = await web5.dwn.records.create({
     data    : todoData,
     message : {
       schema     : 'http://some-schema-registry.org/todo',
@@ -76,8 +51,8 @@ async function addTodo() {
 
   // add DWeb message recordId as a way to reference the message for further operations
   // e.g. updating it or overwriting it
-
-  const todo = { record, data: await record.data.json(), id: record.id };
+  const data = await record.data.json();
+  const todo = { record, data, id: record.id };
   todos.value.push(todo);
 }
 
@@ -95,9 +70,9 @@ async function deleteTodo(todoItem) {
 
   todos.value.splice(index, 1);
 
-  await web5.dwn.records.delete(myDid.id, {
-    author  : myDid.id,
-    message : {
+  // Delete the record.
+  await web5.dwn.records.delete({
+    message: {
       recordId: deletedTodo.id
     }
   });
@@ -117,15 +92,15 @@ async function toggleTodoComplete(todoItem) {
     }
   }
 
-  // Update the record in the DWN, first get the record
-  const { record } = await web5.dwn.records.read(myDid.id, {
-    author  : myDid.id,
-    message : {
+  // Read the record
+  const { record } = await web5.dwn.records.read({
+    message: {
       recordId: toggledTodo.id,
     }
   });
-  // Now update it
-  record.update({ data: updatedTodoData });
+
+  // Update the record
+  await record.update({ data: updatedTodoData });
 }
 
 </script>
