@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Dinger</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300&family=Montserrat:wght@300&display=swap"
+    rel="stylesheet">
+  <style>
+    body {
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    button {
+      font-family: 'IBM Plex Mono', monospace;
+      padding: 5px 10px;
+    }
+
+    input[type="text"] {
+      margin-bottom: 10px;
+      width: 300px;
+      padding: 5px;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    #subtitle {
+      margin-top: 0;
+      font-size: 20px;
+      font-style: italic;
+    }
+
+    #copy-did {
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+
+    #ding-error {
+      color: red;
+      margin-bottom: 5px;
+    }
+
+    #ding-progress {
+      color: green;
+      margin-left: 5px;
+    }
+
+    .ding-back {
+      margin-left: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1><span style="border-bottom: 5px solid black;">Dinger</span> <span id=subtitle> - Ping a DID</span></h1>
+  <button id="copy-did">Copy your DID</button>
+
+  <h2>Ding Someone</h2>
+
+  <form id="ding-form">
+    <p id="ding-error"></p>
+    <input type="text" id="did" placeholder="Enter DID" />
+    <br>
+    <input type="text" id="note" placeholder="Enter note (optional)" />
+    <br>
+    <button type="submit">Ding</button>
+    <span id="ding-progress"></span>
+  </form>
+
+  <h2>You Dinged:</h2>
+  <ul id="dinged-list">
+    <!-- List items will be added here dynamically -->
+  </ul>
+
+  <h2>You were Dinged by:</h2>
+  <ul id="dinged-by-list">
+    <!-- List items will be added here dynamically -->
+  </ul>
+
+  <script type="module" src="/dinger.js"></script>
+</body>
+
+</html>
