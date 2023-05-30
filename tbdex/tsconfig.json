@@ -6,7 +6,7 @@
       "ES6"
     ],
     "allowJs": true,
-    "target": "es6",
+    "target": "es2017", // change to es2017 to allow top level await
     "module": "ESNext", // Required for enabling JavaScript import assertion support
     "declaration": true,
     "declarationMap": true,
