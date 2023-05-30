@@ -3,6 +3,6 @@ import browserConfig from './esbuild-browser-config.cjs';
 
 esbuild.build({
   ...browserConfig,
-  entryPoints : ['./src/alice.ts', './src/pfi.ts'],
+  entryPoints : ['./src/common.ts', './src/alice.ts', './src/pfi.ts'],
   outdir      : 'dist',
 });
