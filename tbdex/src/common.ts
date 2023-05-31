@@ -16,8 +16,8 @@ export type Offering = {
   min?: number;
   max?: number;
   payment_instruments: PaymentInstrument[];
-  
 };
+
 
 // offering from PFI's perspective
 const a: Offering = {
@@ -36,6 +36,14 @@ const a: Offering = {
   }]
 }
 
+
+export type RFQ = {
+  offering_id: string,
+  product: string,
+  size: number,
+  presentation_submission: object
+}
+
 // vcs required may differ based on payment_instrument
 // e.g. payment_instrument credit card, may require ID as VC
 // RFQ from Alice's perspective
@@ -45,6 +53,11 @@ const rfq = {
   product: 'BTC_USD',
   size: 100,
   presentation_submission: {}
+}
+
+export type Quote = {
+  rfq: RFQ,
+
 }
 
 /*
