@@ -36,7 +36,6 @@ async function loadOfferings() {
     }
   })
 
-
   console.log('offering written', record)
   console.log('dwn write status', status)
 }
@@ -44,8 +43,8 @@ async function loadOfferings() {
 const rfqForm = document.querySelector('#receive-rfq-form');
 
 rfqForm.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    await fetchRFQ();
+  event.preventDefault();
+  await fetchRFQ();
 });
 
 async function fetchRFQ() {
@@ -74,32 +73,32 @@ function sendQuoteToAlice() {
 
 async function configureProtocol(protocolDefinition) {
   const { protocols, status } = await web5.dwn.protocols.query({
-      message: {
-        filter: {
-          protocol: 'https://tbd.website/protocols/tbdex'
-        }
+    message: {
+      filter: {
+        protocol: 'https://tbd.website/protocols/tbdex'
       }
-    });
-  
-    if (status.code !== 200) {
-      alert('Failed to query protocols. check console');
-      console.error('Failed to query protocols', status);
-      return;
     }
-  
-    // protocol already exists
-    if (protocols.length > 0) {
-      console.log('protocol already exists');
-      return;
-    }
-  
-    // create protocol
-    const { status: configureStatus } = await web5.dwn.protocols.configure({
-      message: {
-        definition: protocolDefinition
-      }
-    });
-  
-    console.log('configure protocol status', configureStatus);
+  });
+
+  if (status.code !== 200) {
+    alert('Failed to query protocols. check console');
+    console.error('Failed to query protocols', status);
+    return;
   }
+
+  // protocol already exists
+  if (protocols.length > 0) {
+    console.log('protocol already exists');
+    return;
+  }
+
+  // create protocol
+  const { status: configureStatus } = await web5.dwn.protocols.configure({
+    message: {
+      definition: protocolDefinition
+    }
+  });
+
+  console.log('configure protocol status', configureStatus);
+}
 
