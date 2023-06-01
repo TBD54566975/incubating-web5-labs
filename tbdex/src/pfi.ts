@@ -6,38 +6,38 @@ const { web5, did } = await Web5.connect();
 
 // TODO: find a no-creds public api to get USD/BTC fx rate
 
-console.log('pfi did', did)
+console.log('pfi did', did);
 
-await configureProtocol(pfiProtocolDefinition)
-await loadOfferings()
+await configureProtocol(pfiProtocolDefinition);
+await loadOfferings();
 
 
 async function loadOfferings() {
   const offer: Offering = {
-    id: '123',
-    name: 'BTC_USD',
-    unitPrice: 27000,
-    fee: 5,
-    min: 10,
-    max: 100,
-    presentation_definition: {},
-    payment_instruments: [{
-      kind: 'DEBIT_CARD',
-      fee: 1,
-      presentation_definition: {},
+    id                      : '123',
+    name                    : 'BTC_USD',
+    unitPrice               : 27000,
+    fee                     : 5,
+    min                     : 10,
+    max                     : 100,
+    presentation_definition : {},
+    payment_instruments     : [{
+      kind                    : 'DEBIT_CARD',
+      fee                     : 1,
+      presentation_definition : {},
     }]
   };
 
   const { record, status } = await web5.dwn.records.write({
-    data: offer,
-    message: {
-      published: true,
-      schema: 'tbdex.io/schemas/offering'
+    data    : offer,
+    message : {
+      published : true,
+      schema    : 'tbdex.io/schemas/offering'
     }
-  })
+  });
 
-  console.log('offering written', record)
-  console.log('dwn write status', status)
+  console.log('offering written', record);
+  console.log('dwn write status', status);
 }
 
 const rfqForm = document.querySelector('#receive-rfq-form');
@@ -51,15 +51,15 @@ async function fetchRFQ() {
   const { records, status } = await web5.dwn.records.query({
     message: {
       filter: {
-        protocol: 'https://tbd.website/protocols/tbdex',
-        schema: 'https://tbd.website/protocols/tbdex/RequestForQuote'
+        protocol : 'https://tbd.website/protocols/tbdex',
+        schema   : 'https://tbd.website/protocols/tbdex/RequestForQuote'
       }
     }
-  })
+  });
 
   for (let record of records) {
-    const rfq: RFQ = await record.data.json()
-    alert('got an RFQ from Alice ' + JSON.stringify(rfq))
+    const rfq: RFQ = await record.data.json();
+    alert('got an RFQ from Alice ' + JSON.stringify(rfq));
   }
 }
 

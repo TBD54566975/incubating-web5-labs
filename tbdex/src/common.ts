@@ -21,20 +21,20 @@ export type Offering = {
 
 // offering from PFI's perspective
 const a: Offering = {
-  id: '123',
-  name: 'BTC_USD', // base_counter, btc is base, usd is counter. PFI has BTC, PFI wants USD
-  unitPrice: 27000, // how much counter currency you need to buy 1 unit of base currency
-  fee: 5,
-  min: 10,
-  max: 100,
+  id                      : '123',
+  name                    : 'BTC_USD', // base_counter, btc is base, usd is counter. PFI has BTC, PFI wants USD
+  unitPrice               : 27000, // how much counter currency you need to buy 1 unit of base currency
+  fee                     : 5,
+  min                     : 10,
+  max                     : 100,
   // does the presentation definition spec allow us to receive them split like this and then "smush" them together?
-  presentation_definition: {},
-  payment_instruments: [{
-    kind: 'DEBIT_CARD',
-    fee: 1,
-    presentation_definition: {},
+  presentation_definition : {},
+  payment_instruments     : [{
+    kind                    : 'DEBIT_CARD',
+    fee                     : 1,
+    presentation_definition : {},
   }]
-}
+};
 
 
 export type RFQ = {
@@ -49,11 +49,11 @@ export type RFQ = {
 // RFQ from Alice's perspective
 // i have counter currency, i want base currency
 const rfq = {
-  offering_id: '123',
-  product: 'BTC_USD',
-  size: 100,
-  presentation_submission: {}
-}
+  offering_id             : '123',
+  product                 : 'BTC_USD',
+  size                    : 100,
+  presentation_submission : {}
+};
 
 export type Quote = {
   rfq: RFQ,
@@ -79,65 +79,65 @@ buying USD with BTC == selling BTC for USD
 /**
  * Alice is the only one who can send an RFQ
  * Alice is the only one who can receive a Quote
- * 
+ *
  * PFI is the only one who can receive an RFQ
  * PFI is the only one who can send a Quote
- * 
+ *
  */
 
 
 // PFI -> Alice
 
 const offer1 = {
-  id: '123',
+  id                      : '123',
   // (implied directionality) base_counter, btc is base, usd is counter. PFI has BTC, PFI wants USD
   // typically these don't offer directionality in exchanges, but we want to enforce it
-  // side implied here is always sell. 
-  name: 'BTC_USD', // suggested name of "product", thoughts around naming?
+  // side implied here is always sell.
+  name                    : 'BTC_USD', // suggested name of "product", thoughts around naming?
   // side: "BUY",
   // all numbers should be represented as strings to handle precision correctly
-  unitPrice: 27000, // how much counter currency you need to buy 1 unit of base currency
-  fee: 5,
-  min: 10,
-  max: 100,
+  unitPrice               : 27000, // how much counter currency you need to buy 1 unit of base currency
+  fee                     : 5,
+  min                     : 10,
+  max                     : 100,
   // does the presentation definition spec allow us to receive them split like this and then "smush" them together?
-  presentation_definition: {},
-  payment_instruments: [{
-    kind: 'DEBIT_CARD',
-    fee: 1,
-    presentation_definition: {},
+  presentation_definition : {},
+  payment_instruments     : [{
+    kind                    : 'DEBIT_CARD',
+    fee                     : 1,
+    presentation_definition : {},
   }]
-}
+};
 
 // i think naming of this should be consistent with offering
 // another implication here: Alice is always Buying the first currency (base currency)
 // Alice -> PFI
 const rfq1 = {
-  // does it make sense for Alice to make her own id before she sends in her RFQ to PFI? 
-	rfq_id: "1",
-  name: "BTC_USD",
-	// source_currency: "USD",
-	// target_currency: "BTC",
-	amount: 10.00, // Alice has $10 USD
-	presentation_submission: [ {  }, {  }] // do i include presentation definition in payment instrument now?
-}
+  // does it make sense for Alice to make her own id before she sends in her RFQ to PFI?
+  rfq_id                  : '1',
+  name                    : 'BTC_USD',
+  // source_currency: "USD",
+  // target_currency: "BTC",
+  amount                  : 10.00, // Alice has $10 USD
+  presentation_submission : [ {  }, {  }] // do i include presentation definition in payment instrument now?
+};
 
 // PFI -> Alice
-// naming for this message type - executequote, order, 
+// naming for this message type - executequote, order,
 const quote1 = {
-	quote_id: "2",
+  quote_id : '2',
   // or just hand back rfq_id
-	rfq: {
-		rfq_id: "1",
-    name: "BTC_USD",
-		// source_currency: "USD",
-		// target_currency: "BTC",
-		amount: 10.00,
-		// excluded?: "presentation_submission": [ { ... }, { ... }]
-	},
-  expiryTime: "2023-04-14T12:12:12Z",
-	target_amount: '0.000383', // PFI says Alice can have this much BTC for $10 USD
-  payment_link: ''
-}
+  rfq      : {
+    rfq_id : '1',
+    name   : 'BTC_USD',
+    // source_currency: "USD",
+    // target_currency: "BTC",
+    amount : 10.00,
+    // excluded?: "presentation_submission": [ { ... }, { ... }]
+  },
+  expiryTime    : '2023-04-14T12:12:12Z',
+  target_amount : '0.000383', // PFI says Alice can have this much BTC for $10 USD
+  payment_link  : ''
+};
 
 // quote execution status can be dropped (price changes too much, PFI decides to not honor the quote)
