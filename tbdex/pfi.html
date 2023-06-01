@@ -5,19 +5,133 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron&display=swap" rel="stylesheet">
   <title>tbDEX</title>
+
+  <style>
+    * {
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    #offeringForm {
+      padding: 20px;
+    }
+
+    #offeringForm fieldset {
+      padding: 40px;
+    }
+
+    .form-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .form-row>div {
+      flex: 1;
+      margin-right: 10px;
+    }
+
+    .form-row>div:last-child {
+      margin-right: 0;
+    }
+
+    label,
+    input,
+    textarea {
+      display: block;
+      width: 100%;
+    }
+
+    .paymentInstrument div {
+      margin-top: 20px;
+    }
+
+    #submitOffering {
+      margin-top: 10px;
+    }
+  </style>
 </head>
 
 <body>
-  <h1>tbDEX - PFI</h1>
+  <div style="display: flex; gap: 20px; align-items: center;">
+    <h1>tbDEX - PFI</h1>
+    <button id="copy-did" style="height: 20px; width: 80px">Copy DID</button>
+  </div>
 
-  <script type="module" src="/dist/pfi.js"></script>
+  <form id="offeringForm">
+    <fieldset>
+      <legend>Create Offering</legend>
+
+      <!-- Offering Fields -->
+      <div class="form-row">
+        <div>
+          <label for="id">Offering ID:</label>
+          <input type="text" id="id" name="id">
+        </div>
+        <div>
+          <label for="name">Offering Name:</label>
+          <input type="text" id="name" name="name">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div>
+          <label for="unitPrice">Unit Price:</label>
+          <input type="number" id="unitPrice" name="unitPrice">
+        </div>
+        <div>
+          <label for="fee">Fee:</label>
+          <input type="number" id="fee" name="fee">
+        </div>
+        <div>
+          <label for="min">Minimum:</label>
+          <input type="number" id="min" name="min">
+        </div>
+        <div>
+          <label for="max">Maximum:</label>
+          <input type="number" id="max" name="max">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div>
+          <label for="presentation_definition">Presentation Definition:</label>
+          <textarea id="presentation_definition" name="presentation_definition"></textarea>
+        </div>
+      </div>
+
+      <div class="paymentInstrument">
+        <div>
+          <label for="paymentInstrumentKind">Payment Instrument Kind:</label>
+          <input type="text" id="paymentInstrumentKind" name="paymentInstrumentKind">
+        </div>
+        <div>
+          <label for="paymentInstrumentFee">Payment Instrument Fee:</label>
+          <input type="number" id="paymentInstrumentFee" name="paymentInstrumentFee">
+        </div>
+        <div>
+          <label for="paymentInstrumentPresentationDefinition">Payment Instrument Presentation Definition:</label>
+          <textarea id="paymentInstrumentPresentationDefinition"
+            name="paymentInstrumentPresentationDefinition"></textarea>
+        </div>
+      </div>
+      <!-- Form submission -->
+      <button id="submitOffering" type="submit">Submit Offering</button>
+    </fieldset>
+
+  </form>
+
+
 
   <form id="receive-rfq-form">
     <p id="receive-rfq-error"></p>
     <button type="submit">Receive RFQ from Alice</button>
     <span id="receive-rfq-progress"></span>
   </form>
+  <script type="module" src="/dist/pfi.js"></script>
 </body>
 
 </html>

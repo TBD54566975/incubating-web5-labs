@@ -6,10 +6,28 @@ const { web5, did } = await Web5.connect();
 
 // TODO: find a no-creds public api to get USD/BTC fx rate
 
-console.log('pfi did', did);
+// console.log('pfi did', did);
 
-await configureProtocol(pfiProtocolDefinition);
-await loadOfferings();
+// await configureProtocol(pfiProtocolDefinition);
+// await loadOfferings();
+
+const copyDidElement = document.querySelector('#copy-did');
+const copyIndicator = document.querySelector('#copy-indicator') as HTMLElement;
+
+copyDidElement.addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(did);
+    copyIndicator.style.display = 'block';
+
+    setTimeout(() => {
+      copyIndicator.style.display = 'none';
+    }, 2000);
+
+  } catch (err) {
+    alert('Failed to copy DID. check console for error');
+    console.error(err);
+  }
+});
 
 
 async function loadOfferings() {
@@ -101,4 +119,3 @@ async function configureProtocol(protocolDefinition) {
 
   console.log('configure protocol status', configureStatus);
 }
-

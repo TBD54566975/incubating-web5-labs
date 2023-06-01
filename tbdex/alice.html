@@ -5,13 +5,26 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron&display=swap" rel="stylesheet">
   <title>tbDEX</title>
+
+  <style>
+    * {
+      font-family: 'IBM Plex Mono', monospace;
+    }
+  </style>
 </head>
 
 <body>
   <h1>tbDEX - Alice</h1>
 
-  <script type="module" src="/dist/alice.js"></script>
+  <form id="pfi-did-form">
+    <label for="pfi-did">Enter PFI DID:</label>
+    <input id="pfi-did" type="text">
+  </form>
+
   <form id="send-rfq-form">
     <p id="send-rfq-error"></p>
     <button type="submit">Send RFQ to buy BTC with $100 USD</button>
@@ -23,6 +36,7 @@
     <button type="submit">Send Quote to PFI (should not be allowed)</button>
     <span id="attempt-send-quote-progress"></span>
   </form>
+  <script type="module" src="/dist/alice.js"></script>
 </body>
 
 </html>

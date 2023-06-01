@@ -1,5 +1,6 @@
 import type { Offering, RFQ, Quote } from './common.js';
-import { aliceProtocolDefinition, pfiDid } from './protocol.js';
+
+import { aliceProtocolDefinition } from './protocol.js';
 import { Web5 } from '@tbd54566975/web5';
 
 // Fetch & render offerings from PFI
@@ -11,8 +12,8 @@ console.log('Alice: Alice did is', did);
 // similar thing to what we had to do with Dinger - we first spin up PFI, get its DID, then hardcode it here so Alice can know about it so Alice can talk to the PFI.
 
 
-await configureProtocol(aliceProtocolDefinition);
-await getOfferingFromPFI();
+// await configureProtocol(aliceProtocolDefinition);
+// await getOfferingFromPFI();
 
 const rfqForm = document.querySelector('#send-rfq-form');
 
