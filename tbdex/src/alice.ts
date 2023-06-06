@@ -1,6 +1,6 @@
 import type { Offering, RFQ, Quote } from './common.js';
 
-import { aliceProtocolDefinition } from './protocol.js';
+import { protocolDefinition } from './protocol.js';
 import { Web5 } from '@tbd54566975/web5';
 
 // Fetch & render offerings from PFI
@@ -35,68 +35,6 @@ rfqForm.addEventListener('submit', async (event) => {
   await writeRFQ();
 });
 
-const quoteForm = document.querySelector('#attempt-send-quote-form');
-
-quoteForm.addEventListener('submit', async (event) => {
-  event.preventDefault();
-  await attemptToSendQuote();
-});
-
-// Testing out negative case
-// if Alice writes a Quote in response to her own RFQ
-// and attempts to send it to a PFI
-// that should be rejected by DWN protocol
-async function attemptToSendQuote() {
-
-  const rfq = await getFirstRFQFromAliceDWN();
-
-  const rfqJson = await rfq.data.json();
-  const pfiDid = await getPfiDid();
-  const quote: Quote = {
-    rfq: rfqJson,
-    amount: 0.01,
-    expiryDate: '2023-06-30T15:30:00Z',
-  };
-
-  const { record, status } = await web5.dwn.records.write({
-    data: quote,
-    message: {
-      contextId: rfqJson.contextId,
-      parentId: rfqJson.id,
-      protocol: aliceProtocolDefinition.protocol,
-      protocolPath: 'RFQ/Quote',
-      schema: 'https://tbd.website/protocols/tbdex/Quote',
-      recipient: pfiDid
-    }
-  });
-
-  if (status.code !== 202) {
-    alert('Failed to write Quote to local. will not send to PFI. Reason: ' + status.code + ' ' + status.detail);
-    return;
-  }
-
-  // send is a separate step to actually push the record to a third party DWN
-  // in this case, the third party DWN is the PFI DWN.
-  await record.send(pfiDid);
-}
-
-
-async function getFirstRFQFromAliceDWN() {
-  const { records, status } = await web5.dwn.records.query({
-    message: {
-      filter: {
-        protocol: 'https://tbd.website/protocols/tbdex',
-        schema: 'https://tbd.website/protocols/tbdex/RequestForQuote'
-      }
-    }
-  });
-
-  if (status.code !== 200) {
-    alert('failed to get my own RFQs' + status.code + ' ' + status.detail);
-  }
-  alert('Grabbing the first RFQ record from Alices DWN: ' + records[0].contextId);
-  return records[0];
-}
 
 
 async function getOfferingsFromPFI() {
@@ -143,7 +81,7 @@ async function writeRFQ() {
   const { record, status } = await web5.dwn.records.write({
     data: rfq,
     message: {
-      protocol: aliceProtocolDefinition.protocol,
+      protocol: protocolDefinition.protocol,
       protocolPath: 'RFQ',
       schema: 'https://tbd.website/protocols/tbdex/RequestForQuote',
       recipient: pfiDid

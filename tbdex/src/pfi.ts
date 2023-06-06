@@ -1,10 +1,10 @@
 import type { Offering, RFQ, PaymentInstrument } from './common.js';
-import { pfiProtocolDefinition } from './protocol.js';
+import { protocolDefinition } from './protocol.js';
 import { Web5 } from '@tbd54566975/web5';
 
 const { web5, did } = await Web5.connect();
 
-await configureProtocol(pfiProtocolDefinition);
+await configureProtocol(protocolDefinition);
 
 const addPayInInstrumentButton = document.querySelector('#add-pay-in-instrument');
 const addPayOutInstrumentButton = document.querySelector('#add-pay-out-instrument');

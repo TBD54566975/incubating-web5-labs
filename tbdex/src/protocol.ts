@@ -4,38 +4,53 @@
  * - Anyone can write a RFQ to my (PFI) DWN
  * - I (PFI) received an RFQ, so I can respond with a Quote
  */
-export const pfiProtocolDefinition = {
-  'protocol' : 'https://tbd.website/protocols/tbdex',
-  'types'    : {
+export const protocolDefinition = {
+  'protocol': 'https://tbd.website/protocols/tbdex',
+  'types': {
+    'Offering': {
+      'schema': 'https://tbd.website/protocols/tbdex/Offering',
+      'dataFormats': [
+        'application/json'
+      ]
+    },
     'RFQ': {
-      'schema'      : 'https://tbd.website/protocols/tbdex/RequestForQuote',
-      'dataFormats' : [
+      'schema': 'https://tbd.website/protocols/tbdex/RequestForQuote',
+      'dataFormats': [
         'application/json'
       ]
     },
     'Quote': {
-      'schema'      : 'https://tbd.website/protocols/tbdex/Quote',
-      'dataFormats' : [
+      'schema': 'https://tbd.website/protocols/tbdex/Quote',
+      'dataFormats': [
         'application/json'
       ]
     }
   },
   'structure': {
-    'RFQ': {
+    'Offering': {
       '$actions': [
         {
-          'who' : 'anyone',
-          'can' : 'write'
+          'who': 'anyone',
+          'can': 'write'
         }
       ],
-      'Quote': {
+      'RFQ': {
         '$actions': [
           {
-            'who' : 'recipient',
-            'of'  : 'RFQ',
-            'can' : 'write'
+            'who': 'recipient',
+            'of': 'Offering',
+            'can': 'write'
           }
-        ]
+        ],
+        'Quote': {
+          '$actions': [
+            {
+              'who': 'recipient',
+              'of': 'RFQ',
+              'can': 'write'
+            }
+          ]
+        }
       }
     }
   }
@@ -48,36 +63,36 @@ export const pfiProtocolDefinition = {
  * - Whoever received the RFQ I wrote can write a Quote to my (Alice's) DWN
  */
 
-export const aliceProtocolDefinition = {
-  'protocol' : 'https://tbd.website/protocols/tbdex',
-  'types'    : {
-    'RFQ': {
-      'schema'      : 'https://tbd.website/protocols/tbdex/RequestForQuote',
-      'dataFormats' : [
-        'application/json'
-      ]
-    },
-    'Quote': {
-      'schema'      : 'https://tbd.website/protocols/tbdex/Quote',
-      'dataFormats' : [
-        'application/json'
-      ]
-    }
-  },
-  'structure': {
-    'RFQ': {
-      'Quote': {
-        '$actions': [
-          {
-            'who' : 'recipient',
-            'of'  : 'RFQ',
-            'can' : 'write'
-          }
-        ]
-      }
-    }
-  }
-};
+// export const aliceProtocolDefinition = {
+//   'protocol': 'https://tbd.website/protocols/tbdex',
+//   'types': {
+//     'RFQ': {
+//       'schema': 'https://tbd.website/protocols/tbdex/RequestForQuote',
+//       'dataFormats': [
+//         'application/json'
+//       ]
+//     },
+//     'Quote': {
+//       'schema': 'https://tbd.website/protocols/tbdex/Quote',
+//       'dataFormats': [
+//         'application/json'
+//       ]
+//     }
+//   },
+//   'structure': {
+//     'RFQ': {
+//       'Quote': {
+//         '$actions': [
+//           {
+//             'who': 'recipient',
+//             'of': 'RFQ',
+//             'can': 'write'
+//           }
+//         ]
+//       }
+//     }
+//   }
+// };
 
 /**
  * Alice is the only one who can send an RFQ
