@@ -90,7 +90,7 @@ function addPaymentInstrumentInput(instrumentType: 'pay-in' | 'pay-out') {
 }
 
 async function createOffering() {
-  const id: HTMLInputElement =  document.querySelector('#offering-id');
+  const id: HTMLInputElement = document.querySelector('#offering-id');
   const fee: HTMLInputElement = document.querySelector('#offering-fee');
   const min: HTMLInputElement = document.querySelector('#offering-min');
   const max: HTMLInputElement = document.querySelector('#offering-max');
@@ -102,41 +102,31 @@ async function createOffering() {
   const payoutInstruments = getPaymentInstruments('pay-out');
 
   const offering: Offering = {
-    id                  : id.value,
-    pair                : pair.value,
-    unitPrice           : unitPrice.value,
-    fee                 : fee.value,
-    min                 : min.value,
-    max                 : max.value,
-    payinInstruments    : payinInstruments,
-    payoutInstruments   : payoutInstruments,
-    presentationRequest : JSON.parse(presentationDefinition.value)
+    id: id.value,
+    pair: pair.value,
+    unitPrice: unitPrice.value,
+    fee: fee.value,
+    min: min.value,
+    max: max.value,
+    payinInstruments: payinInstruments,
+    payoutInstruments: payoutInstruments,
+    presentationRequest: JSON.parse(presentationDefinition.value)
   };
 
   const { status } = await web5.dwn.records.write({
-    data    : offering,
-    message : {
-      schema    : 'https://tbdex.io/schemas/offering',
-      published : true
+    data: offering,
+    message: {
+      schema: 'https://tbdex.io/schemas/offering',
+      published: true
     }
   });
 
   if (status.code !== 202) {
     throw new Error(`Failed to create offering. error: ${status}`);
   }
+
 }
 
-async function renderOfferings() {
-  const { records, status } = await web5.dwn.records.query({
-    message: {
-      filter: {
-        schema: 'https://tbdex.io/schemas/offering'
-      }
-    }
-  });
-
-  // TODO: render each offering
-}
 
 function getPaymentInstruments(instrumentType: 'pay-in' | 'pay-out'): PaymentInstrument[] {
   const payInInstrumentDivs = document.querySelectorAll(`.${instrumentType}-instrument`);

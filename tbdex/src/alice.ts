@@ -8,12 +8,25 @@ const { web5, did } = await Web5.connect();
 
 console.log('Alice: Alice did is', did);
 
+
+async function getPfiDid() {
+  const pfiDidInput: HTMLInputElement = document.querySelector('#pfi-did')
+  const pfiDid = pfiDidInput.value
+  return pfiDid
+}
+
+
 // how does Alice find PFI's DID?
 // similar thing to what we had to do with Dinger - we first spin up PFI, get its DID, then hardcode it here so Alice can know about it so Alice can talk to the PFI.
 
 
 // await configureProtocol(aliceProtocolDefinition);
-// await getOfferingFromPFI();
+
+const offeringForm = document.querySelector('#get-offering-form');
+offeringForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  await getOfferingsFromPFI();
+})
 
 const rfqForm = document.querySelector('#send-rfq-form');
 
@@ -38,22 +51,22 @@ async function attemptToSendQuote() {
   const rfq = await getFirstRFQFromAliceDWN();
 
   const rfqJson = await rfq.data.json();
-
+  const pfiDid = await getPfiDid();
   const quote: Quote = {
-    rfq        : rfqJson,
-    amount     : 0.01,
-    expiryDate : '2023-06-30T15:30:00Z',
+    rfq: rfqJson,
+    amount: 0.01,
+    expiryDate: '2023-06-30T15:30:00Z',
   };
 
   const { record, status } = await web5.dwn.records.write({
-    data    : quote,
-    message : {
-      contextId    : rfqJson.contextId,
-      parentId     : rfqJson.id,
-      protocol     : aliceProtocolDefinition.protocol,
-      protocolPath : 'RFQ/Quote',
-      schema       : 'https://tbd.website/protocols/tbdex/Quote',
-      recipient    : pfiDid
+    data: quote,
+    message: {
+      contextId: rfqJson.contextId,
+      parentId: rfqJson.id,
+      protocol: aliceProtocolDefinition.protocol,
+      protocolPath: 'RFQ/Quote',
+      schema: 'https://tbd.website/protocols/tbdex/Quote',
+      recipient: pfiDid
     }
   });
 
@@ -72,8 +85,8 @@ async function getFirstRFQFromAliceDWN() {
   const { records, status } = await web5.dwn.records.query({
     message: {
       filter: {
-        protocol : 'https://tbd.website/protocols/tbdex',
-        schema   : 'https://tbd.website/protocols/tbdex/RequestForQuote'
+        protocol: 'https://tbd.website/protocols/tbdex',
+        schema: 'https://tbd.website/protocols/tbdex/RequestForQuote'
       }
     }
   });
@@ -86,12 +99,13 @@ async function getFirstRFQFromAliceDWN() {
 }
 
 
-async function getOfferingFromPFI() {
+async function getOfferingsFromPFI() {
+  const pfiDid = await getPfiDid()
   const { records, status } = await web5.dwn.records.query({
-    from    : pfiDid,
-    message : {
+    from: pfiDid,
+    message: {
       filter: {
-        schema: 'tbdex.io/schemas/offering'
+        schema: 'https://tbdex.io/schemas/offering'
       }
     }
   });
@@ -100,26 +114,39 @@ async function getOfferingFromPFI() {
     alert('life is hard');
   }
 
+  const mainUL = document.createElement('fieldset')
+
   for (let record of records) {
     const offering: Offering = await record.data.json();
-    console.log('got offering!', offering);
+    const box = document.createElement('fieldset')
+    const title = document.createElement('legend')
+    title.innerHTML = 'Offering'
+    const offeringElement = document.createElement('pre')
+    offeringElement.innerHTML = JSON.stringify(offering, null, 4);
+    box.appendChild(title)
+    box.appendChild(offeringElement)
+    mainUL.appendChild(box)
   }
+  document.body.appendChild(mainUL);
+  document.querySelector('#offering')
+  
 }
 
 async function writeRFQ() {
+  const pfiDid = await getPfiDid()
   const rfq: RFQ = {
-    offering_id             : '123',
-    product                 : 'BTC_USD',
-    size                    : 100,
-    presentation_submission : {}
+    offering_id: '123',
+    product: 'BTC_USD',
+    size: 100,
+    presentation_submission: {}
   };
   const { record, status } = await web5.dwn.records.write({
-    data    : rfq,
-    message : {
-      protocol     : aliceProtocolDefinition.protocol,
-      protocolPath : 'RFQ',
-      schema       : 'https://tbd.website/protocols/tbdex/RequestForQuote',
-      recipient    : pfiDid
+    data: rfq,
+    message: {
+      protocol: aliceProtocolDefinition.protocol,
+      protocolPath: 'RFQ',
+      schema: 'https://tbd.website/protocols/tbdex/RequestForQuote',
+      recipient: pfiDid
     }
   });
 
