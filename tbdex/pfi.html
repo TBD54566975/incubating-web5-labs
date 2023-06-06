@@ -15,11 +15,11 @@
       font-family: 'IBM Plex Mono', monospace;
     }
 
-    #offeringForm {
+    #offering-form {
       padding: 20px;
     }
 
-    #offeringForm fieldset {
+    #offering-form fieldset {
       padding: 40px;
     }
 
@@ -36,6 +36,38 @@
 
     .form-row>div:last-child {
       margin-right: 0;
+    }
+
+    .pay-in-instrument {
+      margin-top: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px dotted black;
+    }
+
+    .pay-in-instrument div {
+      margin-top: 10px;
+    }
+
+    .pay-out-instrument {
+      margin-top: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px dotted black;
+    }
+
+    .pay-out-instrument div {
+      margin-top: 10px;
+    }
+
+    #add-pay-out-instrument {
+      margin-top: 20px;
+    }
+
+    #add-pay-in-instrument {
+      margin-top: 20px;
+    }
+
+    #create-offering {
+      margin-top: 20px;
     }
 
     label,
@@ -61,75 +93,93 @@
     <button id="copy-did" style="height: 20px; width: 80px">Copy DID</button>
   </div>
 
-  <form id="offeringForm">
+  <form id="offering-form">
     <fieldset>
       <legend>Create Offering</legend>
-
-      <!-- Offering Fields -->
       <div class="form-row">
         <div>
-          <label for="id">Offering ID:</label>
-          <input type="text" id="id" name="id">
+          <label>ID:</label>
+          <input type="text" id="offering-id" name="id">
         </div>
         <div>
-          <label for="name">Offering Name:</label>
-          <input type="text" id="name" name="name">
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div>
-          <label for="unitPrice">Unit Price:</label>
-          <input type="number" id="unitPrice" name="unitPrice">
-        </div>
-        <div>
-          <label for="fee">Fee:</label>
-          <input type="number" id="fee" name="fee">
-        </div>
-        <div>
-          <label for="min">Minimum:</label>
-          <input type="number" id="min" name="min">
-        </div>
-        <div>
-          <label for="max">Maximum:</label>
-          <input type="number" id="max" name="max">
+          <label>Pair:</label>
+          <input type="text" id="offering-pair" name="pair">
         </div>
       </div>
 
       <div class="form-row">
         <div>
-          <label for="presentation_definition">Presentation Definition:</label>
-          <textarea id="presentation_definition" name="presentation_definition"></textarea>
+          <label>Unit Price:</label>
+          <input type="number" id="offering-unit-price" name="unit-price">
+        </div>
+        <div>
+          <label>Fee:</label>
+          <input type="number" id="offering-fee" name="fee">
+        </div>
+        <div>
+          <label>Min:</label>
+          <input type="number" id="offering-min" name="min">
+        </div>
+        <div>
+          <label>Max:</label>
+          <input type="number" id="offering-max" name="max">
         </div>
       </div>
 
-      <div class="paymentInstrument">
+      <div class="form-row">
         <div>
-          <label for="paymentInstrumentKind">Payment Instrument Kind:</label>
-          <input type="text" id="paymentInstrumentKind" name="paymentInstrumentKind">
-        </div>
-        <div>
-          <label for="paymentInstrumentFee">Payment Instrument Fee:</label>
-          <input type="number" id="paymentInstrumentFee" name="paymentInstrumentFee">
-        </div>
-        <div>
-          <label for="paymentInstrumentPresentationDefinition">Payment Instrument Presentation Definition:</label>
-          <textarea id="paymentInstrumentPresentationDefinition"
-            name="paymentInstrumentPresentationDefinition"></textarea>
+          <label>Presentation Definition:</label>
+          <textarea id="offering-presentation-definition"></textarea>
         </div>
       </div>
+
+      <div id="pay-in-instruments">
+        <h3>Pay-In Instrument(s)</h3>
+        <div class="pay-in-instrument">
+          <div class="form-row">
+            <div>
+              <label>Kind:</label>
+              <input type="text" class="instrument-kind" name="instrument-kind">
+            </div>
+            <div>
+              <label>Fee:</label>
+              <input type="number" class="instrument-fee" name="instrument-fee">
+            </div>
+          </div>
+          <div>
+            <label>Presentation Definition:</label>
+            <textarea class="instrument-presentation-definition" name="instrument-presentation-definition"></textarea>
+          </div>
+        </div>
+      </div>
+      <button type="button" id="add-pay-in-instrument">Add Pay-in Instrument</button>
+
+      <div id="pay-out-instruments">
+        <h3>Pay-Out Instrument(s)</h3>
+        <div class="pay-out-instrument">
+          <div class="form-row">
+            <div>
+              <label>Kind:</label>
+              <input type="text" class="instrument-kind" name="instrument-kind">
+            </div>
+            <div>
+              <label>Fee:</label>
+              <input type="number" class="instrument-fee" name="instrument-fee">
+            </div>
+          </div>
+          <div>
+            <label>Presentation Definition:</label>
+            <textarea class="instrument-payment-definition" name="instrument-presentation-definition"></textarea>
+          </div>
+        </div>
+      </div>
+      <button type="button" id="add-pay-out-instrument">Add Pay-out Instrument</button>
+      <br />
+
       <!-- Form submission -->
-      <button id="submitOffering" type="submit">Submit Offering</button>
+      <input id="create-offering" type="submit" value="Create Offering">
     </fieldset>
 
-  </form>
-
-
-
-  <form id="receive-rfq-form">
-    <p id="receive-rfq-error"></p>
-    <button type="submit">Receive RFQ from Alice</button>
-    <span id="receive-rfq-progress"></span>
   </form>
   <script type="module" src="/dist/pfi.js"></script>
 </body>

@@ -1,92 +1,169 @@
-import type { Offering, RFQ } from './common.js';
+import type { Offering, RFQ, PaymentInstrument } from './common.js';
 import { pfiProtocolDefinition } from './protocol.js';
 import { Web5 } from '@tbd54566975/web5';
 
 const { web5, did } = await Web5.connect();
 
-// TODO: find a no-creds public api to get USD/BTC fx rate
+await configureProtocol(pfiProtocolDefinition);
 
-// console.log('pfi did', did);
-
-// await configureProtocol(pfiProtocolDefinition);
-// await loadOfferings();
-
+const addPayInInstrumentButton = document.querySelector('#add-pay-in-instrument');
+const addPayOutInstrumentButton = document.querySelector('#add-pay-out-instrument');
 const copyDidElement = document.querySelector('#copy-did');
-const copyIndicator = document.querySelector('#copy-indicator') as HTMLElement;
+const offeringForm = document.querySelector('#offering-form');
 
 copyDidElement.addEventListener('click', async () => {
   try {
     await navigator.clipboard.writeText(did);
-    copyIndicator.style.display = 'block';
-
-    setTimeout(() => {
-      copyIndicator.style.display = 'none';
-    }, 2000);
-
   } catch (err) {
     alert('Failed to copy DID. check console for error');
     console.error(err);
   }
 });
 
+addPayInInstrumentButton.addEventListener('click', e => {
+  e.preventDefault();
+  addPaymentInstrumentInput('pay-in');
+});
 
-async function loadOfferings() {
-  const offer: Offering = {
-    id                      : '123',
-    name                    : 'BTC_USD',
-    unitPrice               : 27000,
-    fee                     : 5,
-    min                     : 10,
-    max                     : 100,
-    presentation_definition : {},
-    payment_instruments     : [{
-      kind                    : 'DEBIT_CARD',
-      fee                     : 1,
-      presentation_definition : {},
-    }]
+addPayOutInstrumentButton.addEventListener('click', e => {
+  e.preventDefault();
+  addPaymentInstrumentInput('pay-out');
+});
+
+offeringForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  await createOffering();
+});
+
+function addPaymentInstrumentInput(instrumentType: 'pay-in' | 'pay-out') {
+  const containerElement = document.createElement('div');
+  containerElement.setAttribute('class', `${instrumentType}-instrument`);
+
+  const instrumentKindContainer = document.createElement('div');
+
+  const instrumentKindLabel = document.createElement('label');
+  instrumentKindLabel.innerText = 'Payment Instrument Kind:';
+
+  const instrumentKindInput = document.createElement('input');
+  instrumentKindInput.setAttribute('type', 'text');
+  instrumentKindInput.setAttribute('class', 'instrument-kind');
+  instrumentKindInput.setAttribute('name', 'instrument-kind');
+
+  instrumentKindContainer.appendChild(instrumentKindLabel);
+  instrumentKindContainer.appendChild(instrumentKindInput);
+
+  const instrumentFeeContainer = document.createElement('div');
+
+  const instrumentFeeLabel = document.createElement('label');
+  instrumentFeeLabel.innerText = 'Payment Instrument Fee:';
+
+  const instrumentFeeInput = document.createElement('input');
+  instrumentFeeInput.setAttribute('type', 'number');
+  instrumentFeeInput.setAttribute('class', 'instrument-fee');
+  instrumentFeeInput.setAttribute('name', 'instrument-fee');
+
+  instrumentFeeContainer.appendChild(instrumentFeeLabel);
+  instrumentFeeContainer.appendChild(instrumentFeeInput);
+
+  const row = document.createElement('div');
+  row.setAttribute('class', 'form-row');
+
+  row.appendChild(instrumentKindContainer);
+  row.appendChild(instrumentFeeContainer);
+
+  const instrumentPresentationDefinitionContainer = document.createElement('div');
+
+  const instrumentPresentationDefinitionLabel = document.createElement('label');
+  instrumentPresentationDefinitionLabel.innerText = 'Payment Instrument Presentation Definition:';
+
+  const instrumentPresentationDefinitionInput = document.createElement('textarea');
+  instrumentPresentationDefinitionInput.setAttribute('class', 'instrument-presentation-definition');
+  instrumentPresentationDefinitionInput.setAttribute('name', 'instrument-presentation-definition');
+
+  instrumentPresentationDefinitionContainer.appendChild(instrumentPresentationDefinitionLabel);
+  instrumentPresentationDefinitionContainer.appendChild(instrumentPresentationDefinitionInput);
+
+  containerElement.appendChild(row);
+  containerElement.appendChild(instrumentPresentationDefinitionContainer);
+
+  document.querySelector(`#${instrumentType}-instruments`).appendChild(containerElement);
+}
+
+async function createOffering() {
+  const id: HTMLInputElement =  document.querySelector('#offering-id');
+  const fee: HTMLInputElement = document.querySelector('#offering-fee');
+  const min: HTMLInputElement = document.querySelector('#offering-min');
+  const max: HTMLInputElement = document.querySelector('#offering-max');
+  const pair: HTMLInputElement = document.querySelector('#offering-pair');
+  const unitPrice: HTMLInputElement = document.querySelector('#offering-unit-price');
+  const presentationDefinition: HTMLTextAreaElement = document.querySelector('#offering-presentation-definition');
+
+  const payinInstruments = getPaymentInstruments('pay-in');
+  const payoutInstruments = getPaymentInstruments('pay-out');
+
+  const offering: Offering = {
+    id                  : id.value,
+    pair                : pair.value,
+    unitPrice           : unitPrice.value,
+    fee                 : fee.value,
+    min                 : min.value,
+    max                 : max.value,
+    payinInstruments    : payinInstruments,
+    payoutInstruments   : payoutInstruments,
+    presentationRequest : JSON.parse(presentationDefinition.value)
   };
 
-  const { record, status } = await web5.dwn.records.write({
-    data    : offer,
+  const { status } = await web5.dwn.records.write({
+    data    : offering,
     message : {
-      published : true,
-      schema    : 'tbdex.io/schemas/offering'
+      schema    : 'https://tbdex.io/schemas/offering',
+      published : true
     }
   });
 
-  console.log('offering written', record);
-  console.log('dwn write status', status);
+  if (status.code !== 202) {
+    throw new Error(`Failed to create offering. error: ${status}`);
+  }
 }
 
-const rfqForm = document.querySelector('#receive-rfq-form');
-
-rfqForm.addEventListener('submit', async (event) => {
-  event.preventDefault();
-  await fetchRFQ();
-});
-
-async function fetchRFQ() {
+async function renderOfferings() {
   const { records, status } = await web5.dwn.records.query({
     message: {
       filter: {
-        protocol : 'https://tbd.website/protocols/tbdex',
-        schema   : 'https://tbd.website/protocols/tbdex/RequestForQuote'
+        schema: 'https://tbdex.io/schemas/offering'
       }
     }
   });
 
-  for (let record of records) {
-    const rfq: RFQ = await record.data.json();
-    alert('got an RFQ from Alice ' + JSON.stringify(rfq));
-  }
+  // TODO: render each offering
 }
 
-function writeQuote() {
-  throw new Error('Function not implemented.');
-}
+function getPaymentInstruments(instrumentType: 'pay-in' | 'pay-out'): PaymentInstrument[] {
+  const payInInstrumentDivs = document.querySelectorAll(`.${instrumentType}-instrument`);
+  const paymentInstruments: PaymentInstrument[] = [];
 
-function sendQuoteToAlice() {
-  throw new Error('Function not implemented.');
+  payInInstrumentDivs.forEach((div) => {
+    let paymentInstrument: Partial<PaymentInstrument> = {};
+
+    const instrumentKindInput: HTMLInputElement = div.querySelector('.instrument-kind');
+    if (instrumentKindInput) {
+      paymentInstrument.kind = instrumentKindInput.value;
+    }
+
+    const instrumentFeeInput: HTMLInputElement = div.querySelector('.instrument-fee');
+    if (instrumentFeeInput) {
+      paymentInstrument.fee = instrumentFeeInput.value;
+    }
+
+    const presentationDefinitionInput: HTMLInputElement = div.querySelector('.instrument-presentation-definition');
+    if (presentationDefinitionInput) {
+      paymentInstrument.presentationRequest = JSON.parse(presentationDefinitionInput.value);
+    }
+
+    paymentInstruments.push(paymentInstrument as PaymentInstrument);
+  });
+
+  return paymentInstruments;
 }
 
 async function configureProtocol(protocolDefinition) {
