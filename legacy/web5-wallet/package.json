@@ -16,7 +16,7 @@
     "message-store-level-v2": "file:../message-store-level-v2",
     "@heroicons/vue": "2.0.13",
     "@headlessui/vue": "1.7.7",
-    "@decentralized-identity/ion-tools": "1.0.3",
+    "@decentralized-identity/ion-tools": "1.0.7",
     "@js-temporal/polyfill": "0.4.3",
     "@noble/ed25519": "1.6.0",
     "@tbd54566975/dwn-sdk-js": "0.0.17-unstable.58656ed-2023.1.18-23-41-34",
