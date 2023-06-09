@@ -93,8 +93,12 @@ async function sendRFQ(amount: number) {
 
   // send is a separate step to actually push the record to a third party DWN
   // in this case, the third party DWN is the PFI DWN.
-  await record.send(pfiDid);
-  console.log('Sent RFQ with amount ' + JSON.stringify(rfq) + ' to PFI!')
+  const { status: sendStatus }  = await record.send(pfiDid);
+  if (sendStatus.code == 202) {
+    console.log('Sent RFQ with amount ' + JSON.stringify(rfq) + ' to PFI!')
+  } else {
+    alert("omg sending failed " + JSON.stringify(sendStatus))
+  }
 
 }
 

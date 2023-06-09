@@ -43,6 +43,7 @@ rfqForm.addEventListener('submit', async e => {
 
 async function fetchRFQs() {
   const { records, status } = await web5.dwn.records.query({
+    from: did,
     message: {
       filter: {
         schema: 'https://tbd.website/protocols/tbdex/RequestForQuote'
