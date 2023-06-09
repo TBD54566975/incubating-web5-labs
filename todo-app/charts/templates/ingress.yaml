@@ -1,15 +1,15 @@
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: todo-vservice
-spec:
-  hosts:
+apiVersion: networking.istio.io/v1alpha3  # API version for Istio VirtualService
+kind: VirtualService  # Kind of Istio object
+metadata:  # Metadata about the VirtualService
+  name: todo-vservice  # Name of the VirtualService
+spec:  # Specification for the VirtualService
+  hosts:  # List of hosts that this VirtualService applies to
   - {{ .Values.istio.host }}
-  gateways:
+  gateways:  # List of Gateways that this VirtualService is associated with
   - {{ .Values.istio.gateway }}
-  http:
-  - route:
-    - destination:
-        port:
+  http:  # List of HTTP routes for this VirtualService
+  - route:  # Details about the route
+    - destination:  # Details about the destination of the route
+        port:  # Port on the destination
           number: {{ .Values.service.port }}
-        host: todo-service
+        host: todo-service  # Hostname of the destination

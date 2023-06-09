@@ -1,22 +1,22 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: todo-deployment
-  labels:
+apiVersion: apps/v1  # API version for Deployment
+kind: Deployment  # Kind of Kubernetes object
+metadata:  # Metadata about the Deployment
+  name: todo-deployment  # Name of the Deployment
+  labels:  # Labels to attach to the Deployment
     app: todo
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
+spec:  # Specification for the Deployment
+  replicas: 1  # Number of replicas to maintain
+  selector:  # Label selector to identify the pods for this Deployment
+    matchLabels:  # Match pods with these labels
       app: todo
-  template:
-    metadata:
-      labels:
+  template:  # Template for the pods in this Deployment
+    metadata:  # Metadata about the pod
+      labels:  # Labels to attach to the pod
         app: todo
-    spec:
-      containers:
-      - name: todo
-        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
-        ports:
-        - containerPort: 80
-        imagePullPolicy: IfNotPresent
+    spec:  # Specification for the pod
+      containers:  # List of containers in the pod
+      - name: todo  # Name of the container
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}  # Image for the container
+        ports:  # List of ports to open in the container
+        - containerPort: 80  # Port to open
+        imagePullPolicy: IfNotPresent  # Kubernetes image pull policy
