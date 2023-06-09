@@ -1,15 +1,15 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: nginx-vservice
+  name: todo-vservice
 spec:
   hosts:
-  - "igdemo.tbddev.org"
+  - {{ .Values.istio.host }}
   gateways:
-  - istio-system/primary-gateway
+  - {{ .Values.istio.gateway }}
   http:
   - route:
     - destination:
         port:
-          number: 8080
-        host: nginx-service
+          number: {{ .Values.service.port }}
+        host: todo-service

@@ -1,23 +1,28 @@
 replicaCount: 1
 
 image:
-  repository: todo
-  tag: "0.1"
+  repository: "844731274526.dkr.ecr.us-west-2.amazonaws.com/todo"
+  tag: "0.0.3"
   pullPolicy: IfNotPresent
 
 service:
   type: ClusterIP
   port: 80
+  targetPort: 80
 
-ingress:
-  enabled: false
-  hosts:
-    - host: "todo.local"
-      paths:
-      - path: "/"
-        pathType: Prefix
+istio:
+  host: "todo.tbddev.org"
+  gateway: "istio-system/primary-gateway"
 
-networkPolicy:
-  enabled: true
+# ingress:
+#   enabled: false
+#   hosts:
+#     - host: "todo.local"
+#       paths:
+#       - path: "/"
+#         pathType: Prefix
+#
+# networkPolicy:
+#   enabled: true
 
 resources: {}

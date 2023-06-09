@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: todo
-        image: todo:0.1
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
         ports:
         - containerPort: 80
         imagePullPolicy: IfNotPresent

@@ -1,25 +1,39 @@
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: todo-network-policy
+# spec:
+#   podSelector:
+#     matchLabels:
+#       app: todo
+#   policyTypes:
+#   - Ingress
+#   - Egress
+#   ingress:
+#   - from:
+#     - podSelector:
+#         matchLabels: {}
+#     ports:
+#     - protocol: TCP
+#       port: 80
+#   egress:
+#   - to:
+#     - podSelector:
+#         matchLabels: {}
+#     ports:
+#     - protocol: TCP
+#       port: 80
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
 metadata:
-  name: todo-network-policy
+  name: todo-host
 spec:
-  podSelector:
-    matchLabels:
-      app: todo
-  policyTypes:
-  - Ingress
-  - Egress
-  ingress:
-  - from:
-    - podSelector:
-        matchLabels: {}
-    ports:
-    - protocol: TCP
-      port: 80
-  egress:
+  action: ALLOW
+  rules:
   - to:
-    - podSelector:
-        matchLabels: {}
-    ports:
-    - protocol: TCP
-      port: 80
+    - operation:
+        hosts:
+        - "todo.tbddev.org"
+  - from:
+    - source:
+        namespaces: ["istio-system"]
