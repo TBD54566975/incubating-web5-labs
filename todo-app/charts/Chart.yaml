@@ -1,0 +1,5 @@
+apiVersion: v2  # Helm chart API version
+name: todo  # Name of the Helm chart
+description: A Helm chart for a todo app  # Description of the chart
+version: 0.1.0  # Version of the chart
+appVersion: 0.1  # Version of the app that this chart deploys

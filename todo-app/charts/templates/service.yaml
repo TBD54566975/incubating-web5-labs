@@ -1,0 +1,11 @@
+apiVersion: v1  # API version for Service
+kind: Service  # Kind of Kubernetes object
+metadata:  # Metadata about the Service
+  name: todo-service  # Name of the Service
+spec:  # Specification for the Service
+  type: {{ .Values.service.type }}  # Type of Service
+  ports:  # List of ports for the Service
+    - port: {{ .Values.service.port }}  # Port for the Service to listen on
+      targetPort: {{ .Values.service.targetPort }}  # Port on the app's containers to direct traffic to
+  selector:  # Label selector to identify the pods for this Service
+    app: todo

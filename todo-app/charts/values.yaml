@@ -1,0 +1,17 @@
+replicaCount: 1  # Number of instances of the app to run
+
+image:  # Details about the Docker image for the app
+  repository: "844731274526.dkr.ecr.us-west-2.amazonaws.com/todo"  # Docker image repository, this has been deployed with to AWS beforehand
+  tag: "0.0.3"  # Docker image tag
+  pullPolicy: IfNotPresent  # Kubernetes image pull policy
+
+service:  # Details about the Kubernetes Service for the app
+  type: ClusterIP  # Type of Service
+  port: 80  # Port for the Service to listen on
+  targetPort: 80  # Port on the app's container to direct traffic to
+
+istio:  # Details about the Istio VirtualService for the app
+  host: "todo.tbddev.org"  # Hostname that the VirtualService will handle
+  gateway: "istio-system/primary-gateway"  # Istio Gateway that the VirtualService will be associated with
+
+resources: {}  # Resource requests and limits for the app's pod
