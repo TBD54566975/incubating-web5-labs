@@ -1,16 +1,15 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
 metadata:
-  name: todo-ingress
+  name: nginx-vservice
 spec:
-  rules:
-  - host: "todo.local"
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: todo-service
-            port:
-              number: 80
+  hosts:
+  - "igdemo.tbddev.org"
+  gateways:
+  - istio-system/primary-gateway
+  http:
+  - route:
+    - destination:
+        port:
+          number: 8080
+        host: nginx-service
