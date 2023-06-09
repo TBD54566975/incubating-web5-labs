@@ -1,0 +1,23 @@
+replicaCount: 1
+
+image:
+  repository: todo
+  tag: "0.1"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  hosts:
+    - host: "todo.local"
+      paths:
+      - path: "/"
+        pathType: Prefix
+
+networkPolicy:
+  enabled: true
+
+resources: {}
