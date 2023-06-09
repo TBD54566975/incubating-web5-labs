@@ -15,12 +15,17 @@ offeringForm.addEventListener('submit', async (event) => {
   await getOfferingsFromPFI();
 })
 
-const rfqForm = document.querySelector('#send-rfq-form');
 
 async function getPfiDid() {
   const pfiDidInput: HTMLInputElement = document.querySelector('#pfi-did')
   const pfiDid = pfiDidInput.value
   return pfiDid
+}
+
+async function getAmountForRFQ() {
+  const amountInput: HTMLInputElement = document.querySelector('#amount')
+  const amount = amountInput.value
+  return Number(amount);
 }
 
 async function getOfferingsFromPFI() {
@@ -46,27 +51,29 @@ async function getOfferingsFromPFI() {
     const title = document.createElement('legend')
     title.innerHTML = 'Offering'
     const offeringElement = document.createElement('pre')
-    offeringElement.innerHTML = JSON.stringify(offering, null, 4);    
+    offeringElement.innerHTML = JSON.stringify(offering, null, 4);
     box.appendChild(title)
     box.appendChild(offeringElement)
     mainUL.appendChild(box)
   }
   document.body.appendChild(mainUL);
-  document.querySelector('#offering')
-  
+
 }
+
+const rfqForm = document.querySelector('#send-rfq-form');
 
 rfqForm.addEventListener('submit', async (event) => {
   event.preventDefault();
-  await sendRFQ();
+  const amount = await getAmountForRFQ();
+  await sendRFQ(amount);
 });
 
-async function sendRFQ() {
+async function sendRFQ(amount: number) {
   const pfiDid = await getPfiDid()
   const rfq: RFQ = {
     offering_id: '123',
     product: 'BTC_USD',
-    size: 100,
+    size: amount,
     presentation_submission: {}
   };
   const { record, status } = await web5.dwn.records.write({
@@ -87,7 +94,7 @@ async function sendRFQ() {
   // send is a separate step to actually push the record to a third party DWN
   // in this case, the third party DWN is the PFI DWN.
   await record.send(pfiDid);
-  console.log('Sent static RFQ to PFI!')
+  console.log('Sent RFQ with amount ' + JSON.stringify(rfq) + ' to PFI!')
 
 }
 
@@ -100,7 +107,7 @@ export async function configureProtocol(protocolDefinition) {
   const { protocols, status } = await web5.dwn.protocols.query({
     message: {
       filter: {
-        protocol: 'https://tbd.website/protocols/tbdex'
+        protocol: protocolDefinition.protocol
       }
     }
   });

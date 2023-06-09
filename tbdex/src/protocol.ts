@@ -7,12 +7,6 @@
 export const protocolDefinition = {
   'protocol': 'https://tbd.website/protocols/tbdex',
   'types': {
-    'Offering': {
-      'schema': 'https://tbd.website/protocols/tbdex/Offering',
-      'dataFormats': [
-        'application/json'
-      ]
-    },
     'RFQ': {
       'schema': 'https://tbd.website/protocols/tbdex/RequestForQuote',
       'dataFormats': [
@@ -27,30 +21,21 @@ export const protocolDefinition = {
     }
   },
   'structure': {
-    'Offering': {
+    'RFQ': {
       '$actions': [
         {
           'who': 'anyone',
           'can': 'write'
         }
       ],
-      'RFQ': {
+      'Quote': {
         '$actions': [
           {
             'who': 'recipient',
-            'of': 'Offering',
+            'of': 'RFQ',
             'can': 'write'
           }
-        ],
-        'Quote': {
-          '$actions': [
-            {
-              'who': 'recipient',
-              'of': 'RFQ',
-              'can': 'write'
-            }
-          ]
-        }
+        ]
       }
     }
   }

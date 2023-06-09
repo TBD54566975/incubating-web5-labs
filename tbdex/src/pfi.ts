@@ -50,11 +50,21 @@ async function fetchRFQs() {
     }
   })
 
+  console.log('fetched RFQs', status)
+
+  const mainUL = document.createElement('fieldset')
   for (let record of records) {
     const rfq: RFQ = await record.data.json();
-    alert('fetched RFQ ' + JSON.stringify(rfq));
-
+    const box = document.createElement('fieldset')
+    const title = document.createElement('legend')
+    title.innerHTML = 'RFQ'
+    const offeringElement = document.createElement('pre')
+    offeringElement.innerHTML = JSON.stringify(rfq, null, 4);    
+    box.appendChild(title)
+    box.appendChild(offeringElement)
+    mainUL.appendChild(box)
   }
+  document.body.appendChild(mainUL);
 }
 
 function addPaymentInstrumentInput(instrumentType: 'pay-in' | 'pay-out') {
@@ -182,7 +192,7 @@ async function configureProtocol(protocolDefinition) {
   const { protocols, status } = await web5.dwn.protocols.query({
     message: {
       filter: {
-        protocol: 'https://tbd.website/protocols/tbdex'
+        protocol: protocolDefinition.protocol
       }
     }
   });
