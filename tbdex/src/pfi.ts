@@ -10,6 +10,7 @@ const addPayInInstrumentButton = document.querySelector('#add-pay-in-instrument'
 const addPayOutInstrumentButton = document.querySelector('#add-pay-out-instrument');
 const copyDidElement = document.querySelector('#copy-did');
 const offeringForm = document.querySelector('#offering-form');
+const rfqForm = document.querySelector('#fetch-rfq-form')
 
 copyDidElement.addEventListener('click', async () => {
   try {
@@ -34,6 +35,27 @@ offeringForm.addEventListener('submit', async e => {
   e.preventDefault();
   await createOffering();
 });
+
+rfqForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  await fetchRFQs();
+});
+
+async function fetchRFQs() {
+  const { records, status } = await web5.dwn.records.query({
+    message: {
+      filter: {
+        schema: 'https://tbd.website/protocols/tbdex/RequestForQuote'
+      }
+    }
+  })
+
+  for (let record of records) {
+    const rfq: RFQ = await record.data.json();
+    alert('fetched RFQ ' + JSON.stringify(rfq));
+
+  }
+}
 
 function addPaymentInstrumentInput(instrumentType: 'pay-in' | 'pay-out') {
   const containerElement = document.createElement('div');

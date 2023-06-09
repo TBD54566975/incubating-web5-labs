@@ -6,21 +6,8 @@ import { Web5 } from '@tbd54566975/web5';
 // Fetch & render offerings from PFI
 const { web5, did } = await Web5.connect();
 
-console.log('Alice: Alice did is', did);
 
-
-async function getPfiDid() {
-  const pfiDidInput: HTMLInputElement = document.querySelector('#pfi-did')
-  const pfiDid = pfiDidInput.value
-  return pfiDid
-}
-
-
-// how does Alice find PFI's DID?
-// similar thing to what we had to do with Dinger - we first spin up PFI, get its DID, then hardcode it here so Alice can know about it so Alice can talk to the PFI.
-
-
-// await configureProtocol(aliceProtocolDefinition);
+await configureProtocol(protocolDefinition);
 
 const offeringForm = document.querySelector('#get-offering-form');
 offeringForm.addEventListener('submit', async (event) => {
@@ -30,12 +17,11 @@ offeringForm.addEventListener('submit', async (event) => {
 
 const rfqForm = document.querySelector('#send-rfq-form');
 
-rfqForm.addEventListener('submit', async (event) => {
-  event.preventDefault();
-  await writeRFQ();
-});
-
-
+async function getPfiDid() {
+  const pfiDidInput: HTMLInputElement = document.querySelector('#pfi-did')
+  const pfiDid = pfiDidInput.value
+  return pfiDid
+}
 
 async function getOfferingsFromPFI() {
   const pfiDid = await getPfiDid()
@@ -60,7 +46,7 @@ async function getOfferingsFromPFI() {
     const title = document.createElement('legend')
     title.innerHTML = 'Offering'
     const offeringElement = document.createElement('pre')
-    offeringElement.innerHTML = JSON.stringify(offering, null, 4);
+    offeringElement.innerHTML = JSON.stringify(offering, null, 4);    
     box.appendChild(title)
     box.appendChild(offeringElement)
     mainUL.appendChild(box)
@@ -70,7 +56,12 @@ async function getOfferingsFromPFI() {
   
 }
 
-async function writeRFQ() {
+rfqForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  await sendRFQ();
+});
+
+async function sendRFQ() {
   const pfiDid = await getPfiDid()
   const rfq: RFQ = {
     offering_id: '123',
@@ -96,7 +87,7 @@ async function writeRFQ() {
   // send is a separate step to actually push the record to a third party DWN
   // in this case, the third party DWN is the PFI DWN.
   await record.send(pfiDid);
-  alert('sent RFQ to PFI ' + pfiDid.substring(0, 20) + '...');
+  console.log('Sent static RFQ to PFI!')
 
 }
 
