@@ -124,7 +124,7 @@ export async function configureProtocol(protocolDefinition) {
 
   // protocol already exists
   if (protocols.length > 0) {
-    console.log('protocol already exists');
+    console.log('protocol already exists', protocols[0]);
     return;
   }
 

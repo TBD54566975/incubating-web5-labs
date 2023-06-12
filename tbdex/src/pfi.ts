@@ -1,4 +1,4 @@
-import type { Offering, RFQ, PaymentInstrument } from './common.js';
+import type { Offering, RFQ, PaymentInstrument, Quote } from './common.js';
 import { protocolDefinition } from './protocol.js';
 import { Web5 } from '@tbd54566975/web5';
 
@@ -11,6 +11,7 @@ const addPayOutInstrumentButton = document.querySelector('#add-pay-out-instrumen
 const copyDidElement = document.querySelector('#copy-did');
 const offeringForm = document.querySelector('#offering-form');
 const rfqForm = document.querySelector('#fetch-rfq-form')
+const quoteForm = document.querySelector('#create-quote-form')
 
 copyDidElement.addEventListener('click', async () => {
   try {
@@ -41,15 +42,51 @@ rfqForm.addEventListener('submit', async e => {
   await fetchRFQs();
 });
 
-async function fetchRFQs() {
-  const { records, status } = await web5.dwn.records.query({
-    from: did,
+quoteForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  await sendQuote();
+});
+
+
+// respond to the latest RFQ with a quote
+async function sendQuote() {
+  const { records, status: fetchStatus } = await getRFQs();
+
+  const lastRFQRecord = records[records.length - 1]
+  const lastRFQ = await lastRFQRecord.data.json()
+  
+  const rfqAuthor = lastRFQRecord.author
+  const quote: Quote = {
+    rfq: lastRFQ,
+    amount: 0.0142142857,
+    expiryDate: new Date().toJSON()
+  }
+
+  const { record, status: writeStatus } = await web5.dwn.records.write({
+    data: quote,
     message: {
-      filter: {
-        schema: 'https://tbd.website/protocols/tbdex/RequestForQuote'
-      }
+      protocol: 'https://tbd.website/protocols/tbdex',
+      protocolPath: 'Quote',
+      schema: 'https://tbd.website/protocols/tbdex/Quote',
+      recipient: rfqAuthor
     }
   })
+
+  if (writeStatus.code !== 202) {
+    alert('failed to write Quote to local. will not send to Alice :/ ' + writeStatus.code + ' ' + writeStatus.detail);
+    return;
+  }
+
+  const { status: sendStatus } = await record.send(rfqAuthor)
+  if (sendStatus.code == 202) {
+    console.log('Sent Quote ' + JSON.stringify(quote) + ' to Alice!')
+  } else {
+    alert("omg sending Quote failed: " + JSON.stringify(sendStatus))
+  }
+}
+
+async function fetchRFQs() {
+  const { records, status } = await getRFQs()
 
   console.log('fetched RFQs', status)
 
@@ -60,12 +97,23 @@ async function fetchRFQs() {
     const title = document.createElement('legend')
     title.innerHTML = 'RFQ'
     const offeringElement = document.createElement('pre')
-    offeringElement.innerHTML = JSON.stringify(rfq, null, 4);    
+    offeringElement.innerHTML = JSON.stringify(rfq, null, 4);
     box.appendChild(title)
     box.appendChild(offeringElement)
     mainUL.appendChild(box)
   }
   document.body.appendChild(mainUL);
+}
+
+async function getRFQs() {
+  return await web5.dwn.records.query({
+    from: did,
+    message: {
+      filter: {
+        schema: 'https://tbd.website/protocols/tbdex/RequestForQuote'
+      }
+    }
+  });
 }
 
 function addPaymentInstrumentInput(instrumentType: 'pay-in' | 'pay-out') {
@@ -157,6 +205,7 @@ async function createOffering() {
   if (status.code !== 202) {
     throw new Error(`Failed to create offering. error: ${status}`);
   }
+  else { console.log('Offering created!') }
 
 }
 
@@ -206,7 +255,7 @@ async function configureProtocol(protocolDefinition) {
 
   // protocol already exists
   if (protocols.length > 0) {
-    console.log('protocol already exists');
+    console.log('protocol already exists', protocols[0]);
     return;
   }
 
