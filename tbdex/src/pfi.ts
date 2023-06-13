@@ -66,9 +66,11 @@ async function sendQuote() {
     data: quote,
     message: {
       protocol: 'https://tbd.website/protocols/tbdex',
-      protocolPath: 'Quote',
+      protocolPath: 'RFQ/Quote',
       schema: 'https://tbd.website/protocols/tbdex/Quote',
-      recipient: rfqAuthor
+      recipient: rfqAuthor,
+      contextId: lastRFQRecord.contextId,
+      parentId: lastRFQRecord.id
     }
   })
 
