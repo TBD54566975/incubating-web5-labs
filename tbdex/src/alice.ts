@@ -6,7 +6,7 @@ import { Web5 } from '@tbd54566975/web5';
 // Fetch & render offerings from PFI
 const { web5, did } = await Web5.connect();
 
-
+console.log('Alice DID: ', did)
 await configureProtocol(protocolDefinition);
 
 const offeringForm = document.querySelector('#get-offering-form');
