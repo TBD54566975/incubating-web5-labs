@@ -56,7 +56,7 @@ await waitForEnter()
 //#region Quote
 console.log('Quote...')
 console.log('TODO need protocols operational for this to work')
-const endpoint = 'http://tbdollars-kendall.tbddev.org/dwn/quote';
+const endpoint = 'https://tbdollars-kendall.tbddev.org/dwn/quote';
 const quoteResponse = await fetch(endpoint, {
   method: 'POST',
   body: JSON.stringify({
