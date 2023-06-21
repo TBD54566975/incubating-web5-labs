@@ -16,6 +16,7 @@ EVENTLOG
 INDEX
 DATASTORE
 MESSAGESTORE
+data
 tmp
 node_modules
 dist

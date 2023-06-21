@@ -5,7 +5,7 @@ const didState = await new DidIonApi().create({
     id              : 'dwn',
     type            : 'DecentralizedWebNode',
     serviceEndpoint : {
-      nodes: [ `http://localhost:3000` ]
+      nodes: [ `http://0.0.0.0:8080` ]
     }
   }]
 });

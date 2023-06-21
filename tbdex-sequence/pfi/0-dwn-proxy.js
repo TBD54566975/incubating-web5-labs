@@ -1,5 +1,6 @@
-import {DwnProxy} from '../../dwn-proxy-js/dist/esm/main.mjs'
+import {DwnProxy} from '../../../dwn-proxy-js/dist/esm/main.mjs'
 import {protocolDefinition} from '../tbdex-protocol.js'
+import {DID, SIG} from './identity.js'
 
 const app = new DwnProxy();
 
@@ -27,4 +28,8 @@ app.post('/offer', async req => {
 app.dwn.protocols.configure(protocolDefinition)
 
 const PORT = 8080;
-await app.listen(PORT);
+const DID_STATE = {
+  id: DID,
+  signatureInput: SIG
+}
+await app.listen(PORT, {didState: DID_STATE});
