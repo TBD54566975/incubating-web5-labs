@@ -38,8 +38,8 @@ app.post('/quote', async req => {
       recipient: ALICE_DID,
       // contextId: lastRFQRecord.contextId,
       // parentId: lastRFQRecord.id
-      contextId: 'bafyreicsmlcds52ozlg3blwkiil2lcamok3k7o4ays7nd6cisc6zdhwka4',
-      parentId: 'bafyreicsmlcds52ozlg3blwkiil2lcamok3k7o4ays7nd6cisc6zdhwka4'
+      contextId: 'bafyreiabuamfcygs7d4i2yp3ij5zzrhkpp56wmtbg52ynkqau3qnoruj54',
+      parentId: 'bafyreiabuamfcygs7d4i2yp3ij5zzrhkpp56wmtbg52ynkqau3qnoruj54'
     },
     data: {
       some: 'quote data and stuff'
