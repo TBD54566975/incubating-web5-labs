@@ -10,30 +10,34 @@ const configure = async (definition, did, sig) => {
   console.log('Configure status', status)
 }
 
-const write = async (did, sig) => {
-  const data = Buffer.from(JSON.stringify({
-    some: 'rfq data and stuff'
-  }), 'utf-8');
+const write = async (did, sig, protocol) => {
+  const data = Buffer.from(JSON.stringify({hello: 'world'}), 'utf-8');
   const intent = await RecordsWrite.create({
     data,
     dataFormat: 'application/json',
     authorizationSignatureInput: sig,
-    protocol: protocolDefinition.protocol,
-    protocolPath: 'RFQ',
-    schema: 'https://tbd.website/protocols/tbdex/RequestForQuote',
-    recipient: BOB_DID
+    ...protocol
   });
   const reply = await dwn.processMessage(did, intent.message, data)
   console.log('RecordsWrite reply', reply)
   return intent.message.recordId
 }
 
+const protocol = {
+  protocol: protocolDefinition.protocol,
+  protocolPath: 'RFQ',
+  schema: 'https://tbd.website/protocols/tbdex/RequestForQuote',
+  recipient: BOB_DID
+}
+
 // alice
 await configure(protocolDefinition, ALICE_DID, ALICE_SIG)
-const recordId = await write(ALICE_DID, ALICE_SIG)
-console.log('recordId:', recordId)
+await write(ALICE_DID, ALICE_SIG, protocol)
 
 // bob
 await configure(protocolDefinition, BOB_DID, BOB_SIG)
-const recordId2 = await write(BOB_DID, ALICE_SIG)
-console.log('recordId:', recordId2)
+await write(BOB_DID, ALICE_SIG, protocol)
+
+// to showcase alice can't just write any old record to bob,
+// the record must be part of the protocol
+await write(BOB_DID, ALICE_SIG)
