@@ -33,4 +33,4 @@ console.log('recordId:', recordId)
 await query(recordId, ALICE_DID, ALICE_SIG)
 
 // bob
-await query(recordId, BOB_DID, BOB_SIG)
+await query(recordId, ALICE_DID, BOB_SIG)
