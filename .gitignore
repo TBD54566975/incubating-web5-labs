@@ -14,6 +14,8 @@ message-event-log
 BLOCKSTORE
 EVENTLOG
 INDEX
+DATASTORE
+MESSAGESTORE
 tmp
 node_modules
 dist

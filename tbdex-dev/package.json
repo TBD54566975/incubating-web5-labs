@@ -1,0 +1,17 @@
+{
+  "name": "tbdex-dev",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@tbd54566975/dids": "^0.1.7",
+    "@tbd54566975/dwn-sdk-js": "^0.0.33"
+  }
+}
