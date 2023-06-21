@@ -9,7 +9,7 @@ const result = await web5.dwn.records.query({
   from: proxyDid,
   message: {
     filter: {
-      recordId: 'bafyreiahb4xryqoviqasf3dsfrzh5arg4n5gh352tpx7mosjren7pc3roy'
+      recordId: 'bafyreicczxsugyfazexlbhcll55nrgznqez6bf3c524tlspxddzpdilysq'
     }
   }
 })
