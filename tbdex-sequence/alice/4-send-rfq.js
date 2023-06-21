@@ -1,0 +1,14 @@
+import { Web5 } from '@tbd54566975/web5';
+
+const proxyDid = 'did:ion:EiACSZ3C6aj3a5XRt9LIj3Khj8VN9Y-BFIu-8Qz8KJr5KA:eyJkZWx0YSI6eyJwYXRjaGVzIjpbeyJhY3Rpb24iOiJyZXBsYWNlIiwiZG9jdW1lbnQiOnsicHVibGljS2V5cyI6W3siaWQiOiJkd24iLCJwdWJsaWNLZXlKd2siOnsiY3J2Ijoic2VjcDI1NmsxIiwia3R5IjoiRUMiLCJ4IjoidkZBUk9HUkhuemY5eWZlVlI1M09IajUzTG8xa2hsYlRHUVU4Mm9XbERyZyIsInkiOiJucXRlMWNCMm5tOUNTX0VUaG1NM3M3QnVqUVN0Q2RXcWtZMS1uV3A2ZEJVIn0sInB1cnBvc2VzIjpbImF1dGhlbnRpY2F0aW9uIl0sInR5cGUiOiJKc29uV2ViS2V5MjAyMCJ9XSwic2VydmljZXMiOlt7ImlkIjoiZHduIiwic2VydmljZUVuZHBvaW50Ijp7Im5vZGVzIjpbImh0dHA6Ly8wLjAuMC4wOjgwODAiXX0sInR5cGUiOiJEZWNlbnRyYWxpemVkV2ViTm9kZSJ9XX19XSwidXBkYXRlQ29tbWl0bWVudCI6IkVpQS1OUV9XVkpiU1J1Q3MxSHhmN3VVcVA5c09mXzA5MXBrS0doc29kVVJ2WVEifSwic3VmZml4RGF0YSI6eyJkZWx0YUhhc2giOiJFaURTdWttTnVTWlVCNlNxZG1JZzBNQTlBXy1WaGVRNGd0dnNYLWhmNTFQVG9RIiwicmVjb3ZlcnlDb21taXRtZW50IjoiRWlEWVp2LUdmbkJKNXhqMDl3b2o4bTlJQkFIVE5aQXpXbTZUMXBhQmEtaDNGdyJ9fQ';
+
+const { web5 } = await Web5.connect();
+
+const result = await web5.dwn.records.write({
+  data: {
+    some: 'rfq data and stuff'
+  }
+})
+console.log('Result', await result.record.data.json())
+const response = await result.record.send(proxyDid)
+console.log('Response', response)
